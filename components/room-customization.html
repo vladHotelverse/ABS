@@ -1,0 +1,739 @@
+<!-- Room Customization Component -->
+<div class="section bg-white p-6 rounded-lg shadow-sm mt-6" x-data="{
+  openSections: {
+    camas: true,
+    ubicacion: true,
+    vista: true,
+    piso: true
+  },
+
+  toggleSection(section) {
+    this.openSections[section] = !this.openSections[section];
+  },
+  openModal(modalId) {
+    this.$refs[modalId].showModal();
+  },
+  openFloorModal(modalId) {
+    this.$refs[modalId].showModal();
+  },
+  get selectedOptions() {
+    // Create a mapping of category to selected ID
+    const selections = {};
+    Object.entries($store.booking.customizations).forEach(([category, option]) => {
+      selections[category] = option ? option.id : '';
+    });
+    return selections;
+  },
+  sectionInfo: {
+    camas: 'Elige el tipo de cama que prefieras para tu estancia. Cada opción ofrece diferentes niveles de comodidad y espacio según tus necesidades. Las camas king-size son ideales para parejas que desean más espacio, mientras que las camas individuales son perfectas para amigos o familiares.',
+    ubicacion: 'La ubicación de tu habitación puede afectar significativamente tu experiencia. Las habitaciones en esquina ofrecen más privacidad, mientras que las suites con vista al mar te brindan panoramas impresionantes del océano. Elige la ubicación que mejor se adapte a tus preferencias.',
+    vista: 'Selecciona la vista exacta desde tu habitación. Cada opción ofrece una perspectiva única del entorno del hotel, desde vistas panorámicas de la ciudad hasta impresionantes amaneceres sobre el mar.',
+    piso: 'El piso en el que se encuentra tu habitación puede influir en la vista, el ruido y la accesibilidad. Los pisos superiores ofrecen mejores vistas y menos ruido, mientras que los pisos inferiores proporcionan un acceso más rápido a las instalaciones del hotel.'
+  },
+  bedsOptions: [
+    {
+      id: 'king',
+      icon: 'bed',
+      label: 'Cama tamaño king',
+      description: 'Habitación libre de humo',
+      price: 9.00
+    },
+    {
+      id: 'twin',
+      icon: 'bed',
+      label: 'Dos camas individuales',
+      description: 'Habitación sin humo',
+      price: 0.00
+    },
+    {
+      id: 'queen',
+      icon: 'bed',
+      label: 'Cama tamaño queen',
+      description: 'Habitación para fumadores',
+      price: 5.00
+    },
+    {
+      id: 'suite',
+      icon: 'hotel',
+      label: 'Suite de lujo',
+      description: 'Habitación libre de humo',
+      price: 15.00
+    }
+  ],
+  locationOptions: [
+    {
+      id: 'main',
+      icon: 'building',
+      label: 'En el edificio principal',
+      description: 'Habitación estándar',
+      price: 0.00
+    },
+    {
+      id: 'corner',
+      icon: 'corner-up-right',
+      label: 'Habitación de esquina',
+      description: 'Vista panorámica',
+      price: 5.00
+    },
+    {
+      id: 'sea',
+      icon: 'waves',
+      label: 'Suite con vista al mar',
+      description: 'Vista al océano',
+      price: 9.00
+    },
+    {
+      id: 'rooftop',
+      icon: 'home',
+      label: 'Suite en la azotea',
+      description: 'Vista panorámica',
+      price: 12.00
+    },
+    {
+      id: 'rooftop1',
+      icon: 'home',
+      label: 'Suite en la azotea1',
+      description: 'Vista panorámica1',
+      price: 15.00
+    }
+  ],
+  viewOptions: [
+    { id: 'view1', label: 'Vista al jardín', price: 0.00 },
+    { id: 'view2', label: 'Vista a la piscina', price: 5.00 },
+    { id: 'view3', label: 'Vista a la calle', price: 0.00 },
+    { id: 'view4', label: 'Vista al océano', price: 10.00 },
+    { id: 'view5', label: 'Vista a la montaña', price: 7.00 },
+    { id: 'view6', label: 'Vista al atardecer', price: 8.00 }
+  ],
+  floorOptions: [
+    {
+      id: 'ground',
+      icon: 'layout',
+      label: 'Planta baja',
+      description: 'Fácil acceso',
+      price: 0.00
+    },
+    {
+      id: 'middle',
+      icon: 'layers',
+      label: 'Pisos intermedios',
+      description: 'Balance perfecto',
+      price: 3.00
+    },
+    {
+      id: 'high',
+      icon: 'arrow-up',
+      label: 'Pisos superiores',
+      description: 'Mejor vista',
+      price: 6.00
+    },
+    {
+      id: 'penthouse',
+      icon: 'home',
+      label: 'Penthouse',
+      description: 'Experiencia premium',
+      price: 20.00
+    }
+  ],
+  handleSelect(category, id) {
+    // Find the option details
+    let optionDetails;
+    let price = 0;
+    let label = '';
+    
+    switch(category) {
+      case 'camas':
+        optionDetails = this.bedsOptions.find(o => o.id === id);
+        break;
+      case 'ubicacion':
+        optionDetails = this.locationOptions.find(o => o.id === id);
+        break;
+      case 'piso':
+        optionDetails = this.floorOptions.find(o => o.id === id);
+        break;
+      case 'vista':
+        optionDetails = this.viewOptions.find(o => o.id === id);
+        break;
+    }
+    
+    if (optionDetails) {
+      price = optionDetails.price;
+      label = optionDetails.label;
+    }
+    
+    // Toggle the selection using the global state
+    const currentSelectedId = this.selectedOptions[category];
+    
+    if (currentSelectedId === id) {
+      // If already selected, deselect it
+      $store.booking.toggleCustomization(category, '', 0, '');
+    } else {
+      // Otherwise select the new option
+      $store.booking.toggleCustomization(category, id, price, label);
+    }
+  },
+  
+  init() {
+    // No longer needed to watch for changes since we're using a getter
+  }
+}">
+  <div class=" rounded-lg">
+    <div class="px-4 py-6">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Personaliza tu Habitación Deluxe!</h1>
+      <p class="text-gray-600 mb-8">
+        Descubre nuestras opciones exclusivas de personalización para una estancia inolvidable.
+      </p>
+    </div>
+
+    <!-- Camas Section -->
+    <div class="mb-6 bg-white rounded-md overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 border-b cursor-pointer" @click="toggleSection('camas')">
+        <div class="flex items-center">
+          <h2 class="text-xl font-semibold text-gray-800">Camas</h2>
+          <button @click.stop="openModal('camas')" class="ml-2 text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        </div>
+        <button class="text-gray-400">
+          <span class="text-2xl" x-text="openSections.camas ? '−' : '+'"></span>
+        </button>
+      </div>
+
+      <div x-show="openSections.camas" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-4"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4">
+        <template x-for="option in bedsOptions" :key="option.id">
+          <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div class="p-4">
+              <div class="flex flex-col mb-1">
+                <div class="flex gap-2.5 items-center w-20">
+                  <img
+                    src="https://cdn.builder.io/api/v1/image/assets/cdb357f47dc342a99db9a4132e4c6871/96b3a3585c1c453631b2ddc1d2f2323d3f1822a7f54f182cca2d886bd2f0373a?placeholderIfAbsent=true"
+                    alt="Room icon" class="object-contain self-stretch my-auto w-12 aspect-square" />
+                </div>
+                <h3 class="font-medium text-gray-900 text-sm" x-text="option.label"></h3>
+              </div>
+              <p class="text-xs text-gray-500 mb-1" x-text="option.description"></p>
+              <p class="text-xs font-medium mb-4" x-text="`${option.price.toFixed(2)}EUR/noche`"></p>
+              <button @click="handleSelect('camas', option.id)"
+                class="w-full py-2 text-center text-xs font-medium rounded transition-all duration-300" :class="selectedOptions.camas === option.id ? 
+                'bg-gray-800/90 text-white  ring-2 ring-black/10 ring-offset-2' : 
+                'bg-gray-800 text-white hover:bg-gray-800 hover:translate-y-[-2px] shadow-sm hover:shadow-md'">
+                <span x-text="selectedOptions.camas === option.id ? 'Seleccionado' : 'Mejorar'"></span>
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Ubicación Section -->
+    <div class="mb-6 bg-white rounded-md overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 border-b cursor-pointer"
+        @click="toggleSection('ubicacion')">
+        <div class="flex items-center">
+          <h2 class="text-xl font-semibold text-gray-800">Ubicación</h2>
+          <button @click.stop="openModal('ubicacion')" class="ml-2 text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        </div>
+        <button class="text-gray-400">
+          <span class="text-2xl" x-text="openSections.ubicacion ? '−' : '+'"></span>
+        </button>
+      </div>
+
+      <div x-show="openSections.ubicacion" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-4"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4">
+        <template x-for="option in locationOptions" :key="option.id">
+          <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div class="p-4">
+              <div class="flex items-center mb-1">
+                <i :data-lucide="option.icon" class="h-6 w-6 text-gray-700"></i>
+                <div class="ml-2">
+                  <h3 class="font-medium text-gray-900 text-sm" x-text="option.label"></h3>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 mb-1" x-text="option.description"></p>
+              <p class="text-xs font-medium mb-4" x-text="`${option.price.toFixed(2)}EUR/noche`"></p>
+              <button @click="handleSelect('ubicacion', option.id)"
+                class="w-full py-2 text-center text-xs font-medium rounded transition-all duration-300" :class="selectedOptions.ubicacion === option.id ? 
+                'bg-gray-800/90 text-white  ring-2 ring-[#0a1e3c]/10 ring-offset-2' : 
+                'bg-gray-800 text-white hover:bg-[#132d54] hover:translate-y-[-2px] shadow-sm hover:shadow-md'">
+                <span x-text="selectedOptions.ubicacion === option.id ? 'Seleccionado' : 'Mejorar'"></span>
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Floor Section (Simple, More Compact) -->
+    <div class="mb-6 bg-white rounded-md overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 border-b cursor-pointer" @click="toggleSection('piso')">
+        <div class="flex items-center">
+          <h2 class="text-xl font-semibold text-gray-800">Piso</h2>
+          <button @click.stop="openModal('piso')" class="ml-2 text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        </div>
+        <button class="text-gray-400">
+          <span class="text-2xl" x-text="openSections.piso ? '−' : '+'"></span>
+        </button>
+      </div>
+
+      <div x-show="openSections.piso" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-4" class="p-4" x-data="{ activeDescription: null }">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Planta Baja -->
+          <div
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <div class="p-4">
+              <div class="mb-2">
+                <h3 class="font-semibold text-gray-900 text-lg">Planta Baja</h3>
+                <p class="text-sm text-gray-600">Acceso directo y conveniente a todas las instalaciones</p>
+              </div>
+              <div class="flex justify-between items-center flex-wrap gap-2">
+                <span class="font-medium text-gray-900 text-sm">0.00EUR/noche</span>
+                <div class="flex gap-3 items-center">
+                  <button @click.stop="openFloorModal('planta-baja')"
+                    class="text-xs text-gray-500 hover:text-gray-700 underline transition-colors">
+                    Más información
+                  </button>
+                  <button @click="handleSelect('piso', 'ground')"
+                    class="px-4 py-2 text-sm font-medium rounded transition-all duration-300 shadow-sm" :class="selectedOptions.piso === 'ground' ? 
+                    'bg-gray-800/90 text-white  ring-2 ring-gray-800/10 ring-offset-2' : 
+                    'bg-gray-800 text-white hover:bg-gray-900 hover:translate-y-[-2px] hover:shadow-md'">
+                    <span x-text="selectedOptions.piso === 'ground' ? 'Seleccionado' : 'Seleccionar'"></span>
+                  </button>
+                </div>
+              </div>
+              <div x-show="activeDescription === 'ground'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                class="mt-3 pt-3 border-t border-gray-100 hidden">
+                <p class="text-gray-700 text-sm">Ideal para huéspedes que prefieren evitar ascensores. Disfrute de un
+                  acceso rápido al lobby, restaurantes y áreas de piscina sin esperas.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pisos Intermedios -->
+          <div
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <div class="p-4">
+              <div class="mb-2">
+                <h3 class="font-semibold text-gray-900 text-lg">Pisos Intermedios</h3>
+                <p class="text-sm text-gray-600">Equilibrio perfecto entre vista y accesibilidad</p>
+              </div>
+              <div class="flex justify-between items-center flex-wrap gap-2">
+                <span class="font-medium text-gray-900 text-sm">3.00EUR/noche</span>
+                <div class="flex gap-3 items-center">
+                  <button @click.stop="openFloorModal('pisos-intermedios')"
+                    class="text-xs text-gray-500 hover:text-gray-700 underline transition-colors">
+                    Más información
+                  </button>
+                  <button @click="handleSelect('piso', 'middle')"
+                    class="px-4 py-2 text-sm font-medium rounded transition-all duration-300 shadow-sm" :class="selectedOptions.piso === 'middle' ? 
+                    'bg-gray-800/90 text-white  ring-2 ring-gray-800/10 ring-offset-2' : 
+                    'bg-gray-800 text-white hover:bg-gray-900 hover:translate-y-[-2px] hover:shadow-md'">
+                    <span x-text="selectedOptions.piso === 'middle' ? 'Seleccionado' : 'Seleccionar'"></span>
+                  </button>
+                </div>
+              </div>
+              <div x-show="activeDescription === 'middle'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                class="mt-3 pt-3 border-t border-gray-100 hidden">
+                <p class="text-gray-700 text-sm">Experimente la combinación ideal de tranquilidad y acceso conveniente.
+                  Estos pisos ofrecen buenas vistas con un ambiente más sereno que la planta baja.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pisos Superiores -->
+          <div
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <div class="p-4">
+              <div class="mb-2">
+                <h3 class="font-semibold text-gray-900 text-lg">Pisos Superiores</h3>
+                <p class="text-sm text-gray-600">Vistas panorámicas y mayor tranquilidad</p>
+              </div>
+              <div class="flex justify-between items-center flex-wrap gap-2">
+                <span class="font-medium text-gray-900 text-sm">6.00EUR/noche</span>
+                <div class="flex gap-3 items-center">
+                  <button @click.stop="openFloorModal('pisos-superiores')"
+                    class="text-xs text-gray-500 hover:text-gray-700 underline transition-colors">
+                    Más información
+                  </button>
+                  <button @click="handleSelect('piso', 'high')"
+                    class="px-4 py-2 text-sm font-medium rounded transition-all duration-300 shadow-sm" :class="selectedOptions.piso === 'high' ? 
+                    'bg-gray-800/90 text-white  ring-2 ring-gray-800/10 ring-offset-2' : 
+                    'bg-gray-800 text-white hover:bg-gray-900 hover:translate-y-[-2px] hover:shadow-md'">
+                    <span x-text="selectedOptions.piso === 'high' ? 'Seleccionado' : 'Seleccionar'"></span>
+                  </button>
+                </div>
+              </div>
+              <div x-show="activeDescription === 'high'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                class="mt-3 pt-3 border-t border-gray-100 hidden">
+                <p class="text-gray-700 text-sm">Disfrute de impresionantes vistas de la ciudad y el paisaje desde
+                  nuestros pisos superiores. El ambiente es más exclusivo y silencioso, perfecto para descansar.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Penthouse -->
+          <div
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <div class="p-4">
+              <div class="mb-2">
+                <h3 class="font-semibold text-gray-900 text-lg">Penthouse</h3>
+                <p class="text-sm text-gray-600">Experiencia premium con vistas de 360°</p>
+              </div>
+              <div class="flex justify-between items-center flex-wrap gap-2">
+                <span class="font-medium text-gray-900 text-sm">20.00EUR/noche</span>
+                <div class="flex gap-3 items-center">
+                  <button @click.stop="openFloorModal('penthouse')"
+                    class="text-xs text-gray-500 hover:text-gray-700 underline transition-colors">
+                    Más información
+                  </button>
+                  <button @click="handleSelect('piso', 'penthouse')"
+                    class="px-4 py-2 text-sm font-medium rounded transition-all duration-300 shadow-sm" :class="selectedOptions.piso === 'penthouse' ? 
+                    'bg-gray-800/90 text-white  ring-2 ring-gray-800/10 ring-offset-2' : 
+                    'bg-gray-800 text-white hover:bg-gray-900 hover:translate-y-[-2px] hover:shadow-md'">
+                    <span x-text="selectedOptions.piso === 'penthouse' ? 'Seleccionado' : 'Seleccionar'"></span>
+                  </button>
+                </div>
+              </div>
+              <div x-show="activeDescription === 'penthouse'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                class="mt-3 pt-3 border-t border-gray-100 hidden">
+                <p class="text-gray-700 text-sm">Nuestra opción más exclusiva. El penthouse ofrece máxima privacidad,
+                  vistas espectaculares desde lo más alto del edificio y servicio personalizado para una estancia
+                  inolvidable.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista exacta Section -->
+    <div class="bg-white rounded-md overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 border-b cursor-pointer" @click="toggleSection('vista')">
+        <div class="flex items-center">
+          <h2 class="text-xl font-semibold text-gray-800">Vista exacta</h2>
+          <button @click.stop="openModal('vista')" class="ml-2 text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        </div>
+        <button class="text-gray-400">
+          <span class="text-2xl" x-text="openSections.vista ? '−' : '+'"></span>
+        </button>
+      </div>
+
+      <div x-show="openSections.vista" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-4"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4">
+        <template x-for="view in viewOptions" :key="view.id">
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="relative">
+              <img src="https://picsum.photos/600/400" :alt="`Room view option - ${view.label}`"
+                class="w-full h-48 object-cover" />
+              <div class="absolute bottom-0 left-10 right-10 py-2 text-center">
+                <button @click="handleSelect('vista', view.id)"
+                  class="text-xs font-medium mb-4 p-3 rounded shadow transition-all duration-300" :class="selectedOptions.vista === view.id ? 
+                          'bg-white/90 text-gray-800 ring-2 ring-gray-400/10 ring-offset-2' : 
+                          'bg-white text-gray-800 hover:bg-gray-100 hover:translate-y-[-2px] hover:shadow-md'">
+                  <span
+                    x-text="selectedOptions.vista === view.id ? 'Seleccionado' : `Añadir por ${view.price.toFixed(2)} EUR`"></span>
+                </button>
+              </div>
+              <div class="absolute top-2 left-2 bg-gray-800/70 text-white text-xs px-2 py-1 rounded">
+                <span x-text="view.label"></span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog templates remain the same -->
+  <dialog id="dialog-camas" x-ref="camas" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Información sobre Camas</h3>
+        <button onclick="document.querySelector('#dialog-camas').close()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-600">
+        Elige el tipo de cama que prefieras para tu estancia. Cada opción ofrece diferentes niveles de comodidad y
+        espacio según tus necesidades. Las camas king-size son ideales para parejas que desean más espacio, mientras que
+        las camas individuales son perfectas para amigos o familiares.
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-camas').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Floor Option Dialogs -->
+  <dialog id="dialog-planta-baja" x-ref="planta-baja" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Planta Baja</h3>
+        <button onclick="document.querySelector('#dialog-planta-baja').close()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700">
+        <p class="mb-4">Ideal para huéspedes que prefieren evitar ascensores. Disfrute de un acceso rápido al lobby,
+          restaurantes y áreas de piscina sin esperas.</p>
+
+        <h4 class="font-medium text-gray-900 mb-2">Ventajas de la Planta Baja:</h4>
+        <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+          <li>Acceso directo al jardín y piscina</li>
+          <li>Ideal para personas con movilidad reducida</li>
+          <li>Fácil acceso a restaurantes y servicios</li>
+          <li>Sin necesidad de ascensores o escaleras</li>
+          <li>Llegada rápida a su habitación desde la recepción</li>
+        </ul>
+
+        <p class="text-sm italic">Perfecto para: Familias con niños pequeños, personas mayores o con movilidad reducida,
+          y huéspedes que valoran la comodidad de acceso rápido.</p>
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-planta-baja').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </dialog>
+  <!-- <dialog id="dialog-ubicacion" x-ref="ubicacion" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Información sobre Ubicación</h3>
+        <button onclick="document.querySelector('#dialog-ubicacion').close()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-600">
+        La ubicación de tu habitación puede afectar significativamente tu experiencia. Las habitaciones en esquina
+        ofrecen más privacidad, mientras que las suites con vista al mar te brindan panoramas impresionantes del océano.
+        Elige la ubicación que mejor se adapte a tus preferencias.
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-ubicacion').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dialog-vista" x-ref="vista" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Información sobre Vista exacta</h3>
+        <button onclick="document.querySelector('#dialog-vista').close()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-600">
+        Selecciona la vista exacta desde tu habitación. Cada opción ofrece una perspectiva única del entorno del hotel,
+        desde vistas panorámicas de la ciudad hasta impresionantes amaneceres sobre el mar.
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-vista').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dialog-piso" x-ref="piso" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Información sobre Piso</h3>
+        <button onclick="document.querySelector('#dialog-piso').close()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-600">
+        El piso en el que se encuentra tu habitación puede influir en la vista, el ruido y la accesibilidad. Los pisos
+        superiores ofrecen mejores vistas y menos ruido, mientras que los pisos inferiores proporcionan un acceso más
+        rápido a las instalaciones del hotel.
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-piso').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </dialog> -->
+
+
+
+  <!-- <dialog id="dialog-pisos-intermedios" x-ref="pisos-intermedios" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Pisos Intermedios</h3>
+        <button onclick="document.querySelector('#dialog-pisos-intermedios').close()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700">
+        <p class="mb-4">Experimente la combinación ideal de tranquilidad y acceso conveniente. Estos pisos ofrecen
+          buenas vistas con un ambiente más sereno que la planta baja.</p>
+
+        <h4 class="font-medium text-gray-900 mb-2">Ventajas de los Pisos Intermedios:</h4>
+        <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+          <li>Buen balance entre vista y accesibilidad</li>
+          <li>Mayor tranquilidad que en la planta baja</li>
+          <li>Ambiente equilibrado y confortable</li>
+          <li>Fácil acceso por ascensor o escaleras</li>
+          <li>Ideal para estancias prolongadas</li>
+        </ul>
+
+        <p class="text-sm italic">Perfecto para: Viajeros de negocios, parejas y cualquier huésped que busque un
+          equilibrio entre comodidad, vista y accesibilidad.</p>
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-pisos-intermedios').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dialog-pisos-superiores" x-ref="pisos-superiores" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Pisos Superiores</h3>
+        <button onclick="document.querySelector('#dialog-pisos-superiores').close()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700">
+        <p class="mb-4">Disfrute de impresionantes vistas de la ciudad y el paisaje desde nuestros pisos superiores. El
+          ambiente es más exclusivo y silencioso, perfecto para descansar.</p>
+
+        <h4 class="font-medium text-gray-900 mb-2">Ventajas de los Pisos Superiores:</h4>
+        <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+          <li>Vistas impresionantes de la ciudad y el entorno</li>
+          <li>Menor nivel de ruido y mayor privacidad</li>
+          <li>Ambiente más exclusivo y tranquilo</li>
+          <li>Mayor luminosidad natural</li>
+          <li>Experiencia premium con excelentes vistas</li>
+        </ul>
+
+        <p class="text-sm italic">Perfecto para: Parejas en luna de miel, viajeros que buscan tranquilidad, y huéspedes
+          que valoran las vistas panorámicas y la privacidad.</p>
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-pisos-superiores').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dialog-penthouse" x-ref="penthouse" class="p-0 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Penthouse</h3>
+        <button onclick="document.querySelector('#dialog-penthouse').close()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700">
+        <p class="mb-4">Nuestra opción más exclusiva. El penthouse ofrece máxima privacidad, vistas espectaculares desde
+          lo más alto del edificio y servicio personalizado para una estancia inolvidable.</p>
+
+        <h4 class="font-medium text-gray-900 mb-2">Ventajas del Penthouse:</h4>
+        <ul class="list-disc pl-5 space-y-1 text-sm mb-4">
+          <li>Ubicación en lo más alto del edificio</li>
+          <li>Vistas panorámicas de 360° espectaculares</li>
+          <li>Máxima privacidad y exclusividad</li>
+          <li>Acceso a terraza privada</li>
+          <li>Servicio de mayordomo disponible</li>
+          <li>Experiencia de lujo incomparable</li>
+        </ul>
+
+        <p class="text-sm italic">Perfecto para: Celebraciones especiales, lunas de miel, ocasiones memorables y
+          huéspedes que buscan la experiencia más exclusiva y lujosa posible.</p>
+      </div>
+      <div class="mt-6">
+        <button onclick="document.querySelector('#dialog-penthouse').close()"
+          class="w-full py-2 text-center font-medium rounded bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </dialog> -->
+</div>

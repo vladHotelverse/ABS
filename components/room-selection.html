@@ -1,0 +1,359 @@
+<!-- Room Selection Component with Clear Side Cards -->
+<div class="section bg-white p-6 rounded-lg shadow-sm" x-data="{
+    selectedRoom: $store.booking.selectedRoom,
+    activeIndex: 1, // Start with middle card active
+    activeImageIndices: {
+      0: 0,
+      1: 0,
+      2: 0
+    },
+    roomOptions: [
+    {
+        id: 'habitacion-moderna',
+        name: 'Habitación Moderna',
+        description: 'Espacio contemporáneo con diseño minimalista y tecnología inteligente.',
+        amenities: ['Smart TV', 'Ducha efecto lluvia', 'Minibar', 'WiFi Premium'],
+        price: 105,
+        oldPrice: 125,
+        images: [
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp',
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp',
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp'
+        ],
+      },
+      {
+        id: 'habitacion-real',
+        name: 'Habitación Real',
+        description: 'Habitación de lujo con balcón privado, área de descanso y servicios exclusivos.',
+        amenities: ['Cama amplia', 'Vista marítima', 'Terraza privada', 'Sala de estar'],
+        price: 123,
+        images: [
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp',
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp',
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp'
+        ],
+      },
+      {
+        id: 'suite-deluxe',
+        name: 'Suite Deluxe',
+        description: 'Suite de lujo con balcón privado, vistas al océano y servicios exclusivos.',
+        amenities: ['Cama King Size', 'Panorama oceánico', 'Terraza privada', 'Baño elegante'],
+        price: 150,
+        oldPrice: 180,
+        images: [
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp',
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp',
+          'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h70/rt726/53a88e60-a2a5-4a19-b435-a0d8958efff4/thumbnail.webp'
+        ],
+      }
+    ],
+    prevImage(index) {
+      this.activeImageIndices[index] = this.activeImageIndices[index] > 0 
+        ? this.activeImageIndices[index] - 1 
+        : this.roomOptions[index].images.length - 1;
+    },
+    nextImage(index) {
+      this.activeImageIndices[index] = (this.activeImageIndices[index] + 1) % this.roomOptions[index].images.length;
+    },
+    prevSlide() {
+      this.activeIndex = this.activeIndex > 0 ? this.activeIndex - 1 : this.roomOptions.length - 1;
+    },
+    nextSlide() {
+      this.activeIndex = (this.activeIndex + 1) % this.roomOptions.length;
+    },
+    setSlide(index) {
+      this.activeIndex = index;
+    },
+    selectRoom(room) {
+      // Update the local state
+      this.selectedRoom = room;
+      
+      // Update the global state
+      $store.booking.selectRoom(room);
+    },
+    init() {
+      // Watch for changes in the global store
+      this.$watch('$store.booking.selectedRoom', (value) => {
+        this.selectedRoom = value;
+      });
+    }
+  }">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">¿Quieres una habitación superior?</h2>
+        <p class="text-gray-600">
+            En lugar de hospedarte en una Habitación Deluxe, ¿por qué no elegir una con Vista al Océano?
+        </p>
+    </div>
+
+    <div class="lg:col-span-2">
+        <!-- Slider Container with Visible Cards -->
+        <div class="relative w-full overflow-visible" style="height: 550px;">
+            <!-- Main Carousel Area -->
+            <style>
+                .card-carousel {
+                    width: 100%;
+                    position: relative;
+                    perspective: 1000px;
+                    height: 550px;
+                    overflow: hidden;
+                }
+
+                .card-container {
+                    width: 50%;
+                    position: absolute;
+                    transition: all 0.5s ease;
+                }
+
+                .card-container.active {
+                    top: 5px;
+                    left: 25%;
+                    z-index: 10;
+                }
+
+                .card-container.prev {
+                    left: -30%;
+                    z-index: 5;
+                    opacity: 0.7;
+                }
+
+                .card-container.next {
+                    left: 80%;
+                    z-index: 5;
+                    opacity: 0.7;
+                }
+
+                .badge-discount {
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    background-color: #000;
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    z-index: 10;
+                }
+            </style>
+
+            <div class="card-carousel">
+                <!-- First Card (Left) -->
+                <div class="card-container"
+                    :class="{'active': activeIndex === 0, 'prev': activeIndex === 1, 'next': activeIndex === 2}"
+                    @click="setSlide(0)">
+                    <div class="border rounded-lg overflow-hidden shadow-md bg-white h-full">
+                        <!-- Discount Badge -->
+                        <div class="badge-discount">
+                            -16%
+                        </div>
+
+                        <!-- Room Image Carousel -->
+                        <div class="relative h-64 bg-gray-100">
+                            <img :src="roomOptions[0].images[activeImageIndices[0]]" :alt="roomOptions[0].name"
+                                class="object-cover w-full h-full" />
+
+                            <!-- Image Indicators -->
+                            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                                <template x-for="(_, imgIndex) in roomOptions[0].images" :key="imgIndex">
+                                    <span class="block h-2 w-2 rounded-full"
+                                        :class="activeImageIndices[0] === imgIndex ? 'bg-white' : 'bg-white/50'"></span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Room Details -->
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold text-gray-800" x-text="roomOptions[0].name"></h3>
+                                <div class="flex items-center">
+                                    <span class="text-sm text-gray-500 line-through mr-2"
+                                        x-text="'€' + roomOptions[0].oldPrice"></span>
+                                    <span class="text-lg font-bold text-gray-800"
+                                        x-text="'€' + roomOptions[0].price"></span>
+                                </div>
+                            </div>
+
+                            <p class="text-sm text-gray-600 mb-4 min-h-10" x-text="roomOptions[0].description"></p>
+
+                            <!-- Amenities -->
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <template x-for="(amenity, amenityIndex) in roomOptions[0].amenities"
+                                    :key="amenityIndex">
+                                    <span class="text-xs bg-gray-100 px-3 py-1 rounded-full" x-text="amenity"></span>
+                                </template>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col gap-3 mt-4">
+                                <button
+                                    class="w-full py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                                    :class="selectedRoom?.id === roomOptions[0].id ? 'bg-black text-white shadow-md' : 'bg-white text-black border border-gray-300 hover:bg-gray-50'"
+                                    @click.stop="selectRoom(roomOptions[0])">
+                                    <span
+                                        x-text="selectedRoom?.id === roomOptions[0].id ? 'Seleccionado' : 'Reservar Ahora'"></span>
+                                </button>
+                                <button class="text-sm transition-colors duration-200 focus:outline-none"
+                                    :class="selectedRoom?.id === roomOptions[0].id ? 'text-black font-medium' : 'text-gray-500 hover:text-gray-700'">
+                                    Descubre más detalles
+                                </button>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <p class="text-xs text-gray-500 mt-4">Información sobre tarifas e impuestos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Card (Middle) -->
+                <div class="card-container"
+                    :class="{'active': activeIndex === 1, 'prev': activeIndex === 2, 'next': activeIndex === 0}"
+                    @click="setSlide(1)">
+                    <div class="border rounded-lg overflow-hidden shadow-sm bg-white h-full"
+                        :class="activeIndex === 1 ? 'ring-2 ring-gray-400' : ''">
+                        <!-- Room Image Carousel -->
+                        <div class="relative h-64 bg-gray-100">
+                            <img :src="roomOptions[1].images[activeImageIndices[1]]" :alt="roomOptions[1].name"
+                                class="object-cover w-full h-full" />
+
+                            <!-- Image Indicators -->
+                            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                                <template x-for="(_, imgIndex) in roomOptions[1].images" :key="imgIndex">
+                                    <span class="block h-2 w-2 rounded-full"
+                                        :class="activeImageIndices[1] === imgIndex ? 'bg-white' : 'bg-white/50'"></span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Room Details -->
+                        <div class="p-4">
+                            <h3 class="text-xl font-bold text-[#533a7b] mb-1" x-text="roomOptions[1].name"></h3>
+                            <p class="text-sm text-gray-600 mb-3 min-h-10" x-text="roomOptions[1].description"></p>
+
+                            <!-- Amenities -->
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <template x-for="(amenity, amenityIndex) in roomOptions[1].amenities"
+                                    :key="amenityIndex">
+                                    <span class="text-xs border border-gray-200 px-3 py-1 rounded-full"
+                                        x-text="amenity"></span>
+                                </template>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center justify-between mt-4">
+                                <button
+                                    class="px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                                    :class="selectedRoom?.id === roomOptions[1].id ? 'bg-[#533a7b] text-white shadow-md' : 'bg-black text-white hover:bg-gray-800'"
+                                    @click.stop="selectRoom(roomOptions[1])">
+                                    <span
+                                        x-text="selectedRoom?.id === roomOptions[1].id ? 'Seleccionado' : 'Reserva ahora por'"></span>
+                                    <span x-show="!selectedRoom || selectedRoom.id !== roomOptions[1].id"
+                                        class="font-bold" x-text="'$ ' + roomOptions[1].price"></span>
+                                    <span x-show="!selectedRoom || selectedRoom.id !== roomOptions[1].id"
+                                        class="text-xs"> / noche</span>
+                                </button>
+
+
+                                <button class="text-sm text-gray-500 ml-auto">
+                                    Descubre más detalles
+                                </button>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <p class="text-xs text-gray-500 mt-4">Información sobre tarifas e impuestos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Third Card (Right) -->
+                <div class="card-container"
+                    :class="{'active': activeIndex === 2, 'prev': activeIndex === 0, 'next': activeIndex === 1}"
+                    @click="setSlide(2)">
+                    <div class="border rounded-lg overflow-hidden shadow-sm bg-white h-full">
+                        <!-- Room Image Carousel -->
+                        <div class="relative h-64 bg-gray-100">
+                            <img :src="roomOptions[2].images[activeImageIndices[2]]" :alt="roomOptions[2].name"
+                                class="object-cover w-full h-full" />
+
+                            <!-- Image Indicators -->
+                            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                                <template x-for="(_, imgIndex) in roomOptions[2].images" :key="imgIndex">
+                                    <span class="block h-2 w-2 rounded-full"
+                                        :class="activeImageIndices[2] === imgIndex ? 'bg-white' : 'bg-white/50'"></span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Room Details -->
+                        <div class="p-4">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1" x-text="roomOptions[2].name"></h3>
+                            <p class="text-sm text-gray-600 mb-3 min-h-10" x-text="roomOptions[2].description"></p>
+
+                            <!-- Amenities -->
+                            <div class="flex flex-nowrap gap-2 mb-3 w-full overflow-auto">
+                                <template x-for="(amenity, amenityIndex) in roomOptions[2].amenities"
+                                    :key="amenityIndex">
+                                    <span class="text-xs border border-gray-200 px-3 py-1 rounded-md text-nowrap"
+                                        x-text="amenity"></span>
+                                </template>
+                            </div>
+
+                            <!-- Price Display -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl font-bold" x-text="'€' + roomOptions[2].price"></span>
+                                <span class="text-gray-500 line-through text-sm"
+                                    x-text="'€' + roomOptions[2].oldPrice"></span>
+                                <span class="text-sm text-gray-500">/noche</span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center gap-4 mt-3">
+                                <button
+                                    class="px-6 py-2.5 text-sm font-medium rounded-md uppercase tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                                    :class="selectedRoom?.id === roomOptions[2].id ? 'bg-green-600 text-white shadow-md' : 'bg-black text-white hover:bg-gray-800'"
+                                    @click.stop="selectRoom(roomOptions[2])">
+                                    <span
+                                        x-text="selectedRoom?.id === roomOptions[2].id ? 'SELECCIONADO' : 'SELECCIONAR'"></span>
+                                </button>
+
+                                <button class="text-sm text-gray-500 underline">
+                                    Descubre más detalles
+                                </button>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <p class="text-xs text-gray-500 mt-4">Información sobre tarifas e impuestos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow Navigation Controls -->
+            <button @click="prevSlide"
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full shadow-md p-2 ml-2 transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                aria-label="Previous room">
+                <i data-lucide="chevron-left" class="h-6 w-6"></i>
+            </button>
+
+            <button @click="nextSlide"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white rounded-full shadow-md p-2 mr-2 transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                aria-label="Next room">
+                <i data-lucide="chevron-right" class="h-6 w-6"></i>
+            </button>
+        </div>
+
+        <!-- Carousel Navigation Indicators -->
+        <div class="flex justify-center items-center mt-8 text-gray-600">
+            <button
+                class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                @click="prevSlide">
+                <i data-lucide="chevron-left" class="h-5 w-5"></i>
+            </button>
+            <span class="mx-4" x-text="`${activeIndex + 1}/${roomOptions.length}`"></span>
+            <button
+                class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                @click="nextSlide">
+                <i data-lucide="chevron-right" class="h-5 w-5"></i>
+            </button>
+        </div>
+    </div>
+</div>

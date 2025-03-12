@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Booking Experience</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <div x-data x-init="lucide.createIcons()">
+
+    <!-- Option 1: Using JavaScript to load components -->
+    <!-- <div id="booking-hero"></div> -->
+    <div id="header"></div>
+    <div id="booking-bar"></div>
+    <section class="grid grid-cols-1 md:grid-cols-[1fr_400px] container gap-4">
+      <div class="">
+        <div id="room-selection"></div>
+        <div id="room-customization"></div>
+        <div id="room-location"></div>
+        <div id="special-offers"></div>
+      </div>
+      <div id="pricing-summary"></div>
+    </section>
+
+    <!-- Global State Script -->
+    <script id="booking-state">
+      // Global state management for the booking experience
+      document.addEventListener('alpine:init', () => {
+        // Create a global store to share data between components
+        Alpine.store('booking', {
+          // Default values
+          selectedRoom: {
+            id: 'deluxe-double',
+            name: 'Deluxe Double Room',
+            price: 0
+          },
+
+          // Room customizations
+          customizations: {
+            camas: null,  // Bed type
+            ubicacion: null, // Location
+            piso: null,   // Floor
+            vista: null   // View
+          },
+
+          // Selected special offers
+          specialOffers: [],
+
+          // Methods to update selections
+          selectRoom(room) {
+            this.selectedRoom = {
+              id: room.id,
+              name: room.name,
+              price: room.price
+            };
+            this.updatePricingSummary();
+          },
+
+          toggleCustomization(category, option, price, label) {
+            if (this.customizations[category] &&
+              this.customizations[category].id === option) {
+              this.customizations[category] = null;
+            } else {
+              this.customizations[category] = {
+                id: option,
+                price: price,
+                label: label
+              };
+            }
+            this.updatePricingSummary();
+          },
+
+          toggleSpecialOffer(offer) {
+            const index = this.specialOffers.findIndex(o => o.id === offer.id);
+
+            if (index >= 0) {
+              this.specialOffers.splice(index, 1);
+            } else {
+              this.specialOffers.push({
+                id: offer.id,
+                name: offer.title,
+                price: parseFloat(offer.price),
+                priceUnit: offer.priceUnit
+              });
+            }
+            this.updatePricingSummary();
+          },
+
+          // Method to trigger pricing summary update
+          updatePricingSummary() {
+            // This will be handled by the pricing-summary component itself
+            // We're just creating a method to explicitly show this intention
+          },
+
+          // Getter method for active customizations
+          getActiveCustomizations() {
+            return Object.values(this.customizations).filter(item => item !== null);
+          },
+
+          // Calculate total price
+          calculateTotal() {
+            // Base room price (from room selection)
+            let total = 299.00; // Base price before customizations
+
+            // Add room upgrade price if selected
+            if (this.selectedRoom && this.selectedRoom.price) {
+              total += this.selectedRoom.price;
+            }
+
+            // Add customization prices
+            Object.values(this.customizations).forEach(option => {
+              if (option && option.price) {
+                total += option.price;
+              }
+            });
+
+            // Add special offers
+            this.specialOffers.forEach(offer => {
+              if (offer && offer.price) {
+                total += offer.price;
+              }
+            });
+
+            return total;
+          },
+
+          // Calculate taxes (simplified as percentage of subtotal)
+          calculateTaxes() {
+            return this.calculateTotal() * 0.1; // 10% tax rate
+          }
+        });
+      });
+    </script>
+
+    <script>
+      // Function to load HTML components
+      async function loadComponent(elementId, filePath) {
+        try {
+          const response = await fetch(filePath);
+          const html = await response.text();
+          document.getElementById(elementId).innerHTML = html;
+
+          // Re-initialize Lucide icons after loading each component
+          lucide.createIcons();
+        } catch (error) {
+          console.error(`Error loading ${filePath}:`, error);
+        }
+      }
+
+      // Load all components when the page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        // loadComponent('booking-hero', 'components/booking-hero.html');
+        loadComponent('header', 'components/header.html');
+        loadComponent('booking-bar', 'components/booking-bar.html');
+        loadComponent('room-selection', 'components/room-selection.html');
+        loadComponent('room-customization', 'components/room-customization.html');
+        loadComponent('room-location', 'components/room-location.html');
+        loadComponent('special-offers', 'components/special-offers.html');
+        loadComponent('pricing-summary', 'components/pricing-summary.html');
+      });
+    </script>
+
+  </div>
+</body>
+
+</html>

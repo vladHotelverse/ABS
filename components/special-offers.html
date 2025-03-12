@@ -1,0 +1,161 @@
+<!-- Special Offers Component -->
+<div class="section bg-white p-6 rounded-lg shadow-sm" x-data="{
+  offers: [
+    {
+      id: 1,
+      title: 'Spa Bath: Relax in Style',
+      description: 'Indulge in our luxurious spa facilities',
+      price: '59.99',
+      priceUnit: 'per stay',
+      image: 'https://placehold.co/300x300',
+      actionType: 'update',
+      selected: false,
+    },
+    {
+      id: 2,
+      title: 'Gourmet Dining: Culinary Delights',
+      description: 'Experience exquisite flavors and presentation',
+      price: '99.00',
+      priceUnit: 'per meal',
+      image: 'https://placehold.co/300x300',
+      actionType: 'update',
+      selected: false,
+    },
+    {
+      id: 3,
+      title: 'Adventure Tours: Explore the Wild',
+      description: 'Discover exciting outdoor activities',
+      price: '150.00',
+      priceUnit: 'per tour',
+      image: 'https://placehold.co/300x300',
+      actionType: 'book',
+      selected: false,
+    },
+    {
+      id: 4,
+      title: 'Romantic Package',
+      description: 'Special touches for a memorable romantic stay',
+      price: '75.00',
+      priceUnit: 'per stay',
+      image: 'https://placehold.co/300x300',
+      actionType: 'book',
+      selected: false,
+    },
+    {
+      id: 5,
+      title: 'Airport Transfer',
+      description: 'Hassle-free transportation to/from the airport',
+      price: '45.00',
+      priceUnit: 'one way',
+      image: 'https://placehold.co/300x300',
+      actionType: 'update',
+      selected: false,
+    },
+    {
+      id: 6,
+      title: 'Wellness Package',
+      description: 'Daily yoga and meditation sessions',
+      price: '120.00',
+      priceUnit: 'per stay',
+      image: 'https://placehold.co/300x300',
+      actionType: 'book',
+      selected: false,
+    },
+  ],
+  
+  // Track selected offers locally
+  selectedOfferIds: [],
+  
+  // Initialize and watch for store changes
+  init() {
+    // Initialize selected offers from global store
+    this.syncSelectedOffers();
+    
+    // Watch for changes in the global store
+    this.$watch('$store.booking.specialOffers', () => {
+      this.syncSelectedOffers();
+    });
+  },
+  
+  // Sync selected offers with global store
+  syncSelectedOffers() {
+    this.selectedOfferIds = $store.booking.specialOffers.map(offer => offer.id);
+    
+    // Update local selected states
+    this.offers.forEach(offer => {
+      offer.selected = this.selectedOfferIds.includes(offer.id);
+    });
+  },
+  
+  toggleSelection(id) {
+    // Find the offer
+    const offer = this.offers.find(o => o.id === id);
+    
+    if (!offer) return;
+    
+    // Toggle selection locally
+    offer.selected = !offer.selected;
+    
+    // Update the global store
+    $store.booking.toggleSpecialOffer(offer);
+  }
+}">
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">¡Ofertas especiales adaptadas para ti!</h2>
+  <p class="text-gray-600 mb-6">Mejora tu estancia con estas experiencias exclusivas.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <template x-for="offer in offers" :key="offer.id">
+      <!-- Shadcn Card Component -->
+      <div class="rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-200"
+        :class="offer.selected ? 'ring-2 ring-[#0a1e3c]' : ''">
+        <div class="relative h-60 w-full">
+          <img :src="offer.image" :alt="offer.title" class="object-cover w-full h-full rounded-t-lg" />
+          <!-- Selected indicator badge -->
+          <div x-show="offer.selected"
+            class="absolute top-2 right-2 bg-[#0a1e3c] text-white px-2 py-1 rounded-md text-xs font-medium">
+            <span>Selected</span>
+          </div>
+        </div>
+        <!-- Shadcn CardContent Component -->
+        <div class="p-6">
+          <h3 class="font-medium text-base" x-text="offer.title"></h3>
+          <p class="text-sm text-gray-500 min-h-10" x-text="offer.description"></p>
+          <p class="mt-2 font-semibold">
+            €<span x-text="offer.price"></span> <span class="font-normal text-sm text-gray-500"
+              x-text="offer.priceUnit"></span>
+          </p>
+        </div>
+        <!-- Shadcn CardFooter Component -->
+        <div class="p-4 pt-0">
+          <!-- Shadcn Button Component with improved selected state -->
+          <button
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 w-full"
+            :class="offer.selected ? 
+                          'text-[#0a1e3c] hover:text-[#0a1e3c]/90 border border-[#0a1e3c]' : 
+                          'border border-input bg-background hover:bg-accent hover:text-accent-foreground'"
+            @click="toggleSelection(offer.id)">
+            <template x-if="!offer.selected">
+              <span x-text="offer.actionType === 'book' ? 'Book Now' : 'Update Now'"></span>
+            </template>
+            <template x-if="offer.selected">
+              <div class="flex items-center">
+                <span>Remove</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+            </template>
+          </button>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <div class="mt-8 flex justify-end">
+    <button
+      class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-[#0a1e3c] hover:bg-[#0a1e3c]/90 text-white h-10 px-8 py-2">
+      COMPLETAR RESERVA
+    </button>
+  </div>
+</div>
