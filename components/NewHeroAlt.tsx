@@ -17,7 +17,7 @@ interface BookingDetailsProps {
 }
 
 export default function BookingHeroAlt({
-  hotelName = "Hotel Marina",
+  hotelName = "Hotelverse",
   bookingCode = "1003066AU",
   checkInDate = "01/01/2025",
   checkOutDate = "01/01/2025",

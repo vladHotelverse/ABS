@@ -43,10 +43,12 @@
         <div id="special-offers"></div>
       </div>
       <div id="pricing-summary"></div>
+
     </section>
 
     <!-- Global State Script -->
     <script id="booking-state">
+      // Global state management for the booking experience
       // Global state management for the booking experience
       document.addEventListener('alpine:init', () => {
         // Create a global store to share data between components
@@ -66,7 +68,7 @@
             vista: null   // View
           },
 
-          // Selected special offers
+          // Selected special offers (enhanced to support quantity, persons, nights)
           specialOffers: [],
 
           // Methods to update selections
@@ -93,6 +95,30 @@
             this.updatePricingSummary();
           },
 
+          // Updated method to add or update a special offer
+          updateSpecialOffer(offer) {
+            const index = this.specialOffers.findIndex(o => o.id === offer.id);
+
+            if (index >= 0) {
+              this.specialOffers[index] = offer;
+            } else {
+              this.specialOffers.push(offer);
+            }
+
+            this.updatePricingSummary();
+          },
+
+          // New method to remove a special offer
+          removeSpecialOffer(offerId) {
+            const index = this.specialOffers.findIndex(o => o.id === offerId);
+
+            if (index >= 0) {
+              this.specialOffers.splice(index, 1);
+              this.updatePricingSummary();
+            }
+          },
+
+          // Legacy method for backward compatibility
           toggleSpecialOffer(offer) {
             const index = this.specialOffers.findIndex(o => o.id === offer.id);
 
@@ -103,7 +129,8 @@
                 id: offer.id,
                 name: offer.title,
                 price: parseFloat(offer.price),
-                priceUnit: offer.priceUnit
+                priceUnit: offer.priceUnit || 'per stay',
+                quantity: 1
               });
             }
             this.updatePricingSummary();
@@ -137,7 +164,8 @@
               }
             });
 
-            // Add special offers
+            // Add special offers - use the price that was calculated 
+            // with quantity, persons, and nights factored in
             this.specialOffers.forEach(offer => {
               if (offer && offer.price) {
                 total += offer.price;

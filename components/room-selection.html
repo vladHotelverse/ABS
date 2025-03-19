@@ -7,6 +7,14 @@
       1: 0,
       2: 0
     },
+    proposedPrice: 12, // Default proposed price
+    minPrice: 10, // Minimum price for slider
+    get maxPrice() {
+      return this.roomOptions[this.activeIndex]?.price || 20;
+    },
+    get sliderPercentage() {
+      return ((this.proposedPrice - this.minPrice) / (this.maxPrice - this.minPrice)) * 100;
+    },
     roomOptions: [
     {
         id: 'habitacion-moderna',
@@ -63,6 +71,8 @@
     },
     setSlide(index) {
       this.activeIndex = index;
+      // Update proposed price when switching rooms
+      this.proposedPrice = Math.round((this.minPrice + this.maxPrice) / 2);
     },
     selectRoom(room) {
       // Update the local state
@@ -70,6 +80,9 @@
       
       // Update the global state
       $store.booking.selectRoom(room);
+    },
+    makeOffer() {
+      alert('Has propuesto ' + this.proposedPrice + ' EUR por noche');
     },
     init() {
       // Watch for changes in the global store
@@ -81,7 +94,8 @@
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">¿Quieres una habitación superior?</h2>
         <p class="text-gray-600">
-            En lugar de hospedarte en una Habitación Deluxe, ¿por qué no elegir una con Vista al Océano?
+            En lugar de hospedarte en una <span class="font-bold">Habitación Deluxe</span>, ¿por qué no elegir una con
+            <span class="font-bold">Vista al Océano</span>?
         </p>
     </div>
 
@@ -141,10 +155,12 @@
                 <div class="card-container"
                     :class="{'active': activeIndex === 0, 'prev': activeIndex === 1, 'next': activeIndex === 2}"
                     @click="setSlide(0)">
-                    <div class="border rounded-lg overflow-hidden shadow-md bg-white h-full">
+                    <!-- Using Third Card Design -->
+                    <div class="border rounded-lg overflow-hidden shadow-sm bg-white h-full">
                         <!-- Discount Badge -->
-                        <div class="badge-discount">
-                            -16%
+                        <div class="badge-discount" x-show="roomOptions[0].oldPrice">
+                            <span
+                                x-text="`-${Math.round((1 - roomOptions[0].price/roomOptions[0].oldPrice) * 100)}%`"></span>
                         </div>
 
                         <!-- Room Image Carousel -->
@@ -162,38 +178,38 @@
                         </div>
 
                         <!-- Room Details -->
-                        <div class="p-5">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold text-gray-800" x-text="roomOptions[0].name"></h3>
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-500 line-through mr-2"
-                                        x-text="'€' + roomOptions[0].oldPrice"></span>
-                                    <span class="text-lg font-bold text-gray-800"
-                                        x-text="'€' + roomOptions[0].price"></span>
-                                </div>
-                            </div>
-
-                            <p class="text-sm text-gray-600 mb-4 min-h-10" x-text="roomOptions[0].description"></p>
+                        <div class="p-4">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1" x-text="roomOptions[0].name"></h3>
+                            <p class="text-sm text-gray-600 mb-3 min-h-10" x-text="roomOptions[0].description"></p>
 
                             <!-- Amenities -->
-                            <div class="flex flex-wrap gap-2 mb-4">
+                            <div class="flex flex-nowrap gap-2 mb-3 w-full overflow-auto">
                                 <template x-for="(amenity, amenityIndex) in roomOptions[0].amenities"
                                     :key="amenityIndex">
-                                    <span class="text-xs bg-gray-100 px-3 py-1 rounded-full" x-text="amenity"></span>
+                                    <span class="text-xs border border-gray-200 px-3 py-1 rounded-md text-nowrap"
+                                        x-text="amenity"></span>
                                 </template>
                             </div>
 
+                            <!-- Price Display -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl font-bold" x-text="'€' + roomOptions[0].price"></span>
+                                <span class="text-gray-500 line-through text-sm" x-show="roomOptions[0].oldPrice"
+                                    x-text="'€' + roomOptions[0].oldPrice"></span>
+                                <span class="text-sm text-gray-500">/noche</span>
+                            </div>
+
                             <!-- Action Buttons -->
-                            <div class="flex flex-col gap-3 mt-4">
+                            <div class="flex items-center gap-4 mt-3">
                                 <button
-                                    class="w-full py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                                    :class="selectedRoom?.id === roomOptions[0].id ? 'bg-black text-white shadow-md' : 'bg-white text-black border border-gray-300 hover:bg-gray-50'"
+                                    class="px-6 py-2.5 text-sm font-medium rounded-md uppercase tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                                    :class="selectedRoom?.id === roomOptions[0].id ? 'bg-green-600 text-white shadow-md' : 'bg-black text-white hover:bg-gray-800'"
                                     @click.stop="selectRoom(roomOptions[0])">
                                     <span
-                                        x-text="selectedRoom?.id === roomOptions[0].id ? 'Seleccionado' : 'Reservar Ahora'"></span>
+                                        x-text="selectedRoom?.id === roomOptions[0].id ? 'SELECCIONADO' : 'SELECCIONAR'"></span>
                                 </button>
-                                <button class="text-sm transition-colors duration-200 focus:outline-none"
-                                    :class="selectedRoom?.id === roomOptions[0].id ? 'text-black font-medium' : 'text-gray-500 hover:text-gray-700'">
+
+                                <button class="text-sm text-gray-500 underline">
                                     Descubre más detalles
                                 </button>
                             </div>
@@ -208,8 +224,8 @@
                 <div class="card-container"
                     :class="{'active': activeIndex === 1, 'prev': activeIndex === 2, 'next': activeIndex === 0}"
                     @click="setSlide(1)">
-                    <div class="border rounded-lg overflow-hidden shadow-sm bg-white h-full"
-                        :class="activeIndex === 1 ? 'ring-2 ring-gray-400' : ''">
+                    <!-- Using Third Card Design -->
+                    <div class="border rounded-lg overflow-hidden shadow-sm bg-white h-full">
                         <!-- Room Image Carousel -->
                         <div class="relative h-64 bg-gray-100">
                             <img :src="roomOptions[1].images[activeImageIndices[1]]" :alt="roomOptions[1].name"
@@ -226,34 +242,35 @@
 
                         <!-- Room Details -->
                         <div class="p-4">
-                            <h3 class="text-xl font-bold text-[#533a7b] mb-1" x-text="roomOptions[1].name"></h3>
+                            <h3 class="text-xl font-bold text-gray-800 mb-1" x-text="roomOptions[1].name"></h3>
                             <p class="text-sm text-gray-600 mb-3 min-h-10" x-text="roomOptions[1].description"></p>
 
                             <!-- Amenities -->
-                            <div class="flex flex-wrap gap-2 mb-6">
+                            <div class="flex flex-nowrap gap-2 mb-3 w-full overflow-auto">
                                 <template x-for="(amenity, amenityIndex) in roomOptions[1].amenities"
                                     :key="amenityIndex">
-                                    <span class="text-xs border border-gray-200 px-3 py-1 rounded-full"
+                                    <span class="text-xs border border-gray-200 px-3 py-1 rounded-md text-nowrap"
                                         x-text="amenity"></span>
                                 </template>
                             </div>
 
+                            <!-- Price Display -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl font-bold" x-text="'€' + roomOptions[1].price"></span>
+                                <span class="text-sm text-gray-500">/noche</span>
+                            </div>
+
                             <!-- Action Buttons -->
-                            <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-4 mt-3">
                                 <button
-                                    class="px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                                    :class="selectedRoom?.id === roomOptions[1].id ? 'bg-[#533a7b] text-white shadow-md' : 'bg-black text-white hover:bg-gray-800'"
+                                    class="px-6 py-2.5 text-sm font-medium rounded-md uppercase tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                                    :class="selectedRoom?.id === roomOptions[1].id ? 'bg-green-600 text-white shadow-md' : 'bg-black text-white hover:bg-gray-800'"
                                     @click.stop="selectRoom(roomOptions[1])">
                                     <span
-                                        x-text="selectedRoom?.id === roomOptions[1].id ? 'Seleccionado' : 'Reserva ahora por'"></span>
-                                    <span x-show="!selectedRoom || selectedRoom.id !== roomOptions[1].id"
-                                        class="font-bold" x-text="'$ ' + roomOptions[1].price"></span>
-                                    <span x-show="!selectedRoom || selectedRoom.id !== roomOptions[1].id"
-                                        class="text-xs"> / noche</span>
+                                        x-text="selectedRoom?.id === roomOptions[1].id ? 'SELECCIONADO' : 'SELECCIONAR'"></span>
                                 </button>
 
-
-                                <button class="text-sm text-gray-500 ml-auto">
+                                <button class="text-sm text-gray-500 underline">
                                     Descubre más detalles
                                 </button>
                             </div>
@@ -264,7 +281,7 @@
                     </div>
                 </div>
 
-                <!-- Third Card (Right) -->
+                <!-- Third Card (Right) - Original Design -->
                 <div class="card-container"
                     :class="{'active': activeIndex === 2, 'prev': activeIndex === 0, 'next': activeIndex === 1}"
                     @click="setSlide(2)">
@@ -300,7 +317,7 @@
                             <!-- Price Display -->
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="text-2xl font-bold" x-text="'€' + roomOptions[2].price"></span>
-                                <span class="text-gray-500 line-through text-sm"
+                                <span class="text-gray-500 line-through text-sm" x-show="roomOptions[2].oldPrice"
                                     x-text="'€' + roomOptions[2].oldPrice"></span>
                                 <span class="text-sm text-gray-500">/noche</span>
                             </div>
@@ -341,19 +358,72 @@
             </button>
         </div>
 
-        <!-- Carousel Navigation Indicators -->
-        <div class="flex justify-center items-center mt-8 text-gray-600">
-            <button
-                class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                @click="prevSlide">
-                <i data-lucide="chevron-left" class="h-5 w-5"></i>
+        <!-- Price Slider Below Carousel -->
+        <div class="mt-1 mb-6 w-1/2 mx-auto border rounded-lg p-4">
+            <div class="text-sm font-medium mb-2 flex justify-between items-center">
+                <span>Propon tu precio:</span>
+                <span x-text="proposedPrice + ' EUR/noche'" class="text-black font-bold"></span>
+            </div>
+            <div class="relative w-full">
+                <style>
+                    /* Custom styling for range input */
+                    input[type="range"] {
+                        -webkit-appearance: none;
+                        width: 100%;
+                        height: 8px;
+                        border-radius: 5px;
+                        background: #e5e7eb;
+                        /* gray-200 */
+                        outline: none;
+                    }
+
+                    /* Thumb styling */
+                    input[type="range"]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background: white;
+                        border: 2px solid black;
+                        cursor: pointer;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                    }
+
+                    input[type="range"]::-moz-range-thumb {
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background: white;
+                        border: 2px solid black;
+                        cursor: pointer;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                    }
+
+                    /* Track progress fill effect */
+                    input[type="range"] {
+                        background: linear-gradient(to right,
+                                black 0%,
+                                black calc((var(--value) - var(--min)) / (var(--max) - var(--min)) * 100%),
+                                #e5e7eb calc((var(--value) - var(--min)) / (var(--max) - var(--min)) * 100%),
+                                #e5e7eb 100%);
+                    }
+                </style>
+                <input type="range" :min="minPrice" :max="maxPrice" step="1" x-model.number="proposedPrice"
+                    x-init="$el.style.setProperty('--value', proposedPrice); $el.style.setProperty('--min', minPrice); $el.style.setProperty('--max', maxPrice)"
+                    @input="$el.style.setProperty('--value', proposedPrice)"
+                    x-effect="$el.style.setProperty('--min', minPrice); $el.style.setProperty('--max', maxPrice)"
+                    class="w-full" />
+                <div class="w-full flex justify-between text-xs text-gray-500 mt-2">
+                    <span x-text="minPrice + ' EUR/noche'"></span>
+                    <span x-text="maxPrice + ' EUR/noche'"></span>
+                </div>
+            </div>
+            <button class="w-full mt-3 py-2 bg-black hover:bg-gray-900 text-white rounded-md transition duration-200"
+                @click="makeOffer()">
+                Hacer oferta
             </button>
-            <span class="mx-4" x-text="`${activeIndex + 1}/${roomOptions.length}`"></span>
-            <button
-                class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                @click="nextSlide">
-                <i data-lucide="chevron-right" class="h-5 w-5"></i>
-            </button>
+            <p class="text-xs text-gray-500 mt-1 text-center">Sujeto a disponibilidad</p>
         </div>
     </div>
 </div>

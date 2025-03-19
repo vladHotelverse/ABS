@@ -112,192 +112,190 @@
       });
     }
   }">
-    <!-- Added hotel room image at the top -->
-    <div class="w-full h-40 bg-gray-200 overflow-hidden">
-        <img src="https://picsum.photos/400/160" alt="Habitación de hotel" class="w-full h-full object-cover" />
+  <!-- Added hotel room image at the top -->
+  <div class="w-full h-40 bg-gray-200 overflow-hidden">
+    <img
+      src="https://hvdataprostgweu.blob.core.windows.net/renderimages/h305/views/01_main/01d77a02-b92f-4214-a87c-79920dcbeded/background.webp"
+      alt="Habitación de hotel" class="w-full h-full object-cover" />
+  </div>
+
+  <!-- Content container with padding -->
+  <div class="p-4">
+
+    <!-- Room Selection Section -->
+    <div class="mb-4">
+      <div class="flex justify-between items-center mb-1">
+        <h3 class="font-medium">Habitación seleccionada</h3>
+        <div class="flex items-center" x-show="roomUpgrade && roomUpgrade.id !== 'deluxe-double'">
+          <button class="text-sm text-gray-500 font-medium underline">Editar</button>
+          <button class="ml-2">
+            <i data-lucide="pencil" class="h-4 w-4 text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+      <div class="flex justify-between items-center" x-show="roomUpgrade"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95">
+        <span class="text-sm" x-text="roomUpgrade.name"></span>
+        <div class="flex items-center">
+          <span class="text-sm font-medium mr-1" x-show="roomUpgrade.price > 0">
+            + <span x-text="roomUpgrade.price.toFixed(2)"></span> EUR
+          </span>
+          <button x-show="roomUpgrade.id !== 'deluxe-double'" @click="removeRoomUpgrade()"
+            class="border border-gray-300 rounded-full h-5 w-5 flex items-center justify-center hover:bg-gray-100 transition-colors">
+            -
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Content container with padding -->
-    <div class="p-4">
+    <div class="h-[1px] w-full bg-gray-200 my-4"></div>
 
-        <!-- Room Selection Section -->
-        <div class="mb-4">
-            <div class="flex justify-between items-center mb-1">
-                <h3 class="font-medium">Habitación seleccionada</h3>
-                <div class="flex items-center" x-show="roomUpgrade && roomUpgrade.id !== 'deluxe-double'">
-                    <button class="text-sm text-gray-500 font-medium underline">Editar</button>
-                    <button class="ml-2">
-                        <i data-lucide="pencil" class="h-4 w-4 text-gray-500"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex justify-between items-center" x-show="roomUpgrade"
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100 transform scale-100"
-                x-transition:leave-end="opacity-0 transform scale-95">
-                <span class="text-sm" x-text="roomUpgrade.name"></span>
-                <div class="flex items-center">
-                    <span class="text-sm font-medium mr-1" x-show="roomUpgrade.price > 0">
-                        + <span x-text="roomUpgrade.price.toFixed(2)"></span> EUR
-                    </span>
-                    <button x-show="roomUpgrade.id !== 'deluxe-double'" @click="removeRoomUpgrade()"
-                        class="border border-gray-300 rounded-full h-5 w-5 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                        <i data-lucide="minus" class="h-3 w-3"></i>
-                    </button>
-                </div>
-            </div>
+    <!-- Room Customizations Section -->
+    <div class="mb-4">
+      <div class="flex justify-between items-center mb-1">
+        <h3 class="font-medium">Información sobre mejoras</h3>
+        <div class="flex items-center" x-show="customizations.length > 0">
+          <button class="text-sm text-gray-500 font-medium underline">Editar</button>
+          <button class="ml-2">
+            <i data-lucide="pencil" class="h-4 w-4 text-gray-500"></i>
+          </button>
         </div>
-
-        <div class="h-[1px] w-full bg-gray-200 my-4"></div>
-
-        <!-- Room Customizations Section -->
-        <div class="mb-4">
-            <div class="flex justify-between items-center mb-1">
-                <h3 class="font-medium">Información sobre mejoras</h3>
-                <div class="flex items-center" x-show="customizations.length > 0">
-                    <button class="text-sm text-gray-500 font-medium underline">Editar</button>
-                    <button class="ml-2">
-                        <i data-lucide="pencil" class="h-4 w-4 text-gray-500"></i>
-                    </button>
-                </div>
+      </div>
+      <div class="space-y-2" x-show="customizations.length > 0">
+        <template x-for="(option, index) in customizations" :key="option.id">
+          <div class="flex justify-between items-center" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-x-4"
+            x-transition:enter-end="opacity-100 transform translate-x-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-x-0"
+            x-transition:leave-end="opacity-0 transform -translate-x-4">
+            <span class="text-sm" x-text="option.label"></span>
+            <div class="flex items-center">
+              <span class="text-sm font-medium mr-1" x-show="option.price > 0">+ <span
+                  x-text="option.price.toFixed(2)"></span> EUR</span>
+              <button @click="removeCustomization(option.id, option.label)"
+                class="border border-gray-300 rounded-full h-5 w-5 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3">
+                  <path d="M5 12h14"></path>
+                </svg>
+              </button>
             </div>
-            <div class="space-y-2" x-show="customizations.length > 0">
-                <template x-for="(option, index) in customizations" :key="option.id">
-                    <div class="flex justify-between items-center" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform -translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 transform translate-x-0"
-                        x-transition:leave-end="opacity-0 transform -translate-x-4">
-                        <span class="text-sm" x-text="option.label"></span>
-                        <div class="flex items-center">
-                            <span class="text-sm font-medium mr-1" x-show="option.price > 0">+ <span
-                                    x-text="option.price.toFixed(2)"></span> EUR</span>
-                            <button @click="removeCustomization(option.id, option.label)"
-                                class="border border-gray-300 rounded-full h-5 w-5 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                                <i data-lucide="minus" class="h-3 w-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-            <div x-show="customizations.length === 0" class="text-sm text-gray-500 italic">
-                No hay mejoras seleccionadas
-            </div>
-        </div>
-
-        <!-- Special Offers Section -->
-        <div class="mb-4">
-            <div class="h-[1px] w-full bg-gray-200 my-4"></div>
-            <div class="flex justify-between items-center mb-1">
-                <h3 class="font-medium">Ofertas especiales</h3>
-                <div class="flex items-center" x-show="specialOffers.length > 0">
-                    <button class="text-sm text-gray-500 font-medium underline">Editar</button>
-                    <button class="ml-2">
-                        <i data-lucide="pencil" class="h-4 w-4 text-gray-500"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="space-y-2" x-show="specialOffers.length > 0">
-                <template x-for="(offer, index) in specialOffers" :key="offer.id">
-                    <div class="flex justify-between items-center" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform -translate-x-4"
-                        x-transition:enter-end="opacity-100 transform translate-x-0"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 transform translate-x-0"
-                        x-transition:leave-end="opacity-0 transform -translate-x-4">
-                        <span class="text-sm" x-text="offer.name"></span>
-                        <div class="flex items-center">
-                            <span class="text-sm font-medium mr-1" x-show="offer.price > 0">+ <span
-                                    x-text="offer.price.toFixed(2)"></span> EUR</span>
-                            <button @click="removeSpecialOffer(offer.id, offer.name)"
-                                class="border border-gray-300 rounded-full h-5 w-5 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                                <i data-lucide="minus" class="h-3 w-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-            <div x-show="specialOffers.length === 0" class="text-sm text-gray-500 italic">
-                No hay ofertas especiales seleccionadas
-            </div>
-        </div>
-
-        <div class="h-[1px] w-full bg-gray-200 my-4"></div>
-
-        <!-- Price Breakdown -->
-        <div class="space-y-2 mb-6">
-            <div class="flex justify-between">
-                <span>Subtotal</span>
-                <span><span x-text="subtotal.toFixed(2)"></span> EUR</span>
-            </div>
-            <div class="flex justify-between text-sm text-gray-600">
-                <span>Impuestos</span>
-                <span><span x-text="taxes.toFixed(2)"></span> EUR</span>
-            </div>
-            <div class="flex justify-between font-bold pt-2">
-                <span>Total final</span>
-                <span class="transition-all duration-500 ease-in-out"
-                    :class="{'scale-110 text-blue-600': $store.booking.calculateTotal() !== subtotal}">
-                    <span x-text="total.toFixed(2)"></span> EUR
-                </span>
-            </div>
-        </div>
-
-        <div class="h-[1px] w-full bg-gray-200 my-4"></div>
-
-        <!-- Tarifa information from screenshot -->
-        <div class="mb-4">
-
-            <div class="flex items-center mb-2">
-                <i data-lucide="credit-card" class="h-5 w-5 text-gray-500 mr-2"></i>
-                <span class="text-sm text-gray-600">Pagarás online al confirmar la reserva</span>
-            </div>
-
-            <div class="flex items-center mb-2">
-                <i data-lucide="info" class="h-5 w-5 text-gray-500 mr-2"></i>
-                <span class="text-sm text-gray-600">Cancelación con gastos</span>
-            </div>
-
-            <div class="mt-1">
-                <a href="#" class="text-sm text-gray-500 font-medium underline">Ver condiciones</a>
-            </div>
-        </div>
-
-        <!-- Confirm Button -->
-        <button
-            class="inline-flex w-full items-center justify-center rounded-md text-sm font-medium bg-black hover:bg-black/90 text-white py-2 transition-colors">
-            Confirmar
-        </button>
+          </div>
+        </template>
+      </div>
+      <div x-show="customizations.length === 0" class="text-sm text-gray-500 italic">
+        No hay mejoras seleccionadas
+      </div>
     </div>
 
-    <!-- Toast Container (Bottom Right) -->
-    <div class="fixed bottom-4 right-4 z-50 space-y-2 w-72">
-        <template x-for="toast in toasts" :key="toast.id">
-            <div :class="{
+    <!-- Special Offers Section -->
+    <div class="mb-4">
+      <div class="h-[1px] w-full bg-gray-200 my-4"></div>
+      <div class="flex justify-between items-center mb-1">
+        <h3 class="font-medium">Ofertas especiales</h3>
+        <div class="flex items-center" x-show="specialOffers.length > 0">
+          <button class="text-sm text-gray-500 font-medium underline">Editar</button>
+          <button class="ml-2">
+            <i data-lucide="pencil" class="h-4 w-4 text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+      <div class="space-y-2" x-show="specialOffers.length > 0">
+        <template x-for="(offer, index) in specialOffers" :key="offer.id">
+          <div class="flex justify-between items-center" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-x-4"
+            x-transition:enter-end="opacity-100 transform translate-x-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-x-0"
+            x-transition:leave-end="opacity-0 transform -translate-x-4">
+            <span class="text-sm" x-text="offer.name"></span>
+            <div class="flex items-center">
+              <span class="text-sm font-medium mr-1" x-show="offer.price > 0">+ <span
+                  x-text="offer.price.toFixed(2)"></span> EUR</span>
+              <button @click="removeSpecialOffer(offer.id, offer.name)"
+                class="border border-gray-300 rounded-full h-5 w-5 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                -
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div x-show="specialOffers.length === 0" class="text-sm text-gray-500 italic">
+        No hay ofertas especiales seleccionadas
+      </div>
+    </div>
+
+    <div class="h-[1px] w-full bg-gray-200 my-4"></div>
+
+    <!-- Price Breakdown -->
+    <div class="space-y-2 mb-6">
+      <div class="flex justify-between">
+        <span>Subtotal</span>
+        <span><span x-text="subtotal.toFixed(2)"></span> EUR</span>
+      </div>
+      <div class="flex justify-between text-sm text-gray-600">
+        <span>Impuestos</span>
+        <span><span x-text="taxes.toFixed(2)"></span> EUR</span>
+      </div>
+      <div class="flex justify-between font-bold pt-2">
+        <span>Total final</span>
+        <span class="transition-all duration-500 ease-in-out"
+          :class="{'scale-110 text-blue-600': $store.booking.calculateTotal() !== subtotal}">
+          <span x-text="total.toFixed(2)"></span> EUR
+        </span>
+      </div>
+    </div>
+
+    <div class="h-[1px] w-full bg-gray-200 my-4"></div>
+
+    <!-- Tarifa information from screenshot -->
+    <div class="mb-4">
+
+      <div class="flex items-center mb-2">
+        <i data-lucide="credit-card" class="h-5 w-5 text-gray-500 mr-2"></i>
+        <span class="text-sm text-gray-600">Pagar en el hotel</span>
+      </div>
+
+      <div class="mt-1">
+        <a href="#" class="text-sm text-gray-500 font-medium underline">Ver condiciones</a>
+      </div>
+    </div>
+
+    <!-- Confirm Button -->
+    <button
+      class="inline-flex w-full items-center justify-center rounded-md text-sm font-medium bg-black hover:bg-black/90 text-white py-2 transition-colors">
+      Confirmar
+    </button>
+  </div>
+
+  <!-- Toast Container (Bottom Right) -->
+  <div class="fixed bottom-4 right-4 z-50 space-y-2 w-72">
+    <template x-for="toast in toasts" :key="toast.id">
+      <div :class="{
                   'bg-white border-green-400 text-green-700': toast.type === 'success',
                   'bg-white border-blue-400 text-blue-700': toast.type === 'info',
                   'bg-white border-red-400 text-red-700': toast.type === 'error'
                 }" class="border-l-4 p-3 rounded shadow-md flex items-start justify-between"
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 transform translate-y-2"
-                x-transition:enter-end="opacity-100 transform translate-y-0"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100 transform translate-y-0"
-                x-transition:leave-end="opacity-0 transform translate-y-2">
-                <div class="flex items-center">
-                    <i data-lucide="check-circle" class="h-5 w-5 mr-2" x-show="toast.type === 'success'"></i>
-                    <i data-lucide="info" class="h-5 w-5 mr-2" x-show="toast.type === 'info'"></i>
-                    <i data-lucide="alert-triangle" class="h-5 w-5 mr-2" x-show="toast.type === 'error'"></i>
-                    <span x-text="toast.message"></span>
-                </div>
-                <button @click="removeToast(toast.id)" class="text-gray-500 hover:text-gray-700">
-                    <i data-lucide="x" class="h-4 w-4"></i>
-                </button>
-            </div>
-        </template>
-    </div>
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform translate-y-2"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform translate-y-2">
+        <div class="flex items-center">
+          <i data-lucide="check-circle" class="h-5 w-5 mr-2" x-show="toast.type === 'success'"></i>
+          <i data-lucide="info" class="h-5 w-5 mr-2" x-show="toast.type === 'info'"></i>
+          <i data-lucide="alert-triangle" class="h-5 w-5 mr-2" x-show="toast.type === 'error'"></i>
+          <span x-text="toast.message"></span>
+        </div>
+        <button @click="removeToast(toast.id)" class="text-gray-500 hover:text-gray-700">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
 </div>
