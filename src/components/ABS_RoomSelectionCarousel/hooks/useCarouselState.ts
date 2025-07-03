@@ -103,7 +103,8 @@ export interface UseCarouselStateReturn {
 const getInitialActiveIndex = (roomCount: number): number => {
   if (roomCount === 1) return 0
   if (roomCount === 2) return 0
-  return 1 // Default to middle card for 3+ rooms
+  // For 3+ rooms, use the actual middle index (or close to it)
+  return Math.floor((roomCount - 1) / 2)
 }
 
 // Main hook - removed slider-specific logic
@@ -115,13 +116,15 @@ export const useCarouselState = ({
   // Memoize initial state calculation
   const initialState = useMemo((): CarouselState => {
     const initialActiveIndex = getInitialActiveIndex(roomOptions.length)
+    // Initialize image indices for all rooms dynamically
+    const initialImageIndices: Record<number, number> = {}
+    roomOptions.forEach((_, index) => {
+      initialImageIndices[index] = 0
+    })
+    
     return {
       activeIndex: initialActiveIndex,
-      activeImageIndices: {
-        0: 0,
-        1: 0,
-        2: 0,
-      },
+      activeImageIndices: initialImageIndices,
       selectedRoom: initialSelectedRoom,
     }
   }, [roomOptions.length, initialSelectedRoom])
@@ -180,9 +183,15 @@ export const useCarouselState = ({
   // Reinitialize state when roomOptions change
   useEffect(() => {
     const newActiveIndex = getInitialActiveIndex(roomOptions.length)
+    // Initialize image indices for all rooms dynamically
+    const newImageIndices: Record<number, number> = {}
+    roomOptions.forEach((_, index) => {
+      newImageIndices[index] = 0
+    })
+    
     const newState: CarouselState = {
       activeIndex: newActiveIndex,
-      activeImageIndices: { 0: 0, 1: 0, 2: 0 },
+      activeImageIndices: newImageIndices,
       selectedRoom: initialSelectedRoom,
     }
     dispatch({ type: 'RESET_STATE', payload: newState })

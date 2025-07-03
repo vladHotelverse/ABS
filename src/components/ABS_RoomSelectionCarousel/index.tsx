@@ -326,37 +326,48 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         <div className="relative w-full overflow-visible h-full">
           {/* Main Carousel Area */}
           <div className="w-full relative perspective-[1000px] h-[550px] overflow-hidden">
-            {roomOptions.map((room, index) => (
-              <div
-                key={room.id}
-                className={clsx('w-full absolute transition-all duration-500 ease-in-out', {
-                  'left-0 z-10 sm:w-1/2 sm:left-1/4': state.activeIndex === index,
-                  'left-[-100%] z-5 opacity-70 sm:w-1/2 sm:left-[-30%]':
-                    index === (state.activeIndex - 1 + roomOptions.length) % roomOptions.length,
-                  'left-[100%] z-5 opacity-70 sm:w-1/2 sm:left-[80%]':
-                    index === (state.activeIndex + 1) % roomOptions.length,
-                })}
-              >
-                <RoomCard
-                  room={room}
-                  discountBadgeText={resolvedTexts.discountBadgeText}
-                  nightText={resolvedTexts.nightText}
-                  learnMoreText={resolvedTexts.learnMoreText}
-                  priceInfoText={resolvedTexts.priceInfoText}
-                  selectedText={resolvedTexts.selectedText}
-                  selectText={resolvedTexts.selectText}
-                  selectedRoom={state.selectedRoom}
-                  onSelectRoom={actions.selectRoom}
-                  activeImageIndex={state.activeImageIndices[index] || 0}
-                  onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
-                  currencySymbol={resolvedTexts.currencySymbol}
-                  onLearnMore={onLearnMore}
-                  previousImageLabel={resolvedTexts.previousImage}
-                  nextImageLabel={resolvedTexts.nextImage}
-                  viewImageLabel={resolvedTexts.viewImage}
-                />
-              </div>
-            ))}
+            {roomOptions.map((room, index) => {
+              // Calculate if this card should be visible (previous, current, or next)
+              const prevIndex = (state.activeIndex - 1 + roomOptions.length) % roomOptions.length
+              const nextIndex = (state.activeIndex + 1) % roomOptions.length
+              
+              // Only show previous, current, and next cards
+              const isVisible = index === state.activeIndex || index === prevIndex || index === nextIndex
+              
+              if (!isVisible) {
+                return null
+              }
+              
+              return (
+                <div
+                  key={room.id}
+                  className={clsx('w-full absolute transition-all duration-500 ease-in-out', {
+                    'left-0 z-10 sm:w-1/2 sm:left-1/4': state.activeIndex === index,
+                    'left-[-100%] z-5 opacity-70 sm:w-1/2 sm:left-[-30%]': index === prevIndex,
+                    'left-[100%] z-5 opacity-70 sm:w-1/2 sm:left-[80%]': index === nextIndex,
+                  })}
+                >
+                  <RoomCard
+                    room={room}
+                    discountBadgeText={resolvedTexts.discountBadgeText}
+                    nightText={resolvedTexts.nightText}
+                    learnMoreText={resolvedTexts.learnMoreText}
+                    priceInfoText={resolvedTexts.priceInfoText}
+                    selectedText={resolvedTexts.selectedText}
+                    selectText={resolvedTexts.selectText}
+                    selectedRoom={state.selectedRoom}
+                    onSelectRoom={actions.selectRoom}
+                    activeImageIndex={state.activeImageIndices[index] || 0}
+                    onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
+                    currencySymbol={resolvedTexts.currencySymbol}
+                    onLearnMore={onLearnMore}
+                    previousImageLabel={resolvedTexts.previousImage}
+                    nextImageLabel={resolvedTexts.nextImage}
+                    viewImageLabel={resolvedTexts.viewImage}
+                  />
+                </div>
+              )
+            })}
           </div>
 
           {/* Desktop Carousel Navigation - Only visible on Desktop */}

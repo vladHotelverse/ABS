@@ -1,7 +1,8 @@
 import clsx from 'clsx'
 import type React from 'react'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 import type { RoomOption } from './types'
+import { UiTooltip, UiTooltipContent, UiTooltipTrigger, TooltipProvider } from '../ui/tooltip'
 
 interface RoomCardProps {
   room: RoomOption
@@ -41,6 +42,17 @@ const RoomCard: React.FC<RoomCardProps> = ({
   nextImageLabel = 'Next image',
   viewImageLabel = 'View image {index}',
 }) => {
+  // State for checking if description is truncated
+  const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false)
+  const descriptionRef = useRef<HTMLParagraphElement>(null)
+
+  // Check if description needs truncation
+  useEffect(() => {
+    if (descriptionRef.current) {
+      const element = descriptionRef.current
+      setIsDescriptionTruncated(element.scrollHeight > element.clientHeight)
+    }
+  }, [room.description])
   // Memoized handlers
   const handleImageNavigation = useCallback(
     (direction: 'prev' | 'next') => {
@@ -153,7 +165,26 @@ const RoomCard: React.FC<RoomCardProps> = ({
       {/* Room Details */}
       <div className="p-4">
         <h3 className="text-xl font-bold mb-1">{room.name}</h3>
-        <p className="text-sm mb-3 min-h-10">{room.description}</p>
+        <div className="mb-3">
+          <TooltipProvider>
+            <UiTooltip>
+              <UiTooltipTrigger asChild>
+                <p
+                  ref={descriptionRef}
+                  className="text-sm min-h-10 overflow-hidden line-clamp-2 cursor-help"
+                  style={{ maxHeight: '2.5rem' }}
+                >
+                  {room.description}
+                </p>
+              </UiTooltipTrigger>
+              {isDescriptionTruncated && (
+                <UiTooltipContent className="max-w-xs">
+                  <p className="text-sm">{room.description}</p>
+                </UiTooltipContent>
+              )}
+            </UiTooltip>
+          </TooltipProvider>
+        </div>
 
         {/* Amenities */}
         <div className="flex flex-nowrap gap-2 mb-3 w-full overflow-auto">

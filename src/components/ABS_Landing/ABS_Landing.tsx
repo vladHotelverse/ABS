@@ -18,7 +18,7 @@ import type {
 import type { OfferData } from '../ABS_SpecialOffers/types'
 
 // Import new section components
-import { RoomSelectionSection, CustomizationSection, SpecialOffersSection, BookingStateSection } from './sections'
+import { RoomSelectionSection, RoomSelectionMapSection, CustomizationSection, SpecialOffersSection, BookingStateSection } from './sections'
 import type { RoomOption, SpecialOffer, SelectedOffer } from './sections'
 
 // Import hooks and utilities
@@ -138,6 +138,20 @@ export interface ABSLandingProps {
   sections: SectionConfig[]
   sectionOptions: Record<string, CustomizationOption[] | ViewOption[]>
   specialOffers: SpecialOffer[]
+  roomSelectionMap?: {
+    id: string
+    title: string
+    description: string
+    url: string
+    type: 'iframe'
+    iframe: {
+      width: string
+      height: string
+      frameBorder: number
+      allowFullScreen: boolean
+      title: string
+    }
+  }
   initialSelectedRoom?: RoomOption
   translations: Translations
   language?: 'en' | 'es'
@@ -164,6 +178,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   sections,
   sectionOptions,
   specialOffers,
+  roomSelectionMap,
   initialSelectedRoom,
   translations,
   language,
@@ -494,6 +509,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             texts={offersTexts}
             isVisible={shouldShowSection('offer', computedAvailableSections)}
           />
+
+          {/* Room Selection Map Section */}
+          {roomSelectionMap && (
+            <RoomSelectionMapSection
+              roomSelectionConfig={roomSelectionMap}
+              isVisible={true}
+            />
+          )}
         </div>
 
         <aside className="flex-shrink-0 max-w-md">

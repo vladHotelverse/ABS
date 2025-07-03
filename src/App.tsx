@@ -5,6 +5,7 @@ import { ABSLanding } from '@/components/ABS_Landing/ABS_Landing'
 import { 
   roomOptions, 
   specialOffers, 
+  roomSelectionMap,
   translations,
   getSectionsConfig,
   sectionOptions
@@ -52,6 +53,7 @@ function App() {
           sections={sections}
           sectionOptions={sectionOptions}
           specialOffers={specialOffers}
+          roomSelectionMap={roomSelectionMap}
           translations={currentTranslations}
           language={currentLang}
           checkIn="2024-07-15"
