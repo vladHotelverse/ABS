@@ -1,41 +1,69 @@
-# Hotel Booking Experience
+# React + TypeScript + Vite
 
-This project is a single-page web application that provides a user interface for a hotel booking system. It allows users to select rooms, customize their stay, choose special offers, and view a summary of their booking.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Project Structure
+Currently, two official plugins are available:
 
-The project is organized as follows:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- **HTML Files:**
-    - `index.html`: The main entry point for the Spanish version of the website.
-    - `indexEn.html`: The main entry point for the English version of the website.
-    - `indexEs.html`: An alias or alternative entry point for the Spanish version of the website.
-- **`components/` Directory:** Contains reusable HTML snippets for different sections of the website, such as the header, booking bar, room selection, etc. It also includes a TypeScript file (`NewHeroAlt.tsx`) which might be used for a newer or alternative hero section component.
-- **`images/` Directory:** Contains images used in the website.
+## Expanding the ESLint configuration
 
-## Technologies Used
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-- **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
-- **Alpine.js:** A rugged, minimal framework for composing JavaScript behavior in your markup.
-- **Lucide Icons:** A clean and consistent icon toolkit.
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-## Running the Project
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
-This is a static website. To run the project, simply open the `index.html` (for Spanish) or `indexEn.html` (for English) file in your web browser.
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-## Global State Management
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-The project uses Alpine.js for global state management. The main state object, `booking`, is defined within a `<script>` tag with the ID `booking-state` in the `index.html`, `indexEn.html`, and `indexEs.html` files. This state object stores information about:
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-- Selected room and its details.
-- Room customizations (e.g., bed type, location, floor, view).
-- Selected special offers.
-
-The state object also includes methods to:
-
-- Update room selections and customizations.
-- Add, update, or remove special offers.
-- Calculate the total price, including customizations and offers.
-- Calculate taxes.
-
-Components on the page can access and modify this global state, allowing for a reactive and interactive user experience.
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```

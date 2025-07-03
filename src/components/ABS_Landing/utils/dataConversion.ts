@@ -1,0 +1,182 @@
+import type { AvailableSection } from '../../ABS_PricingSummaryPanel'
+import type { PricingItem } from '../../ABS_PricingSummaryPanel'
+import type { SelectedCustomizations } from '../../ABS_RoomCustomization/types'
+import type { RoomOption } from '../sections/RoomSelectionSection'
+import type { SelectedOffer } from '../sections/SpecialOffersSection'
+
+/**
+ * Converts a RoomOption to a PricingItem for the pricing summary
+ */
+export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 1): PricingItem | null => {
+  if (!room) return null
+  const totalPrice = room.price * (room.perNight ? nights : 1)
+  const displayName = room.perNight && nights > 1 ? `${room.name} (${nights} nights)` : room.name
+  
+  return {
+    id: room.id,
+    name: displayName,
+    price: totalPrice,
+    type: 'room',
+  }
+}
+
+/**
+ * Converts selected customizations to PricingItems
+ */
+export const convertCustomizationsToPricingItems = (customizations: SelectedCustomizations): PricingItem[] => {
+  return Object.values(customizations)
+    .filter((c) => c !== undefined)
+    .map((c) => ({
+      id: c.id,
+      name: c.label,
+      price: c.price,
+      type: 'customization' as const,
+    }))
+}
+
+/**
+ * Converts selected offers to PricingItems
+ */
+export const convertOffersToPricingItems = (offers: SelectedOffer[]): PricingItem[] => {
+  return offers.map((o) => ({
+    id: o.id,
+    name: o.quantity && o.quantity > 1 ? `${o.name} (x${o.quantity})` : o.name,
+    price: o.price * (o.quantity || 1),
+    type: 'offer' as const,
+  }))
+}
+
+/**
+ * Calculates the total price from all selected items
+ */
+export const calculateTotalPrice = (
+  selectedRoom: RoomOption | undefined,
+  selectedCustomizations: SelectedCustomizations,
+  selectedOffers: SelectedOffer[],
+  taxRate = 0.1,
+  nights = 1
+): { subtotal: number; tax: number; total: number } => {
+  let subtotal = 0
+
+  // Add room price (multiply by nights if it's a per-night price)
+  if (selectedRoom) {
+    subtotal += selectedRoom.price * (selectedRoom.perNight ? nights : 1)
+  }
+
+  // Add customizations
+  for (const categoryKey in selectedCustomizations) {
+    const customization = selectedCustomizations[categoryKey]
+    if (customization) {
+      subtotal += customization.price
+    }
+  }
+
+  // Add special offers
+  selectedOffers.forEach((offer) => {
+    subtotal += offer.price * (offer.quantity || 1)
+  })
+
+  const tax = subtotal * taxRate
+  const total = subtotal + tax
+
+  return { subtotal, tax, total }
+}
+
+/**
+ * Generates available sections based on what's actually available
+ */
+export const generateAvailableSections = (
+  hasRoomOptions: boolean,
+  hasCustomizations: boolean,
+  hasSpecialOffers: boolean,
+  language: 'en' | 'es' = 'en',
+  onRoomNavigate?: () => void,
+  onCustomizationNavigate?: () => void,
+  onOffersNavigate?: () => void
+): AvailableSection[] => {
+  const sections: AvailableSection[] = []
+
+  if (hasRoomOptions) {
+    sections.push({
+      type: 'room',
+      label: language === 'es' ? 'Mejoras de habitación' : 'Room Upgrades',
+      description:
+        language === 'es'
+          ? 'Mejora tu experiencia con opciones premium como vistas al mar o habitaciones de categoría superior'
+          : 'Upgrade your experience with premium options like sea views or superior room categories',
+      startingPrice: 25,
+      isAvailable: true,
+      onClick: onRoomNavigate,
+    })
+  }
+
+  if (hasCustomizations) {
+    sections.push({
+      type: 'customization',
+      label: language === 'es' ? 'Servicios adicionales' : 'Additional Services',
+      description:
+        language === 'es'
+          ? 'Añade servicios como desayuno, traslado al aeropuerto o acceso al spa'
+          : 'Add services like breakfast, airport transfer or spa access',
+      startingPrice: 10,
+      isAvailable: true,
+      onClick: onCustomizationNavigate,
+    })
+  }
+
+  if (hasSpecialOffers) {
+    sections.push({
+      type: 'offer',
+      label: language === 'es' ? 'Ofertas especiales' : 'Special Offers',
+      description:
+        language === 'es'
+          ? 'Descubre promociones exclusivas y paquetes con descuento'
+          : 'Discover exclusive promotions and discounted packages',
+      startingPrice: 5,
+      isAvailable: true,
+      onClick: onOffersNavigate,
+    })
+  }
+
+  return sections
+}
+
+/**
+ * Counts total items in the cart
+ */
+export const countCartItems = (
+  selectedRoom: RoomOption | undefined,
+  selectedCustomizations: SelectedCustomizations,
+  selectedOffers: SelectedOffer[]
+): number => {
+  return selectedOffers.length + Object.keys(selectedCustomizations).length + (selectedRoom ? 1 : 0)
+}
+
+/**
+ * Determines if a section should be visible based on availability
+ */
+export const shouldShowSection = (
+  sectionType: 'room' | 'customization' | 'offer',
+  availableSections?: AvailableSection[]
+): boolean => {
+  if (!availableSections) return true // Default to showing all sections
+
+  return availableSections.some((section) => section.type === sectionType && section.isAvailable)
+}
+
+/**
+ * Calculates the number of nights between two dates
+ */
+export const calculateNights = (checkIn?: string, checkOut?: string): number => {
+  if (!checkIn || !checkOut) return 1
+  
+  const checkInDate = new Date(checkIn)
+  const checkOutDate = new Date(checkOut)
+  
+  if (checkOutDate <= checkInDate) return 1
+  
+  const diffTime = checkOutDate.getTime() - checkInDate.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  return diffDays > 0 ? diffDays : 1
+}

@@ -1,0 +1,64 @@
+/* Header component styles */
+
+/* 3D Logo animation */
+@keyframes rotate3D {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  50% {
+    transform: rotateX(270deg) rotateY(180deg) rotateZ(90deg) scale(0.9) translateX(-3px);
+  }
+  100% {
+    transform: rotateX(0deg) rotateY(360deg) rotateZ(0deg) scale(0.7) translateX(-7px);
+  }
+}
+
+/* Logo container styling */
+.logo-container {
+  position: relative;
+  height: 35px;
+  width: 180px;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+}
+
+/* Initial H styling */
+#initialH {
+  position: absolute;
+  height: 30px;
+  width: auto;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+/* Full text SVG styling */
+#fullText {
+  position: absolute;
+  width: 80%;
+  max-width: 1200px;
+  height: auto;
+  opacity: 0;
+}
+
+/* SVG path styles */
+.text-path {
+  fill: #ffffff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.h-path {
+  fill: #ffffff;
+  opacity: 1;
+}
+
+/* Hide scrollbar for room tabs on mobile */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
