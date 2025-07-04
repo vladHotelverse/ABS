@@ -167,6 +167,7 @@ export interface ABSLandingProps {
   reservationCode?: string
   checkIn?: string
   checkOut?: string
+  roomType?: string
   occupancy?: string
   fallbackImageUrl?: string
   availableSections?: AvailableSection[]
@@ -196,6 +197,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   reservationCode,
   checkIn,
   checkOut,
+  roomType,
   occupancy,
   fallbackImageUrl,
   availableSections,
@@ -208,6 +210,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 }) => {
   // Calculate nights from check-in and check-out dates
   const nights = calculateNights(checkIn, checkOut)
+  
+  // Create combined stay dates display
+  const stayDates = checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'N/A'
 
   // Use custom hooks for state management
   const bookingState = useBookingState({
@@ -242,8 +247,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     selectedCustomizations,
     selectedOffers,
     subtotal,
-    tax,
-    total,
     state,
     isPriceCalculating,
     isMobilePricingOverlayOpen,
@@ -270,7 +273,8 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Calculate items and totals
   const singleBookingItemCount = countCartItems(selectedRoom, selectedCustomizations, selectedOffers)
   const itemCount = shouldShowMultiBooking ? multiBookingItemCount : singleBookingItemCount
-  const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : total
+  // Use subtotal for header to match pricing panel (taxes removed)
+  const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : subtotal
 
   // Handlers for user interactions
   const handleRoomSelect = (room: RoomOption) => {
@@ -299,8 +303,8 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Create reservation info for special offers
   const reservationInfo = {
     personCount: occupancy ? Number.parseInt(occupancy.split(' ')[0]) || 2 : 2,
-    checkInDate: checkIn ? new Date(checkIn) : undefined,
-    checkOutDate: checkOut ? new Date(checkOut) : undefined,
+    checkInDate: checkIn ? (new Date(checkIn).toString() !== 'Invalid Date' ? new Date(checkIn) : undefined) : undefined,
+    checkOutDate: checkOut ? (new Date(checkOut).toString() !== 'Invalid Date' ? new Date(checkOut) : undefined) : undefined,
   }
 
   const handleBookOffer = (offerData: OfferData) => {
@@ -456,14 +460,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                 guestName: booking.guestName,
                 roomImage: booking.roomImage,
                 items: [
-                  { label: t.checkInLabel || 'Check-in', value: checkIn || 'N/A', icon: 'Calendar' },
-                  { label: t.checkOutLabel || 'Check-out', value: checkOut || 'N/A', icon: 'Calendar' },
-                  {
-                    label: t.occupancyLabel || 'Guests',
-                    value: `${(booking as any).guests || 2} guests`,
-                    icon: 'Users',
-                  },
                   { label: t.reservationCodeLabel || 'Reservation Code', value: reservationCode || 'N/A', icon: 'Tag' },
+                  { label: 'Stay Dates', value: stayDates, icon: 'Calendar' },
+                  { label: 'Room Type', value: roomType || 'N/A', icon: 'Home' },
+                  { label: t.occupancyLabel || 'Occupancy', value: occupancy || 'N/A', icon: 'Users' },
                 ],
               })),
               labels: {
@@ -477,10 +477,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             }
           : {
               items: [
-                { label: t.checkInLabel || 'Check-in', value: checkIn || 'N/A', icon: 'Calendar' },
-                { label: t.checkOutLabel || 'Check-out', value: checkOut || 'N/A', icon: 'Calendar' },
-                { label: t.occupancyLabel || 'Occupancy', value: occupancy || 'N/A', icon: 'Users' },
                 { label: t.reservationCodeLabel || 'Reservation Code', value: reservationCode || 'N/A', icon: 'Tag' },
+                { label: 'Stay Dates', value: stayDates, icon: 'Calendar' },
+                { label: 'Room Type', value: roomType || 'N/A', icon: 'Home' },
+                { label: t.occupancyLabel || 'Occupancy', value: occupancy || 'N/A', icon: 'Users' },
               ],
             })}
       />
@@ -550,7 +550,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                 ...convertCustomizationsToPricingItems(selectedCustomizations),
                 ...convertOffersToPricingItems(selectedOffers),
               ]}
-              pricing={{ subtotal, taxes: tax }}
+              pricing={{ subtotal }}
               isLoading={isPriceCalculating}
               availableSections={computedAvailableSections}
               labels={{
@@ -636,7 +636,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           ...convertCustomizationsToPricingItems(selectedCustomizations),
           ...convertOffersToPricingItems(selectedOffers),
         ]}
-        pricing={{ subtotal, taxes: tax }}
+        pricing={{ subtotal }}
         isLoading={isPriceCalculating}
         availableSections={computedAvailableSections}
         labels={{

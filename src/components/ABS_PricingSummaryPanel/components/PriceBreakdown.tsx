@@ -44,7 +44,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
           {isLoading ? (
             <LoadingSkeleton width="w-20" height="h-6" />
           ) : (
-            <span className={clsx('text-lg font-bold', 'transition-all duration-500 ease-in-out')}>
+            <span className={clsx('text-lg font-bold', 'transition-all duration-500 ease-in-out', 'whitespace-nowrap')}>
               {formatPrice(subtotal)}
             </span>
           )}

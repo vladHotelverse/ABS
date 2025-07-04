@@ -15,7 +15,7 @@ interface PricingItemComponentProps {
 const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroSuffix, removeLabel, onRemove }) => {
   return (
     <div className="flex justify-between items-center py-2 transition-all duration-300 ease-in-out rounded">
-      <span className="text-sm">{item.name}</span>
+      <span className="text-sm max-w-[200px]">{item.name}</span>
       <div className="flex items-center space-x-2">
         <PriceChangeIndicator price={item.price} euroSuffix={euroSuffix} />
         {item.price !== 0 && (

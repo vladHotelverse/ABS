@@ -26,6 +26,7 @@ const SimpleListPicker: React.FC<SimpleListPickerProps> = ({
   const availableDates = useMemo(() => {
     const dates = []
     const today = new Date()
+    today.setHours(0, 0, 0, 0) // Normalize to start of day
 
     // Use reservation dates as the date range if provided, otherwise use today + maxDates
     let startDate: Date
@@ -34,7 +35,9 @@ const SimpleListPicker: React.FC<SimpleListPickerProps> = ({
     if (reservationStartDate && reservationEndDate) {
       // Use the reservation period
       startDate = new Date(reservationStartDate)
+      startDate.setHours(0, 0, 0, 0) // Normalize to start of day
       endDate = new Date(reservationEndDate)
+      endDate.setHours(0, 0, 0, 0) // Normalize to start of day
     } else {
       // Fallback to today + maxDates days
       startDate = new Date(today)
@@ -45,8 +48,11 @@ const SimpleListPicker: React.FC<SimpleListPickerProps> = ({
     // Generate dates within the range
     const current = new Date(startDate)
     while (current <= endDate) {
-      // Only include dates that are today or in the future
-      if (current >= today) {
+      // If we have reservation dates, include all dates in the reservation period
+      // Otherwise, only include dates that are today or in the future
+      const shouldIncludeDate = (reservationStartDate && reservationEndDate) || current >= today
+      
+      if (shouldIncludeDate) {
         const dateKey = dateToKey(current)
         const dayName = current.toLocaleDateString('en-US', { weekday: 'short' })
         const day = current.getDate()

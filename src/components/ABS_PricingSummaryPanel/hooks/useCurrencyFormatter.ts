@@ -37,7 +37,12 @@ export const useCurrencyFormatter = ({ currency, locale, euroSuffix }: UseCurren
       if (formatter) {
         return formatter.format(price)
       }
-      return `${euroSuffix}${price.toFixed(2)}`
+      // Fallback with thousands separators
+      const formattedNumber = price.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+      return `${euroSuffix}${formattedNumber}`
     },
     [formatter, euroSuffix]
   )

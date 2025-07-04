@@ -27,7 +27,11 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
   itemsLabel = 'items',
 }) => {
   const formatPrice = (price: number): string => {
-    return `${price.toFixed(2)} ${currencySymbol}`
+    const formattedNumber = price.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    return `${currencySymbol}${formattedNumber}`
   }
 
   return (
@@ -48,7 +52,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
               <div className="h-6 w-20 bg-neutral-100 rounded" />
             </div>
           ) : (
-            <span className="text-lg font-bold text-blue-600">{formatPrice(total)}</span>
+            <span className="text-lg font-bold text-blue-600 whitespace-nowrap">{formatPrice(total)}</span>
           )}
         </div>
 

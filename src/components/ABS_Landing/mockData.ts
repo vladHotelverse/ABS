@@ -189,11 +189,11 @@ export const roomOptions = [
     price: 599.99,
     perNight: true,
     image:
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt643/5a6459fb-7a86-4d9d-9d9d-acd9a80033d5/original.webp',
     images: [
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/850e6840-cc2b-48f8-9059-3a64d2b9b097/image.webp',
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/f356e89d-6dca-443e-9ac4-9bb975a84b07/image.webp',
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/e69fa285-5242-4992-831b-7e67d401ba00/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt643/5a6459fb-7a86-4d9d-9d9d-acd9a80033d5/original.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt643/e58aeb29-1399-422a-906f-6efc480221c4/original.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt643/40f0715d-3d66-49b7-b71b-cbd8e9d6ed1c/original.webp',
     ],
     amenities: [
       '24 Hours Room Service',
@@ -237,11 +237,11 @@ export const roomOptions = [
     price: 799.99,
     perNight: true,
     image:
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt644/b15ce84f-709d-4d46-a0af-2654a645c643/original.webp',
     images: [
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/850e6840-cc2b-48f8-9059-3a64d2b9b097/image.webp',
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/f356e89d-6dca-443e-9ac4-9bb975a84b07/image.webp',
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/e69fa285-5242-4992-831b-7e67d401ba00/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt644/b15ce84f-709d-4d46-a0af-2654a645c643/original.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt644/6f7ea7a0-68df-47ec-8902-0e9a93eb41c1/original.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt644/7dc6a198-3225-49c0-b89e-5fcc4abcf4dc/original.webp',
     ],
     amenities: [
       '24 Hours Room Service',
@@ -699,6 +699,8 @@ export const translations = {
     addForPriceText: 'Add for',
     availableOptionsText: 'Available Options:',
     removeText: 'Remove',
+    showMoreText: 'Show More',
+    showLessText: 'Show Less',
     // New texts for compatibility system
     optionDisabledText: 'Not Available',
     conflictWithText: 'Conflicts with',
@@ -868,6 +870,8 @@ export const translations = {
     addForPriceText: 'Añadir por',
     availableOptionsText: 'Opciones Disponibles:',
     removeText: 'Quitar',
+    showMoreText: 'Mostrar Más',
+    showLessText: 'Mostrar Menos',
     // New texts for compatibility system
     optionDisabledText: 'No Disponible',
     conflictWithText: 'Conflicto con',

@@ -78,6 +78,8 @@ export interface RoomCustomizationTexts {
   addForPriceText: string
   availableOptionsText: string
   removeText: string
+  showMoreText: string
+  showLessText: string
   // New texts for compatibility system
   optionDisabledText: string
   conflictWithText: string

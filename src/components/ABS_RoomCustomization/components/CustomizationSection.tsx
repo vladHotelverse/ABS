@@ -43,11 +43,20 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   fallbackImageUrl,
 }) => {
   const [showInfo, setShowInfo] = useState(false)
+  const [showAllOptions, setShowAllOptions] = useState(false)
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
+  
+  const INITIAL_ITEMS_COUNT = 3
+  const shouldShowMoreButton = options.length > INITIAL_ITEMS_COUNT
+  const displayOptions = showAllOptions ? options : options.slice(0, INITIAL_ITEMS_COUNT)
 
   const handleInfoToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
     setShowInfo(!showInfo)
+  }
+
+  const handleShowMoreToggle = () => {
+    setShowAllOptions(!showAllOptions)
   }
 
   return (
@@ -86,7 +95,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
             </div>
           )}
 
-          {options.map((option) => {
+          {displayOptions.map((option) => {
             const isSelected = selectedOptions[config.key]?.id === option.id
             const isDisabled = disabledOptions[option.id]?.disabled || false
             const disabledReason = disabledOptions[option.id]?.reason
@@ -123,6 +132,21 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
             }
             return null
           })}
+          
+          {/* Show More/Less Button */}
+          {shouldShowMoreButton && (
+            <div className="col-span-full flex justify-center pt-4">
+              <button
+                onClick={handleShowMoreToggle}
+                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200 border border-blue-200 hover:border-blue-300"
+              >
+                {showAllOptions 
+                  ? texts.showLessText
+                  : `${texts.showMoreText} (${options.length - INITIAL_ITEMS_COUNT} more)`
+                }
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

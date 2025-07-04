@@ -152,9 +152,9 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Cart and Price */}
           <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-xs text-neutral-300">{totalLabel}</p>
-              <p className="text-base font-medium">{formattedPrice}</p>
+            <div className="text-right min-w-0 flex-shrink-0">
+              <p className="text-xs text-neutral-300 whitespace-nowrap">{totalLabel}</p>
+              <p className="text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis">{formattedPrice}</p>
             </div>
             <UiButton
               onClick={onCartClick}

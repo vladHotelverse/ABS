@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { Check } from 'lucide-react'
 import { UiTooltip, UiTooltipContent, TooltipProvider, UiTooltipTrigger } from '@/components/ui/tooltip'
 import type { RoomCustomizationTexts, ExactViewOption } from '../types'
+import { UiButton } from '@/components/ui/button'
 
 interface ViewCardProps {
   view: ExactViewOption
@@ -57,13 +58,13 @@ export const ViewCard: React.FC<ViewCardProps> = ({
         )}
 
         <div className="absolute bottom-0 left-10 right-10 py-2 text-center">
-          <button
+          <UiButton
             onClick={handleClick}
             disabled={isDisabled}
-            className={clsx('text-xs font-medium mb-4 p-3 rounded shadow transition-all duration-300', {
-              'bg-red-500 text-white hover:bg-red-600': isSelected && !isDisabled,
-              'bg-white hover:bg-neutral-100 hover:translate-y-[-2px] hover:shadow-md': !isSelected && !isDisabled,
-              'bg-neutral-300 text-neutral-500 cursor-not-allowed': isDisabled,
+            variant={isSelected ? 'destructive' : 'outline'}
+            size="xs"
+            className={clsx('mb-4 p-3 shadow transition-all duration-300', {
+              'hover:translate-y-[-2px] hover:shadow-md': !isSelected && !isDisabled,
             })}
           >
             {isSelected 
@@ -71,7 +72,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({
               : isDisabled 
                 ? texts.optionDisabledText
                 : `${texts.addForPriceText} ${view.price.toFixed(2)} EUR`}
-          </button>
+          </UiButton>
         </div>
 
         {/* Selected indicator */}

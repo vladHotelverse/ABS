@@ -86,7 +86,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
             onClick={handleClick} 
             variant={isSelected ? 'link' : 'secondary'} 
             size="sm" 
-            className="w-full"
+            className="w-full hover:bg-black hover:text-white transition-all border"
             disabled={isDisabled}
           >
             {isSelected 

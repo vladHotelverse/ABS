@@ -45,7 +45,13 @@ export const formatPrice = (amount: number, currencySymbol = '€', decimals = 2
     return `${currencySymbol}0.00`
   }
 
-  return `${currencySymbol}${amount.toFixed(decimals)}`
+  // Format with thousands separators for better readability
+  const formattedNumber = amount.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+
+  return `${currencySymbol}${formattedNumber}`
 }
 
 /**
@@ -91,9 +97,20 @@ export function formatCurrency(
     }
   }
 
-  // Fallback to simple formatting with proper decimal places
+  // Fallback to simple formatting with proper decimal places and locale-aware thousands separators
   const finalDecimals = decimals ?? (currency ? getCurrencyDecimals(currency) : 2)
-  return formatPrice(price, euroSuffix, finalDecimals)
+  
+  // Use locale-aware formatting even for fallback
+  try {
+    const formattedNumber = price.toLocaleString('en-US', {
+      minimumFractionDigits: finalDecimals,
+      maximumFractionDigits: finalDecimals,
+    })
+    return `${euroSuffix}${formattedNumber}`
+  } catch (error) {
+    // Final fallback
+    return formatPrice(price, euroSuffix, finalDecimals)
+  }
 }
 
 /**

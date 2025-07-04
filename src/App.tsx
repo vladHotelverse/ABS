@@ -40,10 +40,11 @@ function App() {
           roomSelectionMap={roomSelectionMap}
           translations={currentTranslations}
           language={currentLang}
-          checkIn="2024-07-15"
-          checkOut="2024-07-20"
+          checkIn="01/01/2025"
+          checkOut="01/01/2025"
+          roomType="DELUXE SILVER"
           occupancy="2 Adults, 0 Children"
-          reservationCode="DEMO-12345"
+          reservationCode="1003066AU"
           onCartClick={() => {
             console.log('Cart clicked')
           }}

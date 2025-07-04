@@ -88,11 +88,10 @@ export const useMultiBookingState = ({
 
   // Computed values
   const totalItemCount = roomBookings.reduce((sum, booking) => sum + booking.items.length, 0)
-  const totalPrice =
-    roomBookings.reduce((sum, booking) => {
-      const bookingTotal = booking.items.reduce((itemSum, item) => itemSum + item.price, 0)
-      return sum + bookingTotal
-    }, 0) * 1.1 // Add 10% tax
+  const totalPrice = roomBookings.reduce((sum, booking) => {
+    const bookingTotal = booking.items.reduce((itemSum, item) => itemSum + item.price, 0)
+    return sum + bookingTotal
+  }, 0) // Removed tax to match pricing panel
 
   return {
     // State
