@@ -1,4 +1,4 @@
-import { Bed, Building2, Hotel, Waves } from 'lucide-react'
+import { Bed, Building2, Hotel, Waves, Package } from 'lucide-react'
 
 // Mock data for ABS_Landing stories
 export const roomOptions = [
@@ -185,114 +185,219 @@ export const roomOptions = [
 export const bedsOptions = [
   {
     id: 'twin',
-    name: 'Twin Beds',
+    name: '2 x Twin Beds',
     description: 'Two separate single beds',
     price: 0,
     icon: 'bed',
-    label: 'Twin Beds',
-  },
-  {
-    id: 'queen',
-    name: 'Queen Bed',
-    description: 'One large queen-sized bed',
-    price: 15,
-    icon: 'bed',
-    label: 'Queen Bed',
+    label: '2 x Twin Beds',
   },
   {
     id: 'king',
-    name: 'King Bed',
+    name: 'King Size Bed',
     description: 'One extra-large king-sized bed',
-    price: 30,
+    price: 5,
     icon: 'bed',
-    label: 'King Bed',
+    label: 'King Size Bed',
+  },
+  {
+    id: 'sofa',
+    name: 'Sofa Bed - Single',
+    description: 'Single sofa bed for additional sleeping space',
+    price: 2,
+    icon: 'bed',
+    label: 'Sofa Bed - Single',
   },
 ]
 
 export const locationOptions = [
   {
-    id: 'standard',
-    name: 'Standard View',
-    description: 'Basic room with no specific view',
+    id: 'main-building',
+    name: 'In Main Building',
+    description: 'Located in the main hotel building',
     price: 0,
     icon: 'building',
-    label: 'Standard View',
+    label: 'In Main Building',
   },
   {
-    id: 'poolside',
-    name: 'Poolside',
-    description: 'Room near the swimming pool',
-    price: 25,
+    id: 'main-restaurant',
+    name: 'Close to Main Restaurant',
+    description: 'Convenient access to the main restaurant',
+    price: 2,
+    icon: 'utensils',
+    label: 'Close to Main Restaurant',
+  },
+  {
+    id: 'miniclub',
+    name: 'Close to Miniclub',
+    description: 'Perfect for families with children',
+    price: 2,
+    icon: 'baby',
+    label: 'Close to Miniclub',
+  },
+  {
+    id: 'pool',
+    name: 'Close to Pool',
+    description: 'Easy access to swimming facilities',
+    price: 4,
     icon: 'waves',
-    label: 'Poolside',
+    label: 'Close to Pool',
   },
   {
-    id: 'oceanview',
-    name: 'Ocean View',
-    description: 'Room with a beautiful ocean view',
-    price: 50,
-    icon: 'corner-up-right',
-    label: 'Ocean View',
+    id: 'wellness',
+    name: 'Close to Wellness',
+    description: 'Near spa and wellness facilities',
+    price: 2,
+    icon: 'heart',
+    label: 'Close to Wellness',
+  },
+  {
+    id: 'beach-access',
+    name: 'Direct Access to Beach',
+    description: 'Direct pathway to the beach',
+    price: 6,
+    icon: 'umbrella',
+    label: 'Direct Access to Beach',
+  },
+  {
+    id: 'quiet-zone',
+    name: 'Quiet Hotel Zone',
+    description: 'Peaceful area for relaxation',
+    price: 4,
+    icon: 'volume-x',
+    label: 'Quiet Hotel Zone',
   },
 ]
 
 export const floorOptions = [
   {
-    id: 'ground',
-    name: 'Ground Floor',
-    description: 'Easy access, no stairs or elevator needed',
-    price: 0,
+    id: 'ground-floor',
+    name: 'Ground Floor Location',
+    description: 'Easy access without elevators',
+    price: 6,
     icon: 'home',
-    label: 'Ground Floor',
+    label: 'Ground Floor Location',
   },
   {
-    id: 'mid',
-    name: 'Middle Floors (2-4)',
-    description: 'Balance between view and accessibility',
+    id: 'upper-floor',
+    name: 'Upper Floor',
+    description: 'Higher floors with better views',
+    price: 6,
+    icon: 'arrow-up',
+    label: 'Upper Floor',
+  },
+]
+
+export const distributionOptions = [
+  {
+    id: 'garden-access',
+    name: 'Access to Garden',
+    description: 'Direct access to hotel gardens',
+    price: 4,
+    icon: 'flower',
+    label: 'Access to Garden',
+  },
+  {
+    id: 'pool-access',
+    name: 'Access to Pool',
+    description: 'Direct access to swimming pool',
+    price: 10,
+    icon: 'waves',
+    label: 'Access to Pool',
+  },
+  {
+    id: 'balcony',
+    name: 'Balcony',
+    description: 'Private balcony with outdoor seating',
+    price: 2,
+    icon: 'door-open',
+    label: 'Balcony',
+  },
+  {
+    id: 'connecting-room',
+    name: 'Connecting Room',
+    description: 'Adjacent rooms with connecting door',
     price: 15,
-    icon: 'layout',
-    label: 'Middle Floors (2-4)',
+    icon: 'link',
+    label: 'Connecting Room',
   },
   {
-    id: 'high',
-    name: 'High Floor (5+)',
-    description: 'Best views but requires elevator',
-    price: 30,
-    icon: 'layers',
-    label: 'High Floor (5+)',
+    id: 'living-room',
+    name: 'Living Room',
+    description: 'Separate living area in the room',
+    price: 10,
+    icon: 'sofa',
+    label: 'Living Room',
+  },
+  {
+    id: 'terrace',
+    name: 'Terrace',
+    description: 'Large outdoor terrace area',
+    price: 6,
+    icon: 'sun',
+    label: 'Terrace',
   },
 ]
 
 export const viewOptions = [
   {
-    id: 'interior',
-    name: 'Interior',
-    description: 'Room facing the interior courtyard',
+    id: 'city-view',
+    name: 'City View',
+    description: 'Room with a view of the city',
     price: 0,
     icon: 'arrow-up',
-    label: 'Interior View',
+    label: 'City View',
     imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18015/outside/5a6470e5-65cc-46a5-bc84-1ac0f73789bf/image_c.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt632/16535a10-26bd-4037-9e4b-2b1be6e51c4a/original.webp',
   },
   {
-    id: 'street',
-    name: 'Street View',
-    description: 'Room with a view of the street',
-    price: 10,
+    id: 'garden-view',
+    name: 'Garden View',
+    description: 'Room with a view of the garden',
+    price: 2,
     icon: 'corner-up-right',
-    label: 'Street View',
+    label: 'Garden View',
     imageUrl:
-      'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt636/c81251c8-1e68-48dc-b9f3-57aa7bacd2c3/original.webp',
   },
   {
-    id: 'ocean',
-    name: 'Ocean View',
-    description: 'Room with ocean view',
-    price: 45,
+    id: 'lateral-sea-view',
+    name: 'Lateral Sea View',
+    description: 'Room with a lateral view of the sea',
+    price: 6,
     icon: 'waves',
-    label: 'Ocean View',
+    label: 'Lateral Sea View',
     imageUrl:
-      'https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1064&q=80',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt637/6e113cf5-c645-4742-b101-085b25ac90a8/original.webp',
+  },
+  {
+    id: 'pool-view',
+    name: 'Pool View',
+    description: 'Room with a view of the pool',
+    price: 5,
+    icon: 'waves',
+    label: 'Pool View',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18421/outside/671d6b61-edff-4ce7-9acf-f22c908f1699/original.webp',
+  },
+  {
+    id: 'sea-frontal-view',
+    name: 'Sea Frontal View',
+    description: 'Room with a frontal view of the sea',
+    price: 10,
+    icon: 'waves',
+    label: 'Sea Frontal View',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18015/outside/5a6470e5-65cc-46a5-bc84-1ac0f73789bf/original.webp',
+  },
+  {
+    id: 'stage-view',
+    name: 'Stage View',
+    description: 'Room with a view of the stage',
+    price: 6,
+    icon: 'corner-up-right',
+    label: 'Stage View',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18476/outside/745ba6f2-1149-4799-abc3-6527ef0dd0c7/original.webp',
   },
 ]
 
@@ -410,9 +515,12 @@ export const translations = {
       "Select the exact view from your room. Each option offers a unique perspective of the hotel's surroundings, from panoramic city views to impressive sunrises over the sea.",
     floorInfoText:
       'The floor where your room is located can influence the view, noise level, and accessibility. Upper floors offer better views and less noise, while lower floors provide quicker access to hotel facilities.',
+    distributionInfoText:
+      'Choose how your room is distributed and what amenities are included. Each option offers different space configurations and access to specific hotel features like gardens, pools, or additional living areas.',
     bedsTitle: 'Beds',
     locationTitle: 'Location',
     floorTitle: 'Floor',
+    distributionTitle: 'Distribution',
     viewTitle: 'Exact  View',
 
     // Updated translation props for SpecialOffers (using new labels structure)
@@ -556,9 +664,12 @@ export const translations = {
       'Selecciona la vista exacta desde tu habitación. Cada opción ofrece una perspectiva única del entorno del hotel, desde vistas panorámicas de la ciudad hasta impresionantes amaneceres sobre el mar.',
     floorInfoText:
       'El piso en el que se encuentra tu habitación puede influir en la vista, el ruido y la accesibilidad. Los pisos superiores ofrecen mejores vistas y menos ruido, mientras que los pisos inferiores proporcionan un acceso más rápido a las instalaciones del hotel.',
+    distributionInfoText:
+      'Elige cómo se distribuye tu habitación y qué comodidades están incluidas. Cada opción ofrece diferentes configuraciones de espacio y acceso a características específicas del hotel como jardines, piscinas o áreas de estar adicionales.',
     bedsTitle: 'Camas',
     locationTitle: 'Ubicación',
     floorTitle: 'Piso',
+    distributionTitle: 'Distribución',
     viewTitle: 'Vista',
 
     // Updated translation props for SpecialOffers (using new labels structure)
@@ -696,6 +807,14 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       infoText: texts.floorInfoText,
     },
     {
+      key: 'distribucion',
+      title: texts.distributionTitle || 'Distribución',
+      icon: Package,
+      hasModal: true,
+      hasFeatures: false,
+      infoText: texts.distributionInfoText,
+    },
+    {
       key: 'vista',
       title: texts.viewTitle || 'Vista exacta',
       icon: Waves,
@@ -787,5 +906,6 @@ export const sectionOptions = {
   camas: bedsOptions,
   ubicacion: locationOptions,
   piso: floorOptions,
+  distribucion: distributionOptions,
   vista: viewOptions,
 }

@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { Check } from 'lucide-react'
 import type { RoomCustomizationTexts, ViewOption } from '../types'
 
 interface ViewCardProps {
@@ -29,15 +30,25 @@ export const ViewCard: React.FC<ViewCardProps> = ({
           <button
             onClick={onSelect}
             className={clsx('text-xs font-medium mb-4 p-3 rounded shadow transition-all duration-300', {
-              'bg-white/90 ring-2 ring-neutral-400/10 ring-offset-2': isSelected,
+              'bg-red-500 text-white hover:bg-red-600': isSelected,
               'bg-white hover:bg-neutral-100 hover:translate-y-[-2px] hover:shadow-md': !isSelected,
             })}
           >
-            {isSelected ? texts.selectedText : texts.improveText}
+            {isSelected 
+              ? texts.removeText 
+              : view.price > 0 
+                ? `${texts.addForPriceText} ${view.price} EUR`
+                : texts.selectText}
           </button>
         </div>
 
-        <div className="absolute top-2 left-2 bg-neutral-800/70 text-white text-xs px-2 py-1 rounded">{view.label}</div>
+        <div className={clsx("absolute top-2 left-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1", {
+          "bg-green-600/90": isSelected,
+          "bg-neutral-800/70": !isSelected
+        })}>
+          {isSelected && <Check className="h-3 w-3" />}
+          {view.label}
+        </div>
       </div>
     </div>
   )

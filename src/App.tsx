@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LanguageSelector } from '@/components/LanguageSelector'
+// import { LanguageSelector } from '@/components/LanguageSelector'
 import { ABSLanding } from '@/components/ABS_Landing/ABS_Landing'
 import { 
   roomOptions, 
@@ -15,10 +15,10 @@ function App() {
   const { i18n } = useTranslation()
   const [currentLanguage, setCurrentLanguage] = useState('en')
 
-  const changeLanguage = (language: string) => {
-    i18n.changeLanguage(language)
-    setCurrentLanguage(language)
-  }
+  // const changeLanguage = (language: string) => {
+  //   i18n.changeLanguage(language)
+  //   setCurrentLanguage(language)
+  // }
 
   // Set English as default on mount
   useEffect(() => {
@@ -31,23 +31,7 @@ function App() {
   const currentTranslations = translations[currentLang]
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">ABS Components Demo</h1>
-              <p className="text-muted-foreground">Advanced Booking System Components</p>
-            </div>
-            <LanguageSelector 
-              currentLanguage={currentLanguage}
-              onLanguageChange={changeLanguage}
-            />
-          </div>
-        </div>
-      </header>
-      
-      <main>
+      <main className="min-h-screen bg-background">
         <ABSLanding
           roomOptions={roomOptions}
           sections={sections}
@@ -69,7 +53,6 @@ function App() {
           }}
         />
       </main>
-    </div>
   )
 }
 

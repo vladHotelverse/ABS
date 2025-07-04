@@ -30,6 +30,7 @@ export interface SectionConfig {
 export interface RoomCustomizationTexts {
   improveText: string
   selectedText: string
+  selectText: string
   pricePerNightText: string
   featuresText: string
   understood: string
