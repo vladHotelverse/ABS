@@ -46,9 +46,14 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   const [showAllOptions, setShowAllOptions] = useState(false)
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
   
+  // Filter out disabled exact view options - they should be completely removed from the list
+  const filteredOptions = isExactViewSection 
+    ? options.filter(option => !disabledOptions[option.id]?.disabled)
+    : options
+  
   const INITIAL_ITEMS_COUNT = 3
-  const shouldShowMoreButton = options.length > INITIAL_ITEMS_COUNT
-  const displayOptions = showAllOptions ? options : options.slice(0, INITIAL_ITEMS_COUNT)
+  const shouldShowMoreButton = filteredOptions.length > INITIAL_ITEMS_COUNT
+  const displayOptions = showAllOptions ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)
 
   const handleInfoToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -142,7 +147,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
               >
                 {showAllOptions 
                   ? texts.showLessText
-                  : `${texts.showMoreText} (${options.length - INITIAL_ITEMS_COUNT} more)`
+                  : `${texts.showMoreText} (${filteredOptions.length - INITIAL_ITEMS_COUNT} more)`
                 }
               </button>
             </div>

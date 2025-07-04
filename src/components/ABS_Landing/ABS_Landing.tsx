@@ -215,15 +215,26 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   const stayDates = checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'N/A'
 
   // Use custom hooks for state management
-  const bookingState = useBookingState({
+  const {
+    selectedRoom,
+    selectedCustomizations,
+    selectedOffers,
+    subtotal,
+    state,
+    isPriceCalculating,
+    showMobilePricing,
+    actions,
+  } = useBookingState({
     initialSelectedRoom,
     initialState,
     initialSubtotal,
     initialTax,
     onConfirmBooking,
     nights,
-  })
+  });
 
+  const { showToast } = actions;
+  
   const multiBookingState = useMultiBookingState({
     initialRoomBookings,
     onMultiBookingChange,
@@ -243,23 +254,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
   // Extract state from hooks for easier access
   const {
-    selectedRoom,
-    selectedCustomizations,
-    selectedOffers,
-    subtotal,
-    state,
-    isPriceCalculating,
-    isMobilePricingOverlayOpen,
-    setSelectedRoom,
-    setSelectedCustomizations,
-    setSelectedOffers,
-    setIsMobilePricingOverlayOpen,
-    handleConfirmBooking,
-    handleRetry,
-    handleBackToNormal,
-  } = bookingState
-
-  const {
     roomBookings,
     activeRoomId,
     totalItemCount: multiBookingItemCount,
@@ -278,26 +272,11 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
   // Handlers for user interactions
   const handleRoomSelect = (room: RoomOption) => {
-    setSelectedRoom(room)
+    actions.selectRoom(room);
   }
 
   const handleCustomizationChange = (category: string, optionId: string, optionLabel: string, optionPrice: number) => {
-    setSelectedCustomizations((prev) => {
-      const updated = { ...prev }
-      const categoryKey = category.toLowerCase() as keyof SelectedCustomizations
-
-      if (!optionId) {
-        delete updated[categoryKey]
-      } else {
-        updated[categoryKey] = {
-          id: optionId,
-          label: optionLabel,
-          price: optionPrice,
-        }
-      }
-
-      return updated
-    })
+    actions.updateCustomization(category, optionId, optionLabel, optionPrice);
   }
 
   // Create reservation info for special offers
@@ -308,70 +287,89 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }
 
   const handleBookOffer = (offerData: OfferData) => {
-    const originalOffer = specialOffers.find(
-      (offer, index) => (typeof offer.id === 'string' ? index + 1 : offer.id) === offerData.id
-    )
-
     const newOffer: SelectedOffer = {
-      id: originalOffer?.id || offerData.id,
+      id: offerData.id,
       name: offerData.name,
       price: offerData.price,
       quantity: offerData.quantity,
-      persons: offerData.persons,
-      nights: offerData.nights,
-    }
-
-    const existingIndex = selectedOffers.findIndex((offer) => offer.id === newOffer.id)
-    if (existingIndex >= 0) {
-      setSelectedOffers((prev) => {
-        const updatedOffers = [...prev]
-        updatedOffers[existingIndex] = { ...updatedOffers[existingIndex], quantity: newOffer.quantity }
-        return updatedOffers
-      })
-    } else {
-      setSelectedOffers((prev) => [...prev, newOffer])
-    }
-  }
+    };
+    actions.updateOffer(newOffer);
+  };
 
   const handleRemoveRoomUpgrade = () => {
-    setSelectedRoom(undefined)
-    setSelectedCustomizations({})
+    actions.removeRoom();
   }
 
   const handleRemoveCustomization = (optionId: string | number, label: string) => {
-    setSelectedCustomizations((prev) => {
-      const updated = { ...prev }
-      for (const key in updated) {
-        if (updated[key]?.id === optionId && updated[key]?.label === label) {
-          delete updated[key]
-          break
-        }
-      }
-      return updated
-    })
-  }
+    // Find the category of the option to be removed
+    const category = Object.keys(selectedCustomizations).find(
+      (key) => selectedCustomizations[key]?.id === optionId
+    );
+
+    if (category) {
+      // Call handleCustomizationChange to deselect the item
+      actions.removeCustomization(category);
+    }
+    
+    showToast(`${t.customizationRemovedMessagePrefix} "${label}"`, 'info');
+  };
 
   const handleRemoveSpecialOffer = (offerId: string | number, _offerName: string) => {
-    setSelectedOffers((prev) => prev.filter((offer) => offer.id !== offerId))
-  }
+    actions.removeOffer(String(offerId));
+  };
 
   const handleLearnMore = (room: RoomOption) => {
-    console.log('Open room details modal for room:', room)
+    console.log('Learn more about:', room);
   }
 
   const handleEditSection = (_section: 'room' | 'customizations' | 'offer') => {
     if (state === 'confirmation') {
-      handleBackToNormal()
+      actions.resetState();
     }
   }
 
   const handleShowMobilePricing = () => {
-    setIsMobilePricingOverlayOpen(true)
+    actions.setShowMobilePricing(true);
   }
 
   const handleCloseMobilePricing = () => {
-    setIsMobilePricingOverlayOpen(false)
+    actions.setShowMobilePricing(false);
   }
+
+  // Handlers for booking state transitions
+  const handleConfirm = () => {
+    actions.confirmBooking();
+  };
+
+  const handleRetry = () => {
+    actions.resetState();
+  };
+
+  const handleBackToNormal = () => {
+    actions.resetState();
+  };
+
+  // Unified handler for removing items from both single and multi-booking panels
+  const handleRemoveItem = (
+    itemId: string | number,
+    itemName: string,
+    itemType: PricingItem['type'],
+    _roomId?: string
+  ) => {
+    if (itemType === 'customization') {
+      const category = Object.keys(selectedCustomizations).find(
+        (key) => selectedCustomizations[key]?.id === itemId
+      );
+      if (category) {
+        actions.removeCustomization(category);
+      }
+      showToast(`${t.customizationRemovedMessagePrefix} "${itemName}"`, 'info');
+    } else if (itemType === 'offer') {
+      actions.removeOffer(itemId);
+    } else if (itemType === 'room') {
+      actions.removeRoom();
+    }
+  };
 
   // Create section texts for subcomponents
   const roomTexts = {
@@ -536,7 +534,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               currency="EUR"
               locale={language === 'en' ? 'en-US' : 'es-ES'}
               isLoading={isPriceCalculating}
-              onRemoveItem={handleMultiBookingRemoveItem}
+              onRemoveItem={(roomId, itemId, itemName, itemType) =>
+                handleRemoveItem(itemId, itemName, itemType, roomId)
+              }
               onEditSection={handleMultiBookingEditSection}
               onConfirmAll={handleMultiBookingConfirmAll}
             />
@@ -595,15 +595,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               currency="EUR"
               locale={language === 'en' ? 'en-US' : 'es-ES'}
               onRemoveItem={(id, name, type) => {
-                if (type === 'room') {
-                  handleRemoveRoomUpgrade()
-                } else if (type === 'customization') {
-                  handleRemoveCustomization(id, name)
-                } else if (type === 'offer') {
-                  handleRemoveSpecialOffer(id, name)
-                }
+                handleRemoveItem(id, name, type)
               }}
-              onConfirm={handleConfirmBooking}
+              onConfirm={handleConfirm}
               onEditSection={(section) => {
                 if (section === 'room') handleEditSection('room')
                 else if (section === 'customizations') handleEditSection('customizations')
@@ -626,7 +620,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
       {/* Mobile Pricing Overlay */}
       <MobilePricingOverlay
-        isOpen={isMobilePricingOverlayOpen}
+        isOpen={showMobilePricing}
         onClose={handleCloseMobilePricing}
         roomImage={selectedRoom?.image || fallbackImageUrl}
         items={[
@@ -681,15 +675,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         currency="EUR"
         locale={language === 'en' ? 'en-US' : 'es-ES'}
         onRemoveItem={(id: string | number, name: string, type: PricingItem['type']) => {
-          if (type === 'room') {
-            handleRemoveRoomUpgrade()
-          } else if (type === 'customization') {
-            handleRemoveCustomization(id, name)
-          } else if (type === 'offer') {
-            handleRemoveSpecialOffer(id, name)
-          }
+          handleRemoveItem(id, name, type)
         }}
-        onConfirm={handleConfirmBooking}
+        onConfirm={handleConfirm}
         onEditSection={(section: 'room' | 'customizations' | 'offers') => {
           if (section === 'room') handleEditSection('room')
           else if (section === 'customizations') handleEditSection('customizations')

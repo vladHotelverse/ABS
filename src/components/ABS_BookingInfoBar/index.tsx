@@ -9,7 +9,7 @@ import type { BookingInfoProps } from './types'
 const BookingInfoBar: React.FC<BookingInfoProps> = ({
   className,
   hotelImage = DEFAULT_HOTEL_IMAGE,
-  title = 'Información de tu reserva',
+  title = 'Your Booking Information',
   showBanner = true,
   items = [],
   roomBookings = [],

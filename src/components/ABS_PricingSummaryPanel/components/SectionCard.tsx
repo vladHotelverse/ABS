@@ -56,7 +56,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, exploreLabel, fromLa
 
   return (
     <Card
-      className={`transition-all duration-300 cursor-pointer border-2 ${
+      className={`transition-all duration-300 border-2 ${
         isHovered ? `${bgHover} ${borderHover}` : 'border-neutral-200 hover:border-neutral-300'
       }`}
       onMouseEnter={() => setIsHovered(true)}
@@ -85,7 +85,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, exploreLabel, fromLa
             </div>
           </div>
 
-          <UiButton
+          {/* <UiButton
             variant="ghost"
             size="sm"
             className={`text-blue-600 font-medium hover:bg-blue-50 transition-colors duration-200 ${
@@ -94,7 +94,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, exploreLabel, fromLa
           >
             <span className="text-xs">{exploreLabel}</span>
             <ChevronRight className="h-3 w-3 ml-1" />
-          </UiButton>
+          </UiButton> */}
         </div>
 
         {/* Show description on hover */}

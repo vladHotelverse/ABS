@@ -14,33 +14,6 @@ export interface UseBookingStateProps {
   nights?: number
 }
 
-export interface UseBookingStateReturn {
-  // State
-  selectedRoom: RoomOption | undefined
-  selectedCustomizations: SelectedCustomizations
-  selectedOffers: SelectedOffer[]
-  subtotal: number
-  tax: number
-  total: number
-  state: BookingState
-  isPriceCalculating: boolean
-  isMobilePricingOverlayOpen: boolean
-
-  // Actions
-  setSelectedRoom: (room: RoomOption | undefined) => void
-  setSelectedCustomizations: (
-    customizations: SelectedCustomizations | ((prev: SelectedCustomizations) => SelectedCustomizations)
-  ) => void
-  setSelectedOffers: (offers: SelectedOffer[] | ((prev: SelectedOffer[]) => SelectedOffer[])) => void
-  setState: (state: BookingState) => void
-  setIsMobilePricingOverlayOpen: (open: boolean) => void
-
-  // Handlers
-  handleConfirmBooking: () => void
-  handleRetry: () => void
-  handleBackToNormal: () => void
-}
-
 export const useBookingState = ({
   initialSelectedRoom,
   initialState = 'normal',
@@ -48,7 +21,7 @@ export const useBookingState = ({
   initialTax = 0,
   onConfirmBooking,
   nights = 1,
-}: UseBookingStateProps): UseBookingStateReturn => {
+}: UseBookingStateProps) => {
   // State management
   const [selectedRoom, setSelectedRoom] = useState<RoomOption | undefined>(initialSelectedRoom)
   const [selectedCustomizations, setSelectedCustomizations] = useState<SelectedCustomizations>({})
@@ -57,27 +30,65 @@ export const useBookingState = ({
   const [tax, setTax] = useState<number>(initialTax)
   const [state, setState] = useState<BookingState>(initialState)
   const [isPriceCalculating, setIsPriceCalculating] = useState<boolean>(false)
-  const [isMobilePricingOverlayOpen, setIsMobilePricingOverlayOpen] = useState<boolean>(false)
+  const [showMobilePricing, setShowMobilePricing] = useState<boolean>(false)
 
   // Update pricing when selections change
   useEffect(() => {
     setIsPriceCalculating(true)
-
-    // Simulate price calculation delay for better UX
-    const calculatePrices = setTimeout(() => {
+    const timer = setTimeout(() => {
       const pricing = calculateTotalPrice(selectedRoom, selectedCustomizations, selectedOffers, 0.1, nights)
       setSubtotal(pricing.subtotal)
       setTax(pricing.tax)
       setIsPriceCalculating(false)
     }, 300)
-
-    return () => clearTimeout(calculatePrices)
+    return () => clearTimeout(timer)
   }, [selectedRoom, selectedCustomizations, selectedOffers, nights])
 
-  // Handlers
-  const handleConfirmBooking = () => {
+  // Actions
+  const selectRoom = (room: RoomOption) => setSelectedRoom(room)
+
+  const updateCustomization = (category: string, optionId: string, optionLabel: string, optionPrice: number) => {
+    setSelectedCustomizations((prev) => {
+      const updated = { ...prev }
+      if (!optionId) {
+        delete updated[category]
+      } else {
+        updated[category] = { id: optionId, label: optionLabel, price: optionPrice }
+      }
+      return updated
+    })
+  }
+
+  const updateOffer = (offer: SelectedOffer) => {
+    setSelectedOffers((prev) => {
+      const existing = prev.find((o) => o.id === offer.id)
+      if (existing) {
+        return prev.map((o) => (o.id === offer.id ? offer : o))
+      }
+      return [...prev, offer]
+    })
+  }
+
+  const removeRoom = () => {
+    setSelectedRoom(undefined)
+    setSelectedCustomizations({})
+  }
+
+  const removeCustomization = (category: string) => {
+    setSelectedCustomizations((prev) => {
+      const updated = { ...prev }
+      delete updated[category]
+      return updated
+    })
+  }
+
+  const removeOffer = (offerId: string | number) => {
+    setSelectedOffers((prev) => prev.filter((o) => o.id !== offerId))
+  }
+
+  const confirmBooking = () => {
     setState('confirmation')
-    setIsMobilePricingOverlayOpen(false)
+    setShowMobilePricing(false)
     if (onConfirmBooking) {
       onConfirmBooking({
         room: selectedRoom,
@@ -88,15 +99,12 @@ export const useBookingState = ({
     }
   }
 
-  const handleRetry = () => {
-    setState('normal')
-  }
+  const resetState = () => setState('normal')
 
-  const handleBackToNormal = () => {
-    setState('normal')
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    // This is a placeholder. In a real app, you'd use a toast library.
+    console.log(`Toast: [${type}] ${message}`)
   }
-
-  const total = subtotal + tax
 
   return {
     // State
@@ -105,21 +113,23 @@ export const useBookingState = ({
     selectedOffers,
     subtotal,
     tax,
-    total,
+    total: subtotal + tax,
     state,
     isPriceCalculating,
-    isMobilePricingOverlayOpen,
+    showMobilePricing,
 
     // Actions
-    setSelectedRoom,
-    setSelectedCustomizations,
-    setSelectedOffers,
-    setState,
-    setIsMobilePricingOverlayOpen,
-
-    // Handlers
-    handleConfirmBooking,
-    handleRetry,
-    handleBackToNormal,
+    actions: {
+      selectRoom,
+      updateCustomization,
+      updateOffer,
+      removeRoom,
+      removeCustomization,
+      removeOffer,
+      confirmBooking,
+      resetState,
+      showToast,
+      setShowMobilePricing,
+    },
   }
 }

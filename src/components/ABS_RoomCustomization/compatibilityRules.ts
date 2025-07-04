@@ -97,6 +97,14 @@ export class CompatibilityEngine {
       const selectedInGroup = group.options.find(opt => selectedOptionIds.has(opt))
       
       if (selectedInGroup) {
+        // Find the category of the selected option
+        const selectedCategory = this.findOptionCategory(selectedInGroup, selectedOptions)
+        
+        // Skip mutual exclusivity for exact views
+        if (selectedCategory === 'vistaExacta') {
+          continue
+        }
+        
         for (const option of group.options) {
           if (option !== selectedInGroup) {
             disabled[option] = {
@@ -145,12 +153,23 @@ export class CompatibilityEngine {
     // Check mutually exclusive conflicts
     for (const group of this.rules.mutuallyExclusive) {
       if (group.options.includes(newOptionId)) {
+        // Skip mutual exclusivity for exact views - they can have multiple selections
+        if (newOptionCategory === 'vistaExacta') {
+          continue
+        }
+        
         const conflictingOption = group.options.find(opt => 
           opt !== newOptionId && selectedOptionIds.has(opt)
         )
         
         if (conflictingOption) {
           const conflictingCategory = this.findOptionCategory(conflictingOption, selectedOptions)
+          
+          // Skip mutual exclusivity if the conflicting option is also an exact view
+          if (conflictingCategory === 'vistaExacta') {
+            continue
+          }
+          
           const conflictingOptionDetails = this.findOptionDetails(conflictingOption, sectionOptions)
           const newOptionDetails = this.findOptionDetails(newOptionId, sectionOptions)
           
@@ -238,7 +257,7 @@ export class CompatibilityEngine {
    */
   resolveConflicts(
     newOptionId: string,
-    _newOptionCategory: string,
+    newOptionCategory: string,
     selectedOptions: SelectedCustomizations,
     removeConflicting: boolean = true
   ): SelectedCustomizations {
@@ -254,9 +273,20 @@ export class CompatibilityEngine {
     // Remove mutually exclusive options
     for (const group of this.rules.mutuallyExclusive) {
       if (group.options.includes(newOptionId)) {
+        // Skip mutual exclusivity for exact views
+        if (newOptionCategory === 'vistaExacta') {
+          continue
+        }
+        
         for (const option of group.options) {
           if (option !== newOptionId && selectedOptionIds.has(option)) {
             const categoryToRemove = this.findOptionCategory(option, selectedOptions)
+            
+            // Skip removing if the conflicting option is also an exact view
+            if (categoryToRemove === 'vistaExacta') {
+              continue
+            }
+            
             if (categoryToRemove) {
               delete newSelections[categoryToRemove]
             }

@@ -10,7 +10,7 @@ export const createStoryBookingItems = (overrides: BookingInfoBarItemProps[] = [
   {
     icon: 'Calendar',
     label: 'Fechas de estancia',
-    value: '01/01/2025 - 01/01/2025',
+    value: '10/10/2025 - 10/10/2025',
   },
   {
     icon: 'Home',
@@ -40,7 +40,7 @@ export const createStoryRoomBookings = (): RoomBookingInfo[] => [
       {
         icon: 'Calendar',
         label: 'Fechas de estancia',
-        value: '01/01/2025 - 05/01/2025',
+        value: '10/10/2025 - 05/01/2025',
       },
       {
         icon: 'Users',
@@ -63,7 +63,7 @@ export const createStoryRoomBookings = (): RoomBookingInfo[] => [
       {
         icon: 'Calendar',
         label: 'Fechas de estancia',
-        value: '01/01/2025 - 05/01/2025',
+        value: '10/10/2025 - 05/01/2025',
       },
       {
         icon: 'Users',

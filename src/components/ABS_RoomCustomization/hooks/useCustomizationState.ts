@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState, useMemo, useEffect } from 'react'
 import type { 
   CustomizationOption, 
   SelectedCustomizations, 
@@ -27,6 +27,11 @@ export const useCustomizationState = ({
     Object.fromEntries(Object.keys(sectionOptions).map((key) => [key, true]))
   )
   const [pendingConflict, setPendingConflict] = useState<ConflictResolution | null>(null)
+
+  // Sync internal state when initialSelections changes (e.g., when removed from pricing panel)
+  useEffect(() => {
+    setSelectedOptions(initialSelections)
+  }, [initialSelections])
 
   // Initialize compatibility engine
   const compatibilityEngine = useMemo(() => new CompatibilityEngine(compatibilityRules), [compatibilityRules])
