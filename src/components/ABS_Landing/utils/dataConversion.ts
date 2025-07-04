@@ -41,7 +41,7 @@ export const convertOffersToPricingItems = (offers: SelectedOffer[]): PricingIte
   return offers.map((o) => ({
     id: o.id,
     name: o.quantity && o.quantity > 1 ? `${o.name} (x${o.quantity})` : o.name,
-    price: o.price * (o.quantity || 1),
+    price: o.price,
     type: 'offer' as const,
   }))
 }
@@ -73,7 +73,7 @@ export const calculateTotalPrice = (
 
   // Add special offers
   selectedOffers.forEach((offer) => {
-    subtotal += offer.price * (offer.quantity || 1)
+    subtotal += offer.price
   })
 
   const tax = subtotal * taxRate
@@ -170,8 +170,34 @@ export const shouldShowSection = (
 export const calculateNights = (checkIn?: string, checkOut?: string): number => {
   if (!checkIn || !checkOut) return 1
   
-  const checkInDate = new Date(checkIn)
-  const checkOutDate = new Date(checkOut)
+  // Helper function to parse date strings in various formats
+  const parseDate = (dateStr: string): Date => {
+    // Try ISO format first (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return new Date(dateStr)
+    }
+    
+    // Try DD/MM/YYYY format
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+      const parts = dateStr.split('/')
+      // Check if it's likely DD/MM/YYYY (day > 12)
+      if (parseInt(parts[0]) > 12) {
+        // DD/MM/YYYY - convert to MM/DD/YYYY for Date constructor
+        return new Date(`${parts[1]}/${parts[0]}/${parts[2]}`)
+      }
+    }
+    
+    // Default: try parsing as-is (handles MM/DD/YYYY and other formats)
+    return new Date(dateStr)
+  }
+  
+  const checkInDate = parseDate(checkIn)
+  const checkOutDate = parseDate(checkOut)
+  
+  // Check if dates are valid
+  if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+    return 1
+  }
   
   if (checkOutDate <= checkInDate) return 1
   

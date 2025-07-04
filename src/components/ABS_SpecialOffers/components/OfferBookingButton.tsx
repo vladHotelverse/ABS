@@ -20,8 +20,8 @@ const OfferBookingButton: React.FC<OfferBookingButtonProps> = ({
   <UiButton
     onClick={onClick}
     disabled={disabled}
-    variant={isBooked ? 'destructive' : 'secondary'}
-    className="w-full cursor-pointer"
+    variant={isBooked ? 'destructive' : 'default'}
+    className="w-full cursor-pointer hover:bg-black hover:text-white transition-all border"
   >
     {isBooked && <Check className="h-4 w-4" />}
     {isBooked ? removeText : bookText}

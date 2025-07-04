@@ -8,7 +8,7 @@ export interface RoomOption {
   roomType: string
   description: string
   price: number
-  perNight: boolean
+  perNight?: boolean
   image: string
   images?: string[]
   amenities: string[]
