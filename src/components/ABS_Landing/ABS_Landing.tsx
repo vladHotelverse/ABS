@@ -14,6 +14,7 @@ import type {
   SectionConfig,
   SelectedCustomizations,
   ViewOption,
+  ExactViewOption,
 } from '../ABS_RoomCustomization/types'
 import type { OfferData } from '../ABS_SpecialOffers/types'
 
@@ -136,7 +137,7 @@ export interface ABSLandingProps {
   className?: string
   roomOptions: RoomOption[]
   sections: SectionConfig[]
-  sectionOptions: Record<string, CustomizationOption[] | ViewOption[]>
+  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[]>
   specialOffers: SpecialOffer[]
   roomSelectionMap?: {
     id: string

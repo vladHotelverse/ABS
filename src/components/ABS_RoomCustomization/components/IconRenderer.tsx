@@ -1,4 +1,29 @@
-import { ArrowUp, Bed, Building2, CornerUpRight, Home, Hotel, Layers, LayoutGrid, Square, Waves } from 'lucide-react'
+import { 
+  ArrowUp, 
+  Bed, 
+  Building2, 
+  CornerUpRight, 
+  Home, 
+  Hotel, 
+  Layers, 
+  LayoutGrid, 
+  Square, 
+  Waves,
+  Utensils,
+  Baby,
+  Heart,
+  Umbrella,
+  VolumeX,
+  Flower,
+  DoorOpen,
+  Link,
+  Sofa,
+  Sun,
+  Users,
+  Compass,
+  Eye,
+  Package
+} from 'lucide-react'
 import type React from 'react'
 
 const iconMap = {
@@ -13,6 +38,25 @@ const iconMap = {
   'arrow-up': ArrowUp,
   location: CornerUpRight,
   floor: Layers,
+  // Location icons
+  utensils: Utensils,
+  baby: Baby,
+  heart: Heart,
+  umbrella: Umbrella,
+  'volume-x': VolumeX,
+  // Distribution icons
+  flower: Flower,
+  'door-open': DoorOpen,
+  link: Link,
+  sofa: Sofa,
+  sun: Sun,
+  // New section icons
+  users: Users,
+  compass: Compass,
+  eye: Eye,
+  package: Package,
+  // Additional common icons
+  accessibility: Users, // Using Users icon for accessibility
 } as const
 
 interface IconRendererProps {

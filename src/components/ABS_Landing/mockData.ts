@@ -1,4 +1,4 @@
-import { Bed, Building2, Hotel, Waves, Package } from 'lucide-react'
+import { Bed, Building2, Hotel, Waves, Package, Home, Users, Compass, Eye, Heart } from 'lucide-react'
 
 // Mock data for ABS_Landing stories
 export const roomOptions = [
@@ -204,8 +204,60 @@ export const bedsOptions = [
     name: 'Sofa Bed - Single',
     description: 'Single sofa bed for additional sleeping space',
     price: 2,
-    icon: 'bed',
+    icon: 'sofa',
     label: 'Sofa Bed - Single',
+  },
+]
+
+export const roomSizeOptions = [
+  {
+    id: 'large-size',
+    name: '35 to 40 m2 / 375 to 430 sqft',
+    description: 'Spacious room with ample living space',
+    price: 4,
+    icon: 'home',
+    label: '35 to 40 m2 / 375 to 430 sqft',
+  },
+]
+
+export const featuresOptions = [
+  {
+    id: 'adapted-room',
+    name: 'Adapted Room',
+    description: 'Accessible room designed for guests with disabilities',
+    price: 0,
+    icon: 'accessibility',
+    label: 'Adapted Room',
+  },
+]
+
+export const orientationOptions = [
+  {
+    id: 'afternoon-sun',
+    name: 'Afternoon Sun',
+    description: 'West-facing room with warm afternoon sunlight',
+    price: 2,
+    icon: 'sun',
+    label: 'Afternoon Sun',
+  },
+  {
+    id: 'all-day-sun',
+    name: 'All-day Sun',
+    description: 'South-facing room with sunlight throughout the day',
+    price: 6,
+    icon: 'sun',
+    label: 'All-day Sun',
+  },
+]
+
+export const bestChoiceOptions = [
+  {
+    id: 'best-views',
+    name: 'Best views',
+    description: 'Rooms with the most spectacular views available',
+    price: 6,
+    icon: 'eye',
+    label: 'Best views',
   },
 ]
 
@@ -346,8 +398,6 @@ export const viewOptions = [
     price: 0,
     icon: 'arrow-up',
     label: 'City View',
-    imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt632/16535a10-26bd-4037-9e4b-2b1be6e51c4a/original.webp',
   },
   {
     id: 'garden-view',
@@ -356,8 +406,6 @@ export const viewOptions = [
     price: 2,
     icon: 'corner-up-right',
     label: 'Garden View',
-    imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt636/c81251c8-1e68-48dc-b9f3-57aa7bacd2c3/original.webp',
   },
   {
     id: 'lateral-sea-view',
@@ -366,8 +414,6 @@ export const viewOptions = [
     price: 6,
     icon: 'waves',
     label: 'Lateral Sea View',
-    imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt637/6e113cf5-c645-4742-b101-085b25ac90a8/original.webp',
   },
   {
     id: 'pool-view',
@@ -376,8 +422,6 @@ export const viewOptions = [
     price: 5,
     icon: 'waves',
     label: 'Pool View',
-    imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18421/outside/671d6b61-edff-4ce7-9acf-f22c908f1699/original.webp',
   },
   {
     id: 'sea-frontal-view',
@@ -386,8 +430,6 @@ export const viewOptions = [
     price: 10,
     icon: 'waves',
     label: 'Sea Frontal View',
-    imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18015/outside/5a6470e5-65cc-46a5-bc84-1ac0f73789bf/original.webp',
   },
   {
     id: 'stage-view',
@@ -396,20 +438,75 @@ export const viewOptions = [
     price: 6,
     icon: 'corner-up-right',
     label: 'Stage View',
+  },
+]
+
+export const exactViewOptions = [
+  {
+    id: 'city-view',
+    name: 'City View',
+    description: 'Room with a view of the city',
+    price: 0,
+    icon: 'arrow-up',
     imageUrl:
-      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18476/outside/745ba6f2-1149-4799-abc3-6527ef0dd0c7/original.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18127/outside/5630a049-2134-485a-846c-9b01d0728c31/image_c.webp',
+  },
+  {
+    id: 'garden-view',
+    name: 'Garden View',
+    description: 'Room with a view of the garden',
+    price: 2,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18174/outside/2b47e562-59f0-41da-9617-16ea6c310639/image_c.webp',
+  },
+  {
+    id: 'lateral-sea-view',
+    name: 'Lateral Sea View',
+    description: 'Room with a lateral view of the sea',
+    price: 6,
+    icon: 'waves',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18231/outside/dd68f329-aab9-4b80-a4f7-4046e0ace158/image_c.webp',
+  },
+  {
+    id: 'pool-view',
+    name: 'Pool View',
+    description: 'Room with a view of the pool',
+    price: 5,
+    icon: 'waves',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18260/outside/5f07a642-07b0-44aa-aa67-f6141c3aec04/image_c.webp',
+  },
+  {
+    id: 'sea-frontal-view',
+    name: 'Sea Frontal View',
+    description: 'Room with a frontal view of the sea',
+    price: 10,
+    icon: 'waves',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18321/outside/04424aec-0f76-4c0c-98a7-ef0e3d550483/image_c.webp',
+  },
+  {
+    id: 'stage-view',
+    name: 'Stage View',
+    description: 'Room with a view of the stage',
+    price: 6,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18364/outside/bd15466f-eef8-4464-bc45-d5dc5a6daeba/image_c.webp',
   },
 ]
 
 export const roomSelectionMap = {
   id: 'room-selection',
-  title: 'Choose your room number.',
-  description: 'Explore the hotel and choose the exact room where you want to stay.',
+  title: 'Room',
+  description: 'Choose from our selection of premium rooms and suites',
   url: 'https://map-uat.hotelverse.tech/Webmap/en/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUk0TWpSbU5EUmtaakZqWXpneFlXUTBOelkxT1dWaVpEUTJNbVJpTXpsbVlUTTBNRFprTUdZelpHSTJNVFkwWTJZMVpqRmhNVGRrWWpZNE16Y3paVFl4WkRRM1pXVmtNekUwTXpreVpHWm1ZbVU1WXpKa00yRTFPRGsxTkRBNE1tTXhNMkk1Wm1ZM056SXpaVEE1WWpjMVpXSmhZakl6Tm1FMU1EUTVPV1k0TkNJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxTVRVME9UYzFOalUwTUgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=en&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0IiwiZXh0ZXJuYWxDaGFubmVsSWQiOjAsInBsYXRmb3JtIjoiT3Ryb3MiLCJib29raW5nRGF0YSI6eyJmaXJzdE5hbWUiOiJURVNUIiwibGFzdE5hbWUiOiJURVNUIiwiZW1haWwiOiJmcmFuY2lzY28uY29zdGlsbG9AaG90ZWx2ZXJzZS50ZWNoIiwiY2hlY2tJbiI6IjIwMjUtMTAtMTAiLCJjaGVja091dCI6IjIwMjUtMTAtMTUiLCJodlJvb21UeXBlIjo2MzIsIm9jY3VwYW5jeSI6eyJhZHVsdHMiOjIsImNoaWxkcmVuIjowLCJjaGlsZEFnZXMiOltdLCJpbmZhbnRzIjowLCJjdXJyZW5jeSI6IiJ9LCJleHRlcm5hbENoYW5uZWxJZCI6MCwiaXNPd25Ib3RlbCI6ZmFsc2V9fQ%3D%3D',
   type: 'iframe' as const,
   iframe: {
     width: '100%',
-    height: '400px',
+    height: '800px',
     frameBorder: 0,
     allowFullScreen: true,
     title: 'Choose your room number - Interactive Hotel Map',
@@ -509,8 +606,16 @@ export const translations = {
     // Section info texts
     bedsInfoText:
       'Choose the type of bed you prefer for your stay. Each option offers different levels of comfort and space according to your needs. King-size beds are ideal for couples who want more space, while twin beds are perfect for friends or family.',
+    roomSizeInfoText:
+      'Select the room size that best fits your needs. Larger rooms provide more space and comfort, while standard rooms offer great value. Room size affects the overall comfort and available amenities.',
     locationInfoText:
       'The location of your room can significantly affect your experience. Corner rooms offer more privacy, while suites with sea views provide impressive ocean panoramas. Choose the location that best suits your preferences.',
+    featuresInfoText:
+      'Choose special room features that enhance your stay. From accessible accommodations to family-friendly amenities, each feature is designed to meet specific guest needs and preferences.',
+    orientationInfoText:
+      'Room orientation determines the natural light and views you\'ll enjoy throughout the day. Morning sun rooms are perfect for early risers, while all-day sun rooms offer maximum brightness.',
+    bestChoiceInfoText:
+      'Select the option that best matches your travel purpose. Whether you\'re here for business, romance, or family time, we have the perfect room configuration for your needs.',
     viewInfoText:
       "Select the exact view from your room. Each option offers a unique perspective of the hotel's surroundings, from panoramic city views to impressive sunrises over the sea.",
     floorInfoText:
@@ -518,10 +623,15 @@ export const translations = {
     distributionInfoText:
       'Choose how your room is distributed and what amenities are included. Each option offers different space configurations and access to specific hotel features like gardens, pools, or additional living areas.',
     bedsTitle: 'Beds',
+    roomSizeTitle: 'Room Size',
     locationTitle: 'Location',
     floorTitle: 'Floor',
     distributionTitle: 'Distribution',
-    viewTitle: 'Exact  View',
+    featuresTitle: 'Features',
+    orientationTitle: 'Orientation',
+    bestChoiceTitle: 'Best Choice for',
+    viewTitle: 'View',
+    exactViewTitle: 'Exact View',
 
     // Updated translation props for SpecialOffers (using new labels structure)
     specialOffersLabels: {
@@ -658,8 +768,16 @@ export const translations = {
     // Section info texts
     bedsInfoText:
       'Elige el tipo de cama que prefieras para tu estancia. Cada opción ofrece diferentes niveles de comodidad y espacio según tus necesidades. Las camas king-size son ideales para parejas que desean más espacio, mientras que las camas individuales son perfectas para amigos o familiares.',
+    roomSizeInfoText:
+      'Selecciona el tamaño de la habitación que mejor se adapte a tus necesidades. Las habitaciones más grandes proporcionan más espacio y comodidad, mientras que las habitaciones estándar ofrecen un gran valor. El tamaño de la habitación afecta la comodidad general y las comodidades disponibles.',
     locationInfoText:
       'La ubicación de tu habitación puede afectar significativamente tu experiencia. Las habitaciones en esquina ofrecen más privacidad, mientras que las suites con vista al mar te brindan panoramas impresionantes del océano. Elige la ubicación que mejor se adapte a tus preferencias.',
+    featuresInfoText:
+      'Elige las características especiales de la habitación que mejoran tu estancia. Desde acomodaciones accesibles hasta comodidades para familias, cada característica está diseñada para satisfacer las necesidades y preferencias específicas de los huéspedes.',
+    orientationInfoText:
+      'La orientación de la habitación determina la luz natural y las vistas que disfrutarás a lo largo del día. Las habitaciones con sol de la mañana son perfectas para los que se levantan temprano, mientras que las habitaciones con sol de todo el día ofrecen la máxima luminosidad.',
+    bestChoiceInfoText:
+      'Selecciona la opción que mejor coincida con tu propósito de viaje. Ya sea para negocios, romántico o tiempo de familia, tenemos la configuración de habitación perfecta para tus necesidades.',
     viewInfoText:
       'Selecciona la vista exacta desde tu habitación. Cada opción ofrece una perspectiva única del entorno del hotel, desde vistas panorámicas de la ciudad hasta impresionantes amaneceres sobre el mar.',
     floorInfoText:
@@ -667,10 +785,15 @@ export const translations = {
     distributionInfoText:
       'Elige cómo se distribuye tu habitación y qué comodidades están incluidas. Cada opción ofrece diferentes configuraciones de espacio y acceso a características específicas del hotel como jardines, piscinas o áreas de estar adicionales.',
     bedsTitle: 'Camas',
+    roomSizeTitle: 'Tamaño de la Habitación',
     locationTitle: 'Ubicación',
     floorTitle: 'Piso',
     distributionTitle: 'Distribución',
+    featuresTitle: 'Características',
+    orientationTitle: 'Orientación',
+    bestChoiceTitle: 'Mejor Opción para',
     viewTitle: 'Vista',
+    exactViewTitle: 'Vista Exacta',
 
     // Updated translation props for SpecialOffers (using new labels structure)
     specialOffersLabels: {
@@ -791,20 +914,12 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       infoText: texts.bedsInfoText,
     },
     {
-      key: 'ubicacion',
-      title: texts.locationTitle || 'Ubicación',
-      icon: Hotel,
+      key: 'roomSize',
+      title: texts.roomSizeTitle || 'Room Size',
+      icon: Home,
       hasModal: true,
       hasFeatures: false,
-      infoText: texts.locationInfoText,
-    },
-    {
-      key: 'piso',
-      title: texts.floorTitle || 'Piso',
-      icon: Building2,
-      hasModal: true,
-      hasFeatures: true,
-      infoText: texts.floorInfoText,
+      infoText: texts.roomSizeInfoText,
     },
     {
       key: 'distribucion',
@@ -815,9 +930,49 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       infoText: texts.distributionInfoText,
     },
     {
+      key: 'features',
+      title: texts.featuresTitle || 'Features',
+      icon: Users,
+      hasModal: true,
+      hasFeatures: false,
+      infoText: texts.featuresInfoText,
+    },
+    {
+      key: 'orientation',
+      title: texts.orientationTitle || 'Orientation',
+      icon: Compass,
+      hasModal: true,
+      hasFeatures: false,
+      infoText: texts.orientationInfoText,
+    },
+    {
+      key: 'bestChoice',
+      title: texts.bestChoiceTitle || 'Best Choice for',
+      icon: Heart,
+      hasModal: true,
+      hasFeatures: false,
+      infoText: texts.bestChoiceInfoText,
+    },
+    {
       key: 'vista',
-      title: texts.viewTitle || 'Vista exacta',
+      title: (texts.viewTitle || 'Vista').replace('exacta', '').trim(),
       icon: Waves,
+      hasModal: false,
+      hasFeatures: false,
+      infoText: texts.viewInfoText,
+    },
+    {
+      key: 'ubicacion',
+      title: texts.locationTitle || 'Ubicación',
+      icon: Hotel,
+      hasModal: true,
+      hasFeatures: false,
+      infoText: texts.locationInfoText,
+    },
+    {
+      key: 'vistaExacta',
+      title: texts.exactViewTitle || 'Vista exacta',
+      icon: Eye,
       hasModal: false,
       hasFeatures: false,
       infoText: texts.viewInfoText,
@@ -904,8 +1059,12 @@ export const mockAvailableOffers = [
 // Section options for RoomCustomization
 export const sectionOptions = {
   camas: bedsOptions,
-  ubicacion: locationOptions,
-  piso: floorOptions,
+  roomSize: roomSizeOptions,
   distribucion: distributionOptions,
-  vista: viewOptions,
+  features: featuresOptions,
+  orientation: orientationOptions,
+  bestChoice: bestChoiceOptions,
+  vista: viewOptions, // Simple views without images
+  ubicacion: locationOptions,
+  vistaExacta: exactViewOptions, // Exact views with images
 }

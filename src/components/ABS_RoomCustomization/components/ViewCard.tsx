@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { Check } from 'lucide-react'
-import type { RoomCustomizationTexts, ViewOption } from '../types'
+import type { RoomCustomizationTexts, ExactViewOption } from '../types'
 
 interface ViewCardProps {
-  view: ViewOption
+  view: ExactViewOption
   isSelected: boolean
   onSelect: () => void
   texts: RoomCustomizationTexts
@@ -22,7 +22,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({
       <div className="relative">
         <img
           src={view.imageUrl || fallbackImageUrl}
-          alt={`Room view option - ${view.label}`}
+          alt={`Room view option - ${view.name}`}
           className="w-full h-56 object-cover"
         />
 
@@ -36,19 +36,17 @@ export const ViewCard: React.FC<ViewCardProps> = ({
           >
             {isSelected 
               ? texts.removeText 
-              : view.price > 0 
-                ? `${texts.addForPriceText} ${view.price} EUR`
-                : texts.selectText}
+              : `${texts.addForPriceText} ${view.price.toFixed(2)} EUR`}
           </button>
         </div>
 
-        <div className={clsx("absolute top-2 left-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1", {
-          "bg-green-600/90": isSelected,
-          "bg-neutral-800/70": !isSelected
-        })}>
-          {isSelected && <Check className="h-3 w-3" />}
-          {view.label}
-        </div>
+        {/* Removed the label/name display from the image */}
+        {isSelected && (
+          <div className="absolute top-2 left-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
+            <Check className="h-3 w-3" />
+            Selected
+          </div>
+        )}
       </div>
     </div>
   )

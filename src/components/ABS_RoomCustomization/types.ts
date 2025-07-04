@@ -14,6 +14,15 @@ export interface ViewOption {
   imageUrl?: string
 }
 
+export interface ExactViewOption {
+  id: string
+  name: string
+  description?: string
+  price: number
+  icon: string
+  imageUrl: string
+}
+
 export interface SelectedCustomizations {
   [key: string]: { id: string; label: string; price: number } | undefined
 }
@@ -45,7 +54,7 @@ export interface RoomCustomizationProps {
   title: string
   subtitle: string
   sections: SectionConfig[]
-  sectionOptions: Record<string, CustomizationOption[] | ViewOption[]>
+  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[]>
   initialSelections?: SelectedCustomizations
   onCustomizationChange?: (category: string, optionId: string, optionLabel: string, optionPrice: number) => void
   texts: RoomCustomizationTexts

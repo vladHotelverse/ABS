@@ -7,13 +7,14 @@ import type {
   SectionConfig,
   SelectedCustomizations,
   ViewOption,
+  ExactViewOption,
 } from '../types'
 import { OptionCard } from './OptionCard'
 import { ViewCard } from './ViewCard'
 
 interface CustomizationSectionProps {
   config: SectionConfig
-  options: CustomizationOption[] | ViewOption[]
+  options: CustomizationOption[] | ViewOption[] | ExactViewOption[]
   selectedOptions: SelectedCustomizations
   isOpen: boolean
   onToggle: () => void
@@ -23,8 +24,8 @@ interface CustomizationSectionProps {
   fallbackImageUrl?: string
 }
 
-const isViewOption = (option: CustomizationOption | ViewOption): option is ViewOption => {
-  return 'imageUrl' in option
+const isExactViewOption = (option: CustomizationOption | ViewOption | ExactViewOption): option is ExactViewOption => {
+  return 'imageUrl' in option && typeof option.imageUrl === 'string'
 }
 
 export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
@@ -39,7 +40,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   fallbackImageUrl,
 }) => {
   const [showInfo, setShowInfo] = useState(false)
-  const isViewSection = options.length > 0 && isViewOption(options[0])
+  const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
 
   const handleInfoToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -85,7 +86,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
           {options.map((option) => {
             const isSelected = selectedOptions[config.key]?.id === option.id
 
-            if (isViewSection && isViewOption(option)) {
+            if (isExactViewSection && isExactViewOption(option)) {
               return (
                 <ViewCard
                   key={option.id}
@@ -97,7 +98,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                 />
               )
             }
-            if (!isViewSection) {
+            if (!isExactViewSection) {
               return (
                 <OptionCard
                   key={option.id}

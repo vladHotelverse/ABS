@@ -39,7 +39,9 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
         <div className="flex flex-col space-y-2 mt-auto">
           <UiButton onClick={onSelect} variant={isSelected ? 'link' : 'secondary'} size="sm" className="w-full">
-            {isSelected ? texts.removeText : texts.improveText}
+            {isSelected 
+              ? texts.removeText 
+              : `${texts.addForPriceText} ${option.price.toFixed(2)} EUR`}
           </UiButton>
 
           {showFeatures && onShowFeatures && (

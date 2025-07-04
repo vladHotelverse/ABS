@@ -49,10 +49,10 @@ const OfferPriceDisplay: React.FC<OfferPriceDisplayProps> = ({
   offerType,
 }) => (
   <div
-    className={`rounded-lg p-3 flex justify-between ${isBooked ? 'bg-green-50 border border-green-200' : 'bg-neutral-50/50'}`}
+    className={`rounded-lg p-3 flex gap-2 justify-between ${isBooked ? 'bg-green-50 border border-green-200' : 'bg-neutral-50/50'}`}
   >
     <div className="flex items-center justify-between mb-2">
-      <div className="flex flex-col">
+      <div className="flex gap-1 flex-col">
         <div className="flex flex-wrap items-baseline gap-1">
           <span className="text-xl font-bold">{price}</span>
           <span className="text-sm text-neutral-500">{unitLabel}</span>

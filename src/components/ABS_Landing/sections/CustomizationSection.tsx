@@ -6,6 +6,7 @@ import type {
   SectionConfig,
   SelectedCustomizations,
   ViewOption,
+  ExactViewOption,
 } from '../../ABS_RoomCustomization/types'
 
 export interface CustomizationTexts extends RoomCustomizationTexts {
@@ -15,7 +16,7 @@ export interface CustomizationTexts extends RoomCustomizationTexts {
 
 export interface CustomizationSectionProps {
   sections: SectionConfig[]
-  sectionOptions: Record<string, CustomizationOption[] | ViewOption[]>
+  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[]>
   selectedCustomizations: SelectedCustomizations
   onCustomizationChange: (category: string, optionId: string, optionLabel: string, optionPrice: number) => void
   texts: CustomizationTexts
