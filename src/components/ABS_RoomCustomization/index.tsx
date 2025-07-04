@@ -96,7 +96,7 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
                     {sectionOptions[modalSection]?.map((option) => (
                       <div key={option.id} className="flex justify-between items-center p-3 bg-neutral-100 rounded-lg">
                         <div>
-                          <span className="font-medium">{option.label}</span>
+                          <span className="font-medium">{'label' in option ? option.label : option.name}</span>
                           {option.description && <p className="text-sm text-neutral-600">{option.description}</p>}
                         </div>
                         <span className="text-sm font-semibold">

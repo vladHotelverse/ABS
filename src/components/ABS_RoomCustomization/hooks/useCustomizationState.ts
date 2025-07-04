@@ -5,7 +5,6 @@ import type {
   ViewOption, 
   ExactViewOption,
   CompatibilityRules,
-  DisabledOptions,
   ConflictResolution
 } from '../types'
 import { CompatibilityEngine, defaultCompatibilityRules } from '../compatibilityRules'

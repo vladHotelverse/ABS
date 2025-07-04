@@ -13,7 +13,7 @@ import {
 
 function App() {
   const { i18n } = useTranslation()
-  const [currentLanguage, setCurrentLanguage] = useState('en')
+  const [currentLanguage] = useState('en')
 
   // const changeLanguage = (language: string) => {
   //   i18n.changeLanguage(language)

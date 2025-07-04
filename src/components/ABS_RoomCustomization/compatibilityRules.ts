@@ -238,7 +238,7 @@ export class CompatibilityEngine {
    */
   resolveConflicts(
     newOptionId: string,
-    newOptionCategory: string,
+    _newOptionCategory: string,
     selectedOptions: SelectedCustomizations,
     removeConflicting: boolean = true
   ): SelectedCustomizations {
