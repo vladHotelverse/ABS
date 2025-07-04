@@ -4,7 +4,8 @@ import type { RoomOption as CarouselRoomOption } from '../../ABS_RoomSelectionCa
 
 export interface RoomOption {
   id: string
-  name: string
+  title?: string
+  roomType: string
   description: string
   price: number
   perNight: boolean
@@ -37,7 +38,8 @@ export interface RoomSelectionSectionProps {
 // Convert RoomOption to CarouselRoomOption for compatibility
 const convertToCarouselRoomOption = (room: RoomOption): CarouselRoomOption => ({
   id: room.id,
-  name: room.name,
+  title: room.title,
+  roomType: room.roomType,
   description: room.description,
   amenities: room.amenities,
   price: room.price,
@@ -48,7 +50,8 @@ const convertToCarouselRoomOption = (room: RoomOption): CarouselRoomOption => ({
 // Convert CarouselRoomOption back to RoomOption
 const convertFromCarouselRoomOption = (room: CarouselRoomOption): RoomOption => ({
   id: room.id,
-  name: room.name,
+  title: room.title,
+  roomType: room.roomType,
   description: room.description,
   price: room.price,
   perNight: true,

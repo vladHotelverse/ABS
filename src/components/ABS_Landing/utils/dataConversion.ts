@@ -10,7 +10,7 @@ import type { SelectedOffer } from '../sections/SpecialOffersSection'
 export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 1): PricingItem | null => {
   if (!room) return null
   const totalPrice = room.price * (room.perNight ? nights : 1)
-  const displayName = room.perNight && nights > 1 ? `${room.name} (${nights} nights)` : room.name
+  const displayName = room.perNight && nights > 1 ? `${room.title || room.roomType} (${nights} nights)` : room.title || room.roomType
   
   return {
     id: room.id,

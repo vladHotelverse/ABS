@@ -4,7 +4,8 @@ import { Bed, Building2, Hotel, Waves, Package, Home, Users, Compass, Eye, Heart
 export const roomOptions = [
   {
     id: 'deluxe',
-    name: 'DELUXE GOLD',
+    title: "Live luxury’s pinnacle by the sea",
+    roomType: 'DELUXE GOLD',
     description: 'True rock stars look down from above. A space covering 33 square metres with spectacular sea views, a private furnished terrace and elegant décor for a superior experience from the fifth floor upwards. Exceed even your own expectations, and relax with chromotherapy lighting that you can personalise. Lie back like a rock star in a luxurious king-sized bed, or in two full-sized single beds, and enjoy this room\'s ultra-modern facilities: thoughtfully selected state-of-the-art furniture, a 43 SMART TV screen, a dock station and a comfortable reading corner with a sofa bed.',
     price: 129.99,
     perNight: true,
@@ -43,11 +44,11 @@ export const roomOptions = [
     ],
   },
   {
-    id: 'premium',
-    name: 'DELUXE SWIM-UP',
+    id: 'deluxe-swim-up',
+    title: "Dive in from your private terrace",
+    roomType: 'DELUXE SWIM-UP',
     description: 'What about adding to your Double room a furnished outdoors terrace with a direct access to the meandering pool and private sun lounger waiting for you to enjoy the splash.',
     price: 199.99,
-    oldPrice: 249.99,
     perNight: true,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/cdf69769-f553-4c82-aa06-e3e8867954fb/image.webp',
@@ -86,10 +87,10 @@ export const roomOptions = [
   },
   {
     id: 'rocksuite',
-    name: 'ROCK SUITE',
+    roomType: 'ROCK SUITE',
+    title: "Supreme luxury with divine views",
     description: 'Our contemporary Hard Rock Ibiza Suites perfectly capture the authenticity and irreverence of rock \'n\' roll with the sensuality and sophistication of Ibiza Island. Three connecting spaces - Living/ lounge, bedroom and bathroom - allowing you to decide when it\'s time for plugging in or chilling out. Totally unpredictable, totally Ibiza Hard Rock.',
     price: 449.99,
-    oldPrice: 549.99,
     perNight: true,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt640/3e7e2260-63e3-4934-9358-ebf08bb6d96a/image.webp',
@@ -134,10 +135,106 @@ export const roomOptions = [
   },
   {
     id: '80s-suite',
-    name: '80S SUITE',
+    roomType: '80S SUITE',
+    title: "80s nostalgia unleashed",
     description: '60 square-meter space with an 80s setting, among which vinyl, mirror ball, music cassettes with 80s music and some 80\'s gifts like a welcome kit that includes a t-shirt.',
     price: 399.99,
-    oldPrice: 499.99,
+    perNight: true,
+    image:
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
+    images: [
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/850e6840-cc2b-48f8-9059-3a64d2b9b097/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/f356e89d-6dca-443e-9ac4-9bb975a84b07/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/e69fa285-5242-4992-831b-7e67d401ba00/image.webp',
+    ],
+    amenities: [
+      '24 Hours Room Service',
+      '60 to 70 m2 / 645 to 755 sqft',
+      'AC',
+      'Balcony',
+      'Bathrobe and slippers',
+      'Bluetooth sound system',
+      'Close to Pool',
+      'Coffee Machine',
+      'Desk',
+      'Hairdryer',
+      'Hydromassage Bathtub',
+      'Iron & Board',
+      'King Size Bed',
+      'Landmark View',
+      'Living Room',
+      'Magnifying mirror',
+      'Minibar',
+      'Morning Sun',
+      'Non-smoking Room',
+      'Pet Friendly',
+      'Phone',
+      'Pillow Menu',
+      'Pool View',
+      'Premium Wi-Fi',
+      'Rain shower',
+      'Safe',
+      'Smart TV',
+      'Sofa Bed - Double',
+      'Shoe kit',
+      'Table and chairs set',
+      'Tea Set'
+    ],
+  },
+  {
+    id: 'rock-suite-diamond',
+    roomType: 'ROCK SUITE DIAMOND',
+    title: "Glam rock with infinite views",
+    description: 'Llega a la cima del rock en este espacio de 75 metros cuadrados auténticamente inspirado en estrellas del rock y que ofrece ese toque de vida glamourosa. Con una exuberancia sin límites, incluye unas vistas infinitas que se prolongan desde la suite hasta la terraza, y una bañera de grifería vista en mitad del dormitorio principal para que no te pierdas el mínimo detalle del paisaje mientras disfrutas de un placer infinito. Estancia de 75 metros cuadrados con capacidad hasta cuatro personas.',
+    price: 599.99,
+    perNight: true,
+    image:
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
+    images: [
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/850e6840-cc2b-48f8-9059-3a64d2b9b097/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/f356e89d-6dca-443e-9ac4-9bb975a84b07/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt641/e69fa285-5242-4992-831b-7e67d401ba00/image.webp',
+    ],
+    amenities: [
+      '24 Hours Room Service',
+      '60 to 70 m2 / 645 to 755 sqft',
+      'AC',
+      'Balcony',
+      'Bathrobe and slippers',
+      'Bluetooth sound system',
+      'Close to Pool',
+      'Coffee Machine',
+      'Desk',
+      'Hairdryer',
+      'Hydromassage Bathtub',
+      'Iron & Board',
+      'King Size Bed',
+      'Landmark View',
+      'Living Room',
+      'Magnifying mirror',
+      'Minibar',
+      'Morning Sun',
+      'Non-smoking Room',
+      'Pet Friendly',
+      'Phone',
+      'Pillow Menu',
+      'Pool View',
+      'Premium Wi-Fi',
+      'Rain shower',
+      'Safe',
+      'Smart TV',
+      'Sofa Bed - Double',
+      'Shoe kit',
+      'Table and chairs set',
+      'Tea Set'
+    ],
+  },
+  {
+    id: 'rock-suite-legend',
+    roomType: 'ROCK SUITE LEGEND',
+    title: "Live the rock legend",
+    description: 'Llega a la cima del rock en este espacio de 75 metros cuadrados auténticamente inspirado en estrellas del rock y que ofrece ese toque de vida glamourosa. Con una exuberancia sin límites, incluye unas vistas infinitas que se prolongan desde la suite hasta la terraza, y una bañera de grifería vista en mitad del dormitorio principal para que no te pierdas el mínimo detalle del paisaje mientras disfrutas de un placer infinito. Estancia de 75 metros cuadrados con capacidad hasta cuatro personas.',
+    price: 799.99,
     perNight: true,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
@@ -500,7 +597,7 @@ export const exactViewOptions = [
 
 export const roomSelectionMap = {
   id: 'room-selection',
-  title: 'Room',
+  title: 'Want a Superior Room?',
   description: 'Choose from our selection of premium rooms and suites',
   url: 'https://map-uat.hotelverse.tech/Webmap/en/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUk0TWpSbU5EUmtaakZqWXpneFlXUTBOelkxT1dWaVpEUTJNbVJpTXpsbVlUTTBNRFprTUdZelpHSTJNVFkwWTJZMVpqRmhNVGRrWWpZNE16Y3paVFl4WkRRM1pXVmtNekUwTXpreVpHWm1ZbVU1WXpKa00yRTFPRGsxTkRBNE1tTXhNMkk1Wm1ZM056SXpaVEE1WWpjMVpXSmhZakl6Tm1FMU1EUTVPV1k0TkNJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxTVRVME9UYzFOalUwTUgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=en&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0IiwiZXh0ZXJuYWxDaGFubmVsSWQiOjAsInBsYXRmb3JtIjoiT3Ryb3MiLCJib29raW5nRGF0YSI6eyJmaXJzdE5hbWUiOiJURVNUIiwibGFzdE5hbWUiOiJURVNUIiwiZW1haWwiOiJmcmFuY2lzY28uY29zdGlsbG9AaG90ZWx2ZXJzZS50ZWNoIiwiY2hlY2tJbiI6IjIwMjUtMTAtMTAiLCJjaGVja091dCI6IjIwMjUtMTAtMTUiLCJodlJvb21UeXBlIjo2MzIsIm9jY3VwYW5jeSI6eyJhZHVsdHMiOjIsImNoaWxkcmVuIjowLCJjaGlsZEFnZXMiOltdLCJpbmZhbnRzIjowLCJjdXJyZW5jeSI6IiJ9LCJleHRlcm5hbENoYW5uZWxJZCI6MCwiaXNPd25Ib3RlbCI6ZmFsc2V9fQ%3D%3D',
   type: 'iframe' as const,
@@ -577,7 +674,7 @@ export const specialOffers = [
 // Language translations
 export const translations = {
   en: {
-    roomTitle: 'Room',
+    roomTitle: 'Want a Superior Room?',
     roomSubtitle: 'Choose from our selection of premium rooms and suites',
     customizeTitle: 'Customize Your Stay',
     customizeSubtitle: 'Personalize your room for the perfect experience',
@@ -602,6 +699,13 @@ export const translations = {
     addForPriceText: 'Add for',
     availableOptionsText: 'Available Options:',
     removeText: 'Remove',
+    // New texts for compatibility system
+    optionDisabledText: 'Not Available',
+    conflictWithText: 'Conflicts with',
+    keepCurrentText: 'Keep Current Selection',
+    switchToNewText: 'Switch to New Option',
+    conflictDialogTitle: 'Option Conflict',
+    conflictDialogDescription: 'These options cannot be selected together. Please choose which one to keep.',
 
     // Section info texts
     bedsInfoText:
@@ -764,6 +868,13 @@ export const translations = {
     addForPriceText: 'Añadir por',
     availableOptionsText: 'Opciones Disponibles:',
     removeText: 'Quitar',
+    // New texts for compatibility system
+    optionDisabledText: 'No Disponible',
+    conflictWithText: 'Conflicto con',
+    keepCurrentText: 'Mantener Selección Actual',
+    switchToNewText: 'Cambiar a Nueva Opción',
+    conflictDialogTitle: 'Conflicto de Opciones',
+    conflictDialogDescription: 'Estas opciones no pueden seleccionarse juntas. Por favor elige cuál mantener.',
 
     // Section info texts
     bedsInfoText:
@@ -1068,3 +1179,6 @@ export const sectionOptions = {
   ubicacion: locationOptions,
   vistaExacta: exactViewOptions, // Exact views with images
 }
+
+// Export compatibility rules for easy import
+export { defaultCompatibilityRules } from '../ABS_RoomCustomization/compatibilityRules'

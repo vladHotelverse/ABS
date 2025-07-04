@@ -27,6 +27,38 @@ export interface SelectedCustomizations {
   [key: string]: { id: string; label: string; price: number } | undefined
 }
 
+// New types for compatibility system
+export interface CompatibilityRule {
+  option: string
+  disables: string[]
+  reason?: string
+}
+
+export interface MutuallyExclusiveGroup {
+  options: string[]
+  reason?: string
+}
+
+export interface CompatibilityRules {
+  mutuallyExclusive: MutuallyExclusiveGroup[]
+  conflicts: CompatibilityRule[]
+}
+
+export interface DisabledOptions {
+  [optionId: string]: {
+    disabled: boolean
+    reason: string
+    conflictsWith: string[]
+  }
+}
+
+export interface ConflictResolution {
+  type: 'mutually_exclusive' | 'logical_conflict'
+  currentOption: { id: string; label: string; category: string }
+  conflictingOption: { id: string; label: string; category: string }
+  reason: string
+}
+
 export interface SectionConfig {
   key: string
   title: string
@@ -46,6 +78,13 @@ export interface RoomCustomizationTexts {
   addForPriceText: string
   availableOptionsText: string
   removeText: string
+  // New texts for compatibility system
+  optionDisabledText: string
+  conflictWithText: string
+  keepCurrentText: string
+  switchToNewText: string
+  conflictDialogTitle: string
+  conflictDialogDescription: string
 }
 
 export interface RoomCustomizationProps {
@@ -59,4 +98,5 @@ export interface RoomCustomizationProps {
   onCustomizationChange?: (category: string, optionId: string, optionLabel: string, optionPrice: number) => void
   texts: RoomCustomizationTexts
   fallbackImageUrl?: string
+  compatibilityRules?: CompatibilityRules
 }

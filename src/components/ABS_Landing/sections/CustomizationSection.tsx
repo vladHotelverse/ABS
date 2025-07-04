@@ -7,6 +7,7 @@ import type {
   SelectedCustomizations,
   ViewOption,
   ExactViewOption,
+  CompatibilityRules,
 } from '../../ABS_RoomCustomization/types'
 
 export interface CustomizationTexts extends RoomCustomizationTexts {
@@ -23,6 +24,7 @@ export interface CustomizationSectionProps {
   fallbackImageUrl?: string
   className?: string
   isVisible?: boolean
+  compatibilityRules?: CompatibilityRules
 }
 
 export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
@@ -34,6 +36,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   fallbackImageUrl,
   className = '',
   isVisible = true,
+  compatibilityRules,
 }) => {
   if (!isVisible || sections.length === 0) {
     return null
@@ -52,6 +55,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
         onCustomizationChange={onCustomizationChange}
         texts={texts}
         fallbackImageUrl={fallbackImageUrl}
+        compatibilityRules={compatibilityRules}
       />
     </section>
   )

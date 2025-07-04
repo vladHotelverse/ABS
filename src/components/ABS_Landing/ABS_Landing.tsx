@@ -15,6 +15,7 @@ import type {
   SelectedCustomizations,
   ViewOption,
   ExactViewOption,
+  CompatibilityRules,
 } from '../ABS_RoomCustomization/types'
 import type { OfferData } from '../ABS_SpecialOffers/types'
 
@@ -128,8 +129,10 @@ export interface Translations extends RoomCustomizationTexts {
   exploreLabel: string
   roomImageAltText: string
   fromLabel: string
+  customizeStayTitle: string
+  chooseOptionsSubtitle: string
 
-  // Multi-booking labels
+  // Multi-booking support
   multiBookingLabels: MultiBookingLabels
 }
 
@@ -171,6 +174,8 @@ export interface ABSLandingProps {
   isMultiBooking?: boolean
   initialRoomBookings?: RoomBooking[]
   onMultiBookingChange?: (bookings: RoomBooking[]) => void
+  // Compatibility rules for room customization
+  compatibilityRules?: CompatibilityRules
 }
 
 export const ABSLanding: React.FC<ABSLandingProps> = ({
@@ -198,6 +203,8 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   isMultiBooking = false,
   initialRoomBookings = [],
   onMultiBookingChange,
+  // Compatibility rules
+  compatibilityRules,
 }) => {
   // Calculate nights from check-in and check-out dates
   const nights = calculateNights(checkIn, checkOut)
@@ -499,6 +506,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             texts={customizationTexts}
             fallbackImageUrl={fallbackImageUrl}
             isVisible={shouldShowSection('customization', computedAvailableSections)}
+            compatibilityRules={compatibilityRules}
           />
 
           {/* Special Offers Section */}

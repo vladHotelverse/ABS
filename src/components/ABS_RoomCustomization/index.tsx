@@ -3,6 +3,7 @@ import type React from 'react'
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialogHeadless'
 import { CustomizationSection } from './components/CustomizationSection'
+import { ConflictResolutionDialog } from './components/ConflictResolutionDialog'
 import { useCustomizationState } from './hooks/useCustomizationState'
 import type { RoomCustomizationProps } from './types'
 
@@ -15,11 +16,22 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
   onCustomizationChange,
   texts,
   fallbackImageUrl,
+  compatibilityRules,
 }) => {
-  const { selectedOptions, openSections, toggleSection, handleSelect } = useCustomizationState({
+  const { 
+    selectedOptions, 
+    openSections, 
+    disabledOptions,
+    pendingConflict,
+    toggleSection, 
+    handleSelect,
+    resolveConflict,
+    dismissConflict,
+  } = useCustomizationState({
     initialSelections,
     sectionOptions,
     onCustomizationChange,
+    compatibilityRules,
   })
 
   const [modalSection, setModalSection] = useState<string | null>(null)
@@ -46,6 +58,7 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
                 config={section}
                 options={options}
                 selectedOptions={selectedOptions}
+                disabledOptions={disabledOptions}
                 isOpen={openSections[section.key] || false}
                 onToggle={() => toggleSection(section.key)}
                 onSelect={(optionId) => handleSelect(section.key, optionId)}
@@ -107,6 +120,14 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Conflict Resolution Dialog */}
+      <ConflictResolutionDialog
+        conflict={pendingConflict}
+        texts={texts}
+        onResolve={resolveConflict}
+        onDismiss={dismissConflict}
+      />
     </>
   )
 }

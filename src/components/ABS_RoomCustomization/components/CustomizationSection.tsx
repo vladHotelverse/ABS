@@ -8,6 +8,7 @@ import type {
   SelectedCustomizations,
   ViewOption,
   ExactViewOption,
+  DisabledOptions,
 } from '../types'
 import { OptionCard } from './OptionCard'
 import { ViewCard } from './ViewCard'
@@ -16,6 +17,7 @@ interface CustomizationSectionProps {
   config: SectionConfig
   options: CustomizationOption[] | ViewOption[] | ExactViewOption[]
   selectedOptions: SelectedCustomizations
+  disabledOptions: DisabledOptions
   isOpen: boolean
   onToggle: () => void
   onSelect: (optionId: string) => void
@@ -32,6 +34,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   config,
   options,
   selectedOptions,
+  disabledOptions,
   isOpen,
   onToggle,
   onSelect,
@@ -85,6 +88,8 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
 
           {options.map((option) => {
             const isSelected = selectedOptions[config.key]?.id === option.id
+            const isDisabled = disabledOptions[option.id]?.disabled || false
+            const disabledReason = disabledOptions[option.id]?.reason
 
             if (isExactViewSection && isExactViewOption(option)) {
               return (
@@ -92,6 +97,8 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                   key={option.id}
                   view={option}
                   isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  disabledReason={disabledReason}
                   onSelect={() => onSelect(option.id)}
                   texts={texts}
                   fallbackImageUrl={fallbackImageUrl}
@@ -104,6 +111,8 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                   key={option.id}
                   option={option as CustomizationOption}
                   isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  disabledReason={disabledReason}
                   onSelect={() => onSelect(option.id)}
                   texts={texts}
                   fallbackImageUrl={fallbackImageUrl}

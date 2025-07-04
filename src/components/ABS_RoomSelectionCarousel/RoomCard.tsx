@@ -73,7 +73,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       onLearnMore(room)
     } else {
       // Default behavior - could open a modal, navigate to room details, etc.
-      console.log('Learn more about room:', room.name)
+      console.log('Learn more about room:', room.title || room.roomType)
     }
   }, [onLearnMore, room])
 
@@ -106,7 +106,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
       {/* Room Image Carousel */}
       <div className="relative h-64 bg-neutral-100 group">
-        <img src={room.images[activeImageIndex]} alt={room.name} className="object-cover w-full h-full" />
+        <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full" />
 
         {/* Image Navigation Arrows - only show if multiple images */}
         {room.images.length > 1 && (
@@ -164,8 +164,14 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
       {/* Room Details */}
       <div className="p-4">
-        <h3 className="text-xl font-bold mb-1">{room.name}</h3>
-        <div className="mb-3">
+        {room.title && (
+          <h3 className="text-xl font-bold mb-1">{room.title}</h3>
+        )}
+        <h4 className={clsx('font-medium mb-1 text-neutral-600', {
+          'text-base': !room.title,
+          'text-sm': room.title
+        })}>{room.roomType}</h4>
+        <div className="mb-2">
           <TooltipProvider>
             <UiTooltip>
               <UiTooltipTrigger asChild>
@@ -187,7 +193,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         </div>
 
         {/* Amenities */}
-        <div className="flex flex-nowrap gap-2 mb-3 w-full overflow-auto">
+        <div className="flex flex-nowrap gap-2 mb-2 w-full overflow-auto">
           {room.amenities.map((amenity) => (
             <span
               key={`${room.id}-${amenity}`}
@@ -199,7 +205,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         </div>
 
         {/* Price Display */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2">
           <span className="text-2xl font-bold">{`${currencySymbol}${room.price}`}</span>
           {room.oldPrice && (
             <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${room.oldPrice}`}</span>
@@ -208,7 +214,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex items-center gap-4 mt-2">
           <button
             className={clsx(
               'px-6 py-2.5 text-sm font-medium rounded-md uppercase tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black',
@@ -234,7 +240,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         </div>
 
         {/* Additional Info */}
-        <p className="text-xs text-neutral-500 mt-4">{priceInfoText}</p>
+        <p className="text-xs text-neutral-500 mt-2">{priceInfoText}</p>
       </div>
     </div>
   )

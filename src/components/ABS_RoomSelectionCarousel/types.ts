@@ -1,6 +1,7 @@
 export interface RoomOption {
   id: string
-  name: string
+  title?: string
+  roomType: string
   description: string
   amenities: string[]
   price: number
