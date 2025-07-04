@@ -12,7 +12,6 @@ import type {
   CustomizationOption,
   RoomCustomizationTexts,
   SectionConfig,
-  SelectedCustomizations,
   ViewOption,
   ExactViewOption,
   CompatibilityRules,
@@ -258,7 +257,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     activeRoomId,
     totalItemCount: multiBookingItemCount,
     totalPrice: multiBookingTotalPrice,
-    handleMultiBookingRemoveItem,
     handleMultiBookingEditSection,
     handleMultiBookingConfirmAll,
     handleRoomTabClick,
@@ -296,27 +294,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     actions.updateOffer(newOffer);
   };
 
-  const handleRemoveRoomUpgrade = () => {
-    actions.removeRoom();
-  }
-
-  const handleRemoveCustomization = (optionId: string | number, label: string) => {
-    // Find the category of the option to be removed
-    const category = Object.keys(selectedCustomizations).find(
-      (key) => selectedCustomizations[key]?.id === optionId
-    );
-
-    if (category) {
-      // Call handleCustomizationChange to deselect the item
-      actions.removeCustomization(category);
-    }
-    
-    showToast(`${t.customizationRemovedMessagePrefix} "${label}"`, 'info');
-  };
-
-  const handleRemoveSpecialOffer = (offerId: string | number, _offerName: string) => {
-    actions.removeOffer(String(offerId));
-  };
 
   const handleLearnMore = (room: RoomOption) => {
     console.log('Learn more about:', room);

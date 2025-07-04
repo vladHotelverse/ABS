@@ -1,7 +1,6 @@
-import { ArrowUpCircle, ChevronRight, CreditCard, Pencil } from 'lucide-react'
+import { ArrowUpCircle, CreditCard, Pencil } from 'lucide-react'
 import type React from 'react'
 import { useState } from 'react'
-import { UiButton } from '../../ui/button'
 import { Card, CardContent } from '../../ui/card'
 import type { AvailableSection } from '../types'
 
@@ -12,7 +11,7 @@ interface SectionCardProps {
   euroSuffix: string
 }
 
-const SectionCard: React.FC<SectionCardProps> = ({ section, exploreLabel, fromLabel, euroSuffix }) => {
+const SectionCard: React.FC<SectionCardProps> = ({ section, fromLabel, euroSuffix }) => {
   const [isHovered, setIsHovered] = useState(false)
 
   const formatPrice = (price: number): string => {
