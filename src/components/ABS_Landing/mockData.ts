@@ -301,7 +301,7 @@ export const roomSelectionMap = {
   title: 'Choose your room number.',
   description: 'Explore the hotel and choose the exact room where you want to stay.',
   url: 'https://map-uat.hotelverse.tech/Webmap/en/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUk0TWpSbU5EUmtaakZqWXpneFlXUTBOelkxT1dWaVpEUTJNbVJpTXpsbVlUTTBNRFprTUdZelpHSTJNVFkwWTJZMVpqRmhNVGRrWWpZNE16Y3paVFl4WkRRM1pXVmtNekUwTXpreVpHWm1ZbVU1WXpKa00yRTFPRGsxTkRBNE1tTXhNMkk1Wm1ZM056SXpaVEE1WWpjMVpXSmhZakl6Tm1FMU1EUTVPV1k0TkNJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxTVRVME9UYzFOalUwTUgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=en&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0IiwiZXh0ZXJuYWxDaGFubmVsSWQiOjAsInBsYXRmb3JtIjoiT3Ryb3MiLCJib29raW5nRGF0YSI6eyJmaXJzdE5hbWUiOiJURVNUIiwibGFzdE5hbWUiOiJURVNUIiwiZW1haWwiOiJmcmFuY2lzY28uY29zdGlsbG9AaG90ZWx2ZXJzZS50ZWNoIiwiY2hlY2tJbiI6IjIwMjUtMTAtMTAiLCJjaGVja091dCI6IjIwMjUtMTAtMTUiLCJodlJvb21UeXBlIjo2MzIsIm9jY3VwYW5jeSI6eyJhZHVsdHMiOjIsImNoaWxkcmVuIjowLCJjaGlsZEFnZXMiOltdLCJpbmZhbnRzIjowLCJjdXJyZW5jeSI6IiJ9LCJleHRlcm5hbENoYW5uZWxJZCI6MCwiaXNPd25Ib3RlbCI6ZmFsc2V9fQ%3D%3D',
-  type: 'iframe',
+  type: 'iframe' as const,
   iframe: {
     width: '100%',
     height: '400px',

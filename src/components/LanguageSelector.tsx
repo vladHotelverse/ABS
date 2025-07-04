@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { 
   DropdownMenu, 
@@ -13,9 +12,7 @@ interface LanguageSelectorProps {
   onLanguageChange: (language: string) => void
 }
 
-export function LanguageSelector({ currentLanguage, onLanguageChange }: LanguageSelectorProps) {
-  const { t } = useTranslation()
-  
+export function LanguageSelector({ currentLanguage, onLanguageChange }: LanguageSelectorProps) {  
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'es', name: 'Español', flag: '🇪🇸' },

@@ -65,7 +65,7 @@ export const useResponsiveScreen = () => {
   const [isXLScreen, setIsXLScreen] = useState(false)
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: number
 
     const handleResize = () => {
       clearTimeout(timeoutId)

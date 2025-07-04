@@ -34,4 +34,3 @@ const RoomSelectionMapSection: React.FC<RoomSelectionMapSectionProps> = ({
 }
 
 export default RoomSelectionMapSection
-export type { RoomSelectionMapSectionProps, RoomSelectionMapTexts }

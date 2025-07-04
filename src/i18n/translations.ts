@@ -1,5 +1,73 @@
 import { useTranslation } from 'react-i18next';
-import type { Translations as ABSLandingTranslations } from '@/lib/components/ABS_Landing/ABS_Landing';
+
+// Define our own translation type instead of importing from non-existent path
+interface ABSLandingTranslations {
+  roomTitle: string;
+  roomSubtitle: string;
+  selectText: string;
+  selectedText: string;
+  nightText: string;
+  learnMoreText: string;
+  priceInfoText: string;
+  customizeTitle: string;
+  customizeSubtitle: string;
+  bedsTitle: string;
+  locationTitle: string;
+  floorTitle: string;
+  viewTitle: string;
+  noPreferenceLabel: string;
+  highFloorLabel: string;
+  lowFloorLabel: string;
+  quietAreaLabel: string;
+  nearElevatorLabel: string;
+  oceanViewLabel: string;
+  cityViewLabel: string;
+  gardenViewLabel: string;
+  mountainViewLabel: string;
+  kingBedLabel: string;
+  queenBedLabel: string;
+  twinBedsLabel: string;
+  sofaBedLabel: string;
+  offersTitle: string;
+  offersSubtitle: string;
+  specialOffersLabels: Record<string, string>;
+  loadingLabel: string;
+  errorTitle: string;
+  errorMessage: string;
+  tryAgainLabel: string;
+  bookingConfirmedTitle: string;
+  confirmationMessage: string;
+  backToHomeLabel: string;
+  emptyCartMessage: string;
+  totalLabel: string;
+  currencySymbol: string;
+  selectedRoomLabel: string;
+  upgradesLabel: string;
+  specialOffersLabel: string;
+  subtotalLabel: string;
+  taxesLabel: string;
+  payAtHotelLabel: string;
+  viewTermsLabel: string;
+  confirmButtonLabel: string;
+  noUpgradesSelectedLabel: string;
+  noOffersSelectedLabel: string;
+  editLabel: string;
+  roomRemovedMessage: string;
+  offerRemovedMessagePrefix: string;
+  customizationRemovedMessagePrefix: string;
+  addedMessagePrefix: string;
+  euroSuffix: string;
+  checkInLabel: string;
+  checkOutLabel: string;
+  occupancyLabel: string;
+  reservationCodeLabel: string;
+  summaryButtonLabel: string;
+  removeRoomUpgradeLabel: string;
+  exploreLabel: string;
+  roomImageAltText: string;
+  fromLabel: string;
+  multiBookingLabels: Record<string, string>;
+}
 
 /**
  * Hook to get ABS component translations

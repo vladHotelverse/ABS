@@ -20,24 +20,24 @@ export const defaultDatePickerTranslations: DatePickerTranslations = {
   ofString: 'of',
 }
 
-export enum HEIGHT_SIZES {
-  MICRO = 'md:h-10 lg:h-10',
-  MINI = 'md:h-14 lg:h-14',
-  SMALL = 'md:h-21 lg:h-21',
-  MEDIUM = 'md:h-24 lg:h-24',
-  MID_LARGE = 'md:h-28 lg:h-28',
-  LARGE = 'md:h-32 lg:h-32',
-  EXTRA_LARGE = 'md:h-36 lg:h-36',
-}
+export const HEIGHT_SIZES = {
+  MICRO: 'md:h-10 lg:h-10',
+  MINI: 'md:h-14 lg:h-14',
+  SMALL: 'md:h-21 lg:h-21',
+  MEDIUM: 'md:h-24 lg:h-24',
+  MID_LARGE: 'md:h-28 lg:h-28',
+  LARGE: 'md:h-32 lg:h-32',
+  EXTRA_LARGE: 'md:h-36 lg:h-36',
+} as const
 
-export enum SIZES {
-  MICRO = '24',
-  MINI = '32',
-  SMALL = '48',
-  MEDIUM = '64',
-  MIDLARGE = '72',
-  LARGE = '96',
-}
+export const SIZES = {
+  MICRO: '24',
+  MINI: '32',
+  SMALL: '48',
+  MEDIUM: '64',
+  MIDLARGE: '72',
+  LARGE: '96',
+} as const
 
 export type DatePickerTranslations = {
   day: string[]
