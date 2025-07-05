@@ -147,7 +147,7 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
       : undefined
 
   return (
-    <section className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
+    <section id="offers-section" className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
       <h2 className="text-2xl font-bold mb-4">{texts.offersTitle}</h2>
       <p className="mb-6">{texts.offersSubtitle}</p>
       <SpecialOffers
