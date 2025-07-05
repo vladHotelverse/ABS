@@ -70,9 +70,28 @@ export const useMultiBookingState = ({
   }
 
   const handleMultiBookingEditSection = (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => {
-    // Handle edit section for multi-booking
-    console.log('Edit section:', roomId, sectionType)
-    // TODO: Implement edit functionality
+    // Set the active room for editing
+    setActiveRoomId(roomId)
+    
+    // Scroll to the relevant section
+    const sectionMap = {
+      'room': 'room-selection-section',
+      'customizations': 'customization-section', 
+      'offers': 'offers-section'
+    }
+    
+    const sectionId = sectionMap[sectionType]
+    const sectionElement = document.getElementById(sectionId)
+    
+    if (sectionElement) {
+      sectionElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      })
+    }
+    
+    // Log for debugging
+    console.log('Editing section:', sectionType, 'for room:', roomId)
   }
 
   const handleMultiBookingConfirmAll = async () => {

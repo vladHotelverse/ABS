@@ -92,7 +92,7 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
   }
 
   return (
-    <section className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
+    <section id="room-selection-section" className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
       <h2 className="text-2xl font-bold mb-4">{texts.roomTitle}</h2>
       <p className="mb-6">{texts.roomSubtitle}</p>
       <RoomSelectionCarousel
