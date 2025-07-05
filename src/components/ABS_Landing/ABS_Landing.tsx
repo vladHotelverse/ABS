@@ -102,6 +102,10 @@ export interface Translations extends RoomCustomizationTexts {
   selectedRoomLabel: string
   upgradesLabel: string
   specialOffersLabel: string
+  chooseYourSuperiorRoomLabel: string
+  customizeYourRoomLabel: string
+  enhanceYourStayLabel: string
+  chooseYourRoomLabel: string
   subtotalLabel: string
   taxesLabel: string
   payAtHotelLabel: string
@@ -534,6 +538,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                 selectedRoomLabel: t.selectedRoomLabel,
                 upgradesLabel: t.upgradesLabel,
                 specialOffersLabel: t.specialOffersLabel,
+                chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
+                customizeYourRoomLabel: t.customizeYourRoomLabel,
+                enhanceYourStayLabel: t.enhanceYourStayLabel,
+                chooseYourRoomLabel: t.chooseYourRoomLabel,
                 subtotalLabel: t.subtotalLabel,
                 taxesLabel: t.taxesLabel,
                 totalLabel: t.totalLabel,
@@ -614,6 +622,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           selectedRoomLabel: t.selectedRoomLabel,
           upgradesLabel: t.upgradesLabel,
           specialOffersLabel: t.specialOffersLabel,
+          chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
+          customizeYourRoomLabel: t.customizeYourRoomLabel,
+          enhanceYourStayLabel: t.enhanceYourStayLabel,
+          chooseYourRoomLabel: t.chooseYourRoomLabel,
           subtotalLabel: t.subtotalLabel,
           taxesLabel: t.taxesLabel,
           totalLabel: t.totalLabel,

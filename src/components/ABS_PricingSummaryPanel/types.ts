@@ -5,6 +5,7 @@ export interface PricingItem {
   price: number
   type: 'room' | 'customization' | 'offer'
   category?: string
+  concept?: 'choose-your-superior-room' | 'customize-your-room' | 'enhance-your-stay' | 'choose-your-room'
 }
 
 // Available section interface
@@ -15,6 +16,7 @@ export interface AvailableSection {
   startingPrice?: number
   isAvailable: boolean
   onClick?: () => void
+  concept?: 'choose-your-superior-room' | 'customize-your-room' | 'enhance-your-stay' | 'choose-your-room'
 }
 
 // Consolidated translation labels interface
@@ -22,6 +24,10 @@ export interface PricingLabels {
   selectedRoomLabel: string
   upgradesLabel: string
   specialOffersLabel: string
+  chooseYourSuperiorRoomLabel: string
+  customizeYourRoomLabel: string
+  enhanceYourStayLabel: string
+  chooseYourRoomLabel: string
   subtotalLabel: string
   taxesLabel: string
   totalLabel: string

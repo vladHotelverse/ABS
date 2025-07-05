@@ -7,16 +7,25 @@ import type { SelectedOffer } from '../sections/SpecialOffersSection'
 /**
  * Converts a RoomOption to a PricingItem for the pricing summary
  */
-export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 1): PricingItem | null => {
+export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 1, isUpgrade = false): PricingItem | null => {
   if (!room) return null
   const totalPrice = room.price * (room.perNight ? nights : 1)
   const displayName = room.perNight && nights > 1 ? `${room.title || room.roomType} (${nights} nights)` : room.title || room.roomType
+  
+  // Determine if this is a superior room based on room type or explicit upgrade flag
+  const isSuperiorRoom = isUpgrade || 
+    room.roomType?.toLowerCase().includes('suite') ||
+    room.roomType?.toLowerCase().includes('deluxe') ||
+    room.roomType?.toLowerCase().includes('superior') ||
+    room.title?.toLowerCase().includes('luxury') ||
+    room.title?.toLowerCase().includes('premium')
   
   return {
     id: room.id,
     name: displayName,
     price: totalPrice,
     type: 'room',
+    concept: isSuperiorRoom ? 'choose-your-superior-room' : 'choose-your-room',
   }
 }
 
@@ -26,12 +35,20 @@ export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 
 export const convertCustomizationsToPricingItems = (customizations: SelectedCustomizations): PricingItem[] => {
   return Object.values(customizations)
     .filter((c) => c !== undefined)
-    .map((c) => ({
-      id: c.id,
-      name: c.label,
-      price: c.price,
-      type: 'customization' as const,
-    }))
+    .map((c) => {
+      // Determine concept based on customization type
+      const concept = c.label.toLowerCase().includes('upgrade') || c.label.toLowerCase().includes('superior') 
+        ? 'choose-your-superior-room' 
+        : 'customize-your-room'
+      
+      return {
+        id: c.id,
+        name: c.label,
+        price: c.price,
+        type: 'customization' as const,
+        concept,
+      }
+    })
 }
 
 /**
@@ -43,6 +60,7 @@ export const convertOffersToPricingItems = (offers: SelectedOffer[]): PricingIte
     name: o.quantity && o.quantity > 1 ? `${o.name} (x${o.quantity})` : o.name,
     price: o.price,
     type: 'offer' as const,
+    concept: 'enhance-your-stay',
   }))
 }
 

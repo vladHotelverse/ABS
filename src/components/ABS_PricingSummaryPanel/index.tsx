@@ -4,9 +4,10 @@ import { useMemo, useCallback } from 'react'
 import EmptyState from './components/EmptyState'
 import PriceBreakdown from './components/PriceBreakdown'
 import ToastContainer from './components/ToastContainer'
-import RoomSection from './components/RoomSection'
-import CustomizationsSection from './components/CustomizationsSection'
-import OffersSection from './components/OffersSection'
+import PricingItemComponent from './components/PricingItemComponent'
+// import RoomSection from './components/RoomSection'
+// import CustomizationsSection from './components/CustomizationsSection'
+// import OffersSection from './components/OffersSection'
 import LoadingOverlay from './components/LoadingOverlay'
 import type { PricingItem, PricingSummaryPanelProps } from './types'
 import { PANEL_CONFIG, DEFAULT_ROOM_IMAGE } from './constants'
@@ -28,13 +29,14 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   // Toast notifications using custom hook
   const { toasts, showToast, removeToast } = useToasts(PANEL_CONFIG.TOAST_DURATION)
 
-  // Memoize expensive filtering operations
-  const { roomItems, customizationItems, offerItems, isEmpty } = useMemo(() => {
+  // Memoize expensive filtering operations - now grouped by concept
+  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, isEmpty } = useMemo(() => {
     const safeItems = items || []
     return {
-      roomItems: safeItems.filter((item) => item.type === 'room'),
-      customizationItems: safeItems.filter((item) => item.type === 'customization'),
-      offerItems: safeItems.filter((item) => item.type === 'offer'),
+      chooseYourSuperiorRoomItems: safeItems.filter((item) => item.concept === 'choose-your-superior-room'),
+      customizeYourRoomItems: safeItems.filter((item) => item.concept === 'customize-your-room'),
+      chooseYourRoomItems: safeItems.filter((item) => item.concept === 'choose-your-room'),
+      enhanceYourStayItems: safeItems.filter((item) => item.concept === 'enhance-your-stay'),
       isEmpty: safeItems.length === 0,
     }
   }, [items])
@@ -50,12 +52,16 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
       if (onRemoveItem) {
         onRemoveItem(item.id, item.name, item.type)
 
-        // Show appropriate toast message
+        // Show appropriate toast message based on concept
         let toastMessage = labels.roomRemovedMessage
-        if (item.type === 'customization') {
+        if (item.concept === 'customize-your-room') {
           toastMessage = `${labels.customizationRemovedMessagePrefix} ${item.name}`
-        } else if (item.type === 'offer') {
+        } else if (item.concept === 'enhance-your-stay') {
           toastMessage = `${labels.offerRemovedMessagePrefix} ${item.name}`
+        } else if (item.concept === 'choose-your-superior-room') {
+          toastMessage = `Superior room removed: ${item.name}`
+        } else if (item.concept === 'choose-your-room') {
+          toastMessage = `Room selection removed: ${item.name}`
         }
 
         showToast(toastMessage, 'info')
@@ -119,23 +125,92 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </div>
         )}
 
-        {/* Room Section */}
-        <RoomSection roomItems={roomItems} labels={labels} onRemoveItem={handleRemoveItem} />
+        {/* Room Section - combining all room-related items */}
+        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (
+          <section aria-labelledby="room-section-title">
+            <div className="flex justify-between items-center mb-2">
+              <h3 id="room-section-title" className="text-base font-semibold">
+                {chooseYourSuperiorRoomItems.length > 0 ? 'Superior Room Selection' : 'Room Selection'}
+              </h3>
+            </div>
+            {[...chooseYourRoomItems, ...chooseYourSuperiorRoomItems].map((item) => (
+              <PricingItemComponent
+                key={item.id}
+                item={item}
+                euroSuffix={labels.euroSuffix}
+                removeLabel={labels.removeRoomUpgradeLabel}
+                onRemove={() => {
+                  try {
+                    handleRemoveItem(item)
+                  } catch (error) {
+                    console.error('Error in remove item callback:', error)
+                  }
+                }}
+              />
+            ))}
+          </section>
+        )}
 
         {/* Separator after room section if there are customizations or special offers */}
-        {roomItems.length > 0 && (customizationItems.length > 0 || offerItems.length > 0) && (
+        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (customizeYourRoomItems.length > 0 || enhanceYourStayItems.length > 0) && (
           <div className="h-px w-full bg-neutral-200" />
         )}
 
         {/* Customizations Section */}
-        <CustomizationsSection
-          customizationItems={customizationItems}
-          labels={labels}
-          onRemoveItem={handleRemoveItem}
-        />
+        {customizeYourRoomItems.length > 0 && (
+          <section aria-labelledby="customizations-section-title">
+            <div className="flex justify-between items-center mb-2">
+              <h3 id="customizations-section-title" className="text-base font-semibold">
+                Room Customization
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {customizeYourRoomItems.map((item) => (
+                <PricingItemComponent
+                  key={item.id}
+                  item={item}
+                  euroSuffix={labels.euroSuffix}
+                  removeLabel={`Remove ${item.name}`}
+                  onRemove={() => {
+                    try {
+                      handleRemoveItem(item)
+                    } catch (error) {
+                      console.error('Error in remove item callback:', error)
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Special Offers Section */}
-        <OffersSection offerItems={offerItems} labels={labels} onRemoveItem={handleRemoveItem} />
+        {enhanceYourStayItems.length > 0 && (
+          <section aria-labelledby="offers-section-title">
+            <div className="flex justify-between items-center mb-2">
+              <h3 id="offers-section-title" className="text-base font-semibold">
+                Stay Enhancement
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {enhanceYourStayItems.map((item) => (
+                <PricingItemComponent
+                  key={item.id}
+                  item={item}
+                  euroSuffix={labels.euroSuffix}
+                  removeLabel={`Remove ${item.name}`}
+                  onRemove={() => {
+                    try {
+                      handleRemoveItem(item)
+                    } catch (error) {
+                      console.error('Error in remove item callback:', error)
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Price Breakdown - Only show when not empty */}
         {!isEmpty && (

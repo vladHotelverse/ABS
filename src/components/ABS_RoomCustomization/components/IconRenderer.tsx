@@ -1,8 +1,5 @@
 import { 
-  ArrowUp, 
-  Bed, 
   Building2, 
-  CornerUpRight, 
   Home, 
   Hotel, 
   Layers, 
@@ -18,45 +15,73 @@ import {
   DoorOpen,
   Link,
   Sofa,
-  Sun,
   Users,
   Compass,
   Eye,
-  Package
+  Package,
+  TreePine,
+  Mountain,
+  Theater,
+  Building,
+  Sparkles,
+  MapPin,
+  Accessibility,
+  BedDouble,
+  Bed as BedSingle,
+  Sunset,
+  Circle
 } from 'lucide-react'
 import type React from 'react'
 
 const iconMap = {
-  bed: Bed,
+  // Bed icons - more specific representations
+  bed: BedSingle, // Default bed icon
+  'bed-twin': BedSingle, // Twin beds
+  'bed-king': BedDouble, // King size bed
+  'bed-double': BedDouble, // Double bed
+  
+  // Building and structure icons
   hotel: Hotel,
   building: Building2,
-  'corner-up-right': CornerUpRight,
-  waves: Waves,
   home: Home,
   layout: LayoutGrid,
   layers: Layers,
-  'arrow-up': ArrowUp,
-  location: CornerUpRight,
   floor: Layers,
-  // Location icons
+  
+  // View icons - more specific to what guests see
+  'city-view': Building, // City view - use building icon
+  'garden-view': TreePine, // Garden view - use tree icon
+  'stage-view': Theater, // Stage view - use theater icon
+  'mountain-view': Mountain, // Mountain view if needed
+  
+  // Water/Sea view icons - differentiated
+  waves: Waves, // Generic water/sea view
+  'pool-view': Circle, // Pool view - use circle icon to represent pool shape
+  'lateral-sea-view': Waves, // Lateral sea view - waves icon
+  'sea-frontal-view': Waves, // Sea frontal view - waves icon
+  
+  // Location and amenity icons
+  location: MapPin, // Better location indicator
   utensils: Utensils,
   baby: Baby,
-  heart: Heart,
-  umbrella: Umbrella,
-  'volume-x': VolumeX,
-  // Distribution icons
-  flower: Flower,
-  'door-open': DoorOpen,
-  link: Link,
-  sofa: Sofa,
-  sun: Sun,
-  // New section icons
+  heart: Heart, // Wellness/spa
+  umbrella: Umbrella, // Beach access
+  'volume-x': VolumeX, // Quiet zone
+  
+  // Distribution and room feature icons
+  flower: Flower, // Garden access
+  'door-open': DoorOpen, // Balcony
+  link: Link, // Connecting rooms
+  sofa: Sofa, // Living room/sofa bed
+  sun: Sunset, // Terrace/afternoon sun exposure
+  
+  // Special feature icons
   users: Users,
   compass: Compass,
-  eye: Eye,
+  eye: Eye, // Best views
   package: Package,
-  // Additional common icons
-  accessibility: Users, // Using Users icon for accessibility
+  accessibility: Accessibility, // Proper accessibility icon
+  sparkles: Sparkles, // Premium features
 } as const
 
 interface IconRendererProps {

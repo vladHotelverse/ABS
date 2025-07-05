@@ -43,6 +43,10 @@ export interface MultiBookingLabels {
   selectedRoomLabel: string
   upgradesLabel: string
   specialOffersLabel: string
+  chooseYourSuperiorRoomLabel: string
+  customizeYourRoomLabel: string
+  enhanceYourStayLabel: string
+  chooseYourRoomLabel: string
   roomTotalLabel: string
   subtotalLabel: string
   totalLabel: string

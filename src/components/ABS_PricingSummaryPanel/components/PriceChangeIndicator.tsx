@@ -10,7 +10,6 @@ interface PriceChangeIndicatorProps {
 }
 
 const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({ price, euroSuffix, currency, locale }) => {
-  if (price <= 0) return null
 
   // Use new currency utility for consistent formatting
   const formatCurrency = (price: number): string => {

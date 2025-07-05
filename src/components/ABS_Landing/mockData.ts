@@ -279,7 +279,7 @@ export const bedsOptions = [
     name: '2 x Twin Beds',
     description: 'Two separate single beds',
     price: 0,
-    icon: 'bed',
+    icon: 'bed-twin',
     label: '2 x Twin Beds',
   },
   {
@@ -287,7 +287,7 @@ export const bedsOptions = [
     name: 'King Size Bed',
     description: 'One extra-large king-sized bed',
     price: 5,
-    icon: 'bed',
+    icon: 'bed-king',
     label: 'King Size Bed',
   },
   {
@@ -487,7 +487,7 @@ export const viewOptions = [
     name: 'City View',
     description: 'Room with a view of the city',
     price: 0,
-    icon: 'arrow-up',
+    icon: 'city-view',
     label: 'City View',
   },
   {
@@ -591,7 +591,7 @@ export const exactViewOptions = [
 
 export const roomSelectionMap = {
   id: 'room-selection',
-  title: 'Want a Superior Room?',
+  title: 'Choose your Superior Room!',
   description: 'Choose from our selection of premium rooms and suites',
   url: 'https://map-uat.hotelverse.tech/Webmap/en/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUk0TWpSbU5EUmtaakZqWXpneFlXUTBOelkxT1dWaVpEUTJNbVJpTXpsbVlUTTBNRFprTUdZelpHSTJNVFkwWTJZMVpqRmhNVGRrWWpZNE16Y3paVFl4WkRRM1pXVmtNekUwTXpreVpHWm1ZbVU1WXpKa00yRTFPRGsxTkRBNE1tTXhNMkk1Wm1ZM056SXpaVEE1WWpjMVpXSmhZakl6Tm1FMU1EUTVPV1k0TkNJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxTVRVME9UYzFOalUwTUgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=en&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0IiwiZXh0ZXJuYWxDaGFubmVsSWQiOjAsInBsYXRmb3JtIjoiT3Ryb3MiLCJib29raW5nRGF0YSI6eyJmaXJzdE5hbWUiOiJURVNUIiwibGFzdE5hbWUiOiJURVNUIiwiZW1haWwiOiJmcmFuY2lzY28uY29zdGlsbG9AaG90ZWx2ZXJzZS50ZWNoIiwiY2hlY2tJbiI6IjIwMjUtMTAtMTAiLCJjaGVja091dCI6IjIwMjUtMTAtMTUiLCJodlJvb21UeXBlIjo2MzIsIm9jY3VwYW5jeSI6eyJhZHVsdHMiOjIsImNoaWxkcmVuIjowLCJjaGlsZEFnZXMiOltdLCJpbmZhbnRzIjowLCJjdXJyZW5jeSI6IiJ9LCJleHRlcm5hbENoYW5uZWxJZCI6MCwiaXNPd25Ib3RlbCI6ZmFsc2V9fQ%3D%3D',
   type: 'iframe' as const,
@@ -670,7 +670,7 @@ export const specialOffers = [
 // Language translations
 export const translations = {
   en: {
-    roomTitle: 'Want a Superior Room?',
+    roomTitle: 'Choose your Superior Room!',
     roomSubtitle: 'Choose from our selection of premium rooms and suites',
     customizeTitle: 'Customize Your Stay',
     customizeSubtitle: 'Personalize your room for the perfect experience',
@@ -768,6 +768,10 @@ export const translations = {
     selectedRoomLabel: 'Selected Room',
     upgradesLabel: 'Upgrades',
     specialOffersLabel: 'Special Offers',
+    chooseYourSuperiorRoomLabel: 'Choose Your Superior Room',
+    customizeYourRoomLabel: 'Customize Your Room',
+    enhanceYourStayLabel: 'Enhance Your Stay',
+    chooseYourRoomLabel: 'Choose Your Room',
     subtotalLabel: 'Subtotal',
     taxesLabel: 'Taxes',
     payAtHotelLabel: 'Pay at Hotel',
@@ -809,6 +813,10 @@ export const translations = {
       selectedRoomLabel: 'Selected Room',
       upgradesLabel: 'Upgrades',
       specialOffersLabel: 'Special Offers',
+      chooseYourSuperiorRoomLabel: 'Choose Your Superior Room',
+      customizeYourRoomLabel: 'Customize Your Room',
+      enhanceYourStayLabel: 'Enhance Your Stay',
+      chooseYourRoomLabel: 'Choose Your Room',
       roomTotalLabel: 'Room Total',
       subtotalLabel: 'Subtotal',
       taxesLabel: 'Taxes (10%)',
@@ -840,7 +848,7 @@ export const translations = {
     },
   },
   es: {
-    roomTitle: 'Habitación',
+    roomTitle: 'Elige tu Habitación Superior!',
     roomSubtitle: 'Elige entre nuestra selección de habitaciones y suites premium',
     customizeTitle: 'Personaliza Tu Estancia',
     customizeSubtitle: 'Personaliza tu habitación para una experiencia perfecta',
@@ -939,6 +947,10 @@ export const translations = {
     selectedRoomLabel: 'Habitación Seleccionada',
     upgradesLabel: 'Mejoras',
     specialOffersLabel: 'Ofertas Especiales',
+    chooseYourSuperiorRoomLabel: 'Elige Tu Habitación Superior',
+    customizeYourRoomLabel: 'Personaliza Tu Habitación',
+    enhanceYourStayLabel: 'Mejora Tu Estancia',
+    chooseYourRoomLabel: 'Elige Tu Habitación',
     subtotalLabel: 'Subtotal',
     taxesLabel: 'Impuestos',
     payAtHotelLabel: 'Pagar en el Hotel',
@@ -980,6 +992,10 @@ export const translations = {
       selectedRoomLabel: 'Habitación Seleccionada',
       upgradesLabel: 'Mejoras',
       specialOffersLabel: 'Ofertas Especiales',
+      chooseYourSuperiorRoomLabel: 'Elige Tu Habitación Superior',
+      customizeYourRoomLabel: 'Personaliza Tu Habitación',
+      enhanceYourStayLabel: 'Mejora Tu Estancia',
+      chooseYourRoomLabel: 'Elige Tu Habitación',
       roomTotalLabel: 'Total de la Habitación',
       subtotalLabel: 'Subtotal',
       taxesLabel: 'Impuestos (10%)',
