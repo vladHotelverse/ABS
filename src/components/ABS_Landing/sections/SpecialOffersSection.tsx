@@ -1,4 +1,5 @@
 import type React from 'react'
+import { useMemo } from 'react'
 import SpecialOffers from '../../ABS_SpecialOffers'
 import type { OfferData, OfferSelection, OfferType } from '../../ABS_SpecialOffers/types'
 import type { ReservationInfo } from '../../ABS_SpecialOffers/types'
@@ -132,19 +133,22 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
   }
 
   // Create initial selections from selected offers
-  const initialSelections =
-    selectedOffers.length > 0
-      ? selectedOffers.reduce(
-          (acc, offer) => {
-            acc[offer.id] = {
-              quantity: offer.quantity ?? 1,
-              // persons and nights will be managed automatically by reservation data
-            }
-            return acc
-          },
-          {} as Record<string | number, OfferSelection>
-        )
-      : undefined
+  const initialSelections = useMemo(
+    () =>
+      selectedOffers.length > 0
+        ? selectedOffers.reduce(
+            (acc, offer) => {
+              acc[offer.id] = {
+                quantity: offer.quantity ?? 1,
+                // persons and nights will be managed automatically by reservation data
+              }
+              return acc
+            },
+            {} as Record<string | number, OfferSelection>
+          )
+        : undefined,
+    [selectedOffers]
+  )
 
   return (
     <section className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>

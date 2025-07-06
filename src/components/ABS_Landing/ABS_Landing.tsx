@@ -298,6 +298,11 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }
 
   const handleBookOffer = (offerData: OfferData) => {
+    if (offerData.quantity === 0) {
+      actions.removeOffer(offerData.id);
+      return;
+    }
+
     const newOffer: SelectedOffer = {
       id: offerData.id,
       name: offerData.name,

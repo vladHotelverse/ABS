@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import type { OfferSelection, OfferType, ReservationInfo } from '../types'
 
 interface UseOfferSelectionsProps {
@@ -23,9 +23,38 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
     })
     return { ...defaultSelections, ...initialSelections }
   })
-
   const [bookedOffers, setBookedOffers] = useState<Set<number>>(new Set())
   const [bookingAttempts, setBookingAttempts] = useState<Set<number>>(new Set())
+
+  useEffect(() => {
+    const defaultSelections: Record<number, OfferSelection> = {}
+    offers.forEach((offer) => {
+      defaultSelections[offer.id] = {
+        quantity: 0,
+        persons: offer.type === 'perPerson' ? reservationInfo?.personCount || 1 : 1,
+        nights: 1,
+        selectedDate: undefined,
+        startDate: undefined,
+        endDate: undefined,
+      }
+    })
+
+    const newSelections = { ...defaultSelections, ...initialSelections }
+    setSelections(newSelections)
+
+    const newBookedOffers = new Set<number>()
+    if (initialSelections) {
+      for (const id in initialSelections) {
+        if (Object.prototype.hasOwnProperty.call(initialSelections, id)) {
+          const selection = initialSelections[id]
+          if (selection && selection.quantity > 0) {
+            newBookedOffers.add(Number(id))
+          }
+        }
+      }
+    }
+    setBookedOffers(newBookedOffers)
+  }, [initialSelections, offers, reservationInfo])
 
   // Helper function to clear booked state and booking attempts
   const clearOfferState = useCallback((id: number) => {
