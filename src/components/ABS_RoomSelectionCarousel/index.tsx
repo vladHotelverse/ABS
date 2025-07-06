@@ -13,8 +13,9 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   onRoomSelected,
   onMakeOffer,
   onLearnMore,
+  onCancelBid,
   minPrice = 10,
-  showPriceSlider = false,
+  showPriceSlider = true,
   variant = 'basic',
   translations,
   // Deprecated individual props - keeping for backward compatibility
@@ -30,6 +31,10 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   currencySymbol,
   offerMadeText,
   discountBadgeText,
+  bidSubmittedText,
+  updateBidText,
+  cancelBidText,
+  activeBid,
 }) => {
   // Helper function to resolve text values (new translations object takes precedence)
   const getTranslation = (
@@ -70,6 +75,9 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     offerMadeText: getTranslation('offerMadeText', offerMadeText, 'Has propuesto {price} EUR por noche'),
     discountBadgeText: getTranslation('discountBadgeText', discountBadgeText, '-{percentage}%'),
     noRoomsAvailableText: getTranslation('noRoomsAvailableText', undefined, 'No hay habitaciones disponibles.'),
+    bidSubmittedText: getTranslation('bidSubmittedText', bidSubmittedText, 'Bid submitted'),
+    updateBidText: getTranslation('updateBidText', updateBidText, 'Update bid'),
+    cancelBidText: getTranslation('cancelBidText', cancelBidText, 'Cancel'),
     // Navigation labels
     previousRoom: getNavigationLabel('previousRoom', undefined, 'Previous room'),
     nextRoom: getNavigationLabel('nextRoom', undefined, 'Next room'),
@@ -98,6 +106,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     minPrice,
     onMakeOffer,
     offerMadeText: resolvedTexts.offerMadeText,
+    activeBid,
   })
 
   // Create a reusable slider component render function
@@ -115,8 +124,20 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
           availabilityText={resolvedTexts.availabilityText}
           proposePriceText={resolvedTexts.proposePriceText}
           currencyText={resolvedTexts.currencyText}
+          bidStatus={sliderData.bidStatus}
+          submittedPrice={sliderData.submittedPrice}
+          bidSubmittedText={resolvedTexts.bidSubmittedText}
+          updateBidText={resolvedTexts.updateBidText}
+          cancelBidText={resolvedTexts.cancelBidText}
           onPriceChange={sliderData.setProposedPrice}
           onMakeOffer={sliderData.makeOffer}
+          onCancelBid={() => {
+            const currentRoom = roomOptions[state.activeIndex]
+            if (currentRoom && onCancelBid) {
+              onCancelBid(currentRoom.id)
+            }
+            sliderData.resetBid()
+          }}
         />
       </div>
     )

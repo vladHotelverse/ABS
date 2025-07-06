@@ -3,9 +3,10 @@ export interface PricingItem {
   id: string | number
   name: string
   price: number
-  type: 'room' | 'customization' | 'offer'
+  type: 'room' | 'customization' | 'offer' | 'bid'
   category?: string
-  concept?: 'choose-your-superior-room' | 'customize-your-room' | 'enhance-your-stay' | 'choose-your-room'
+  concept?: 'choose-your-superior-room' | 'customize-your-room' | 'enhance-your-stay' | 'choose-your-room' | 'bid-for-upgrade'
+  bidStatus?: 'pending' | 'submitted' | 'accepted' | 'rejected' | 'expired'
 }
 
 // Available section interface

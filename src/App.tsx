@@ -40,8 +40,8 @@ function App() {
           roomSelectionMap={roomSelectionMap}
           translations={currentTranslations}
           language={currentLang}
-          checkIn="10/10/2025"
-          checkOut="15/10/2025"
+          checkIn="2025-10-10"
+          checkOut="2025-10-15"
           roomType="DELUXE SILVER"
           occupancy="2 Adults, 0 Children"
           reservationCode="1003066AU"

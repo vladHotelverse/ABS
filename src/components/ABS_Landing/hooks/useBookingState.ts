@@ -4,6 +4,8 @@ import type { RoomOption } from '../sections/RoomSelectionSection'
 import type { SelectedOffer } from '../sections/SpecialOffersSection'
 import type { BookingState } from '../sections/BookingStateSection'
 import { calculateTotalPrice } from '../utils/dataConversion'
+import { useBidUpgrade } from '../../../hooks/useBidUpgrade'
+import type { BidItem } from '../../../hooks/useBidUpgrade'
 
 export interface UseBookingStateProps {
   initialSelectedRoom?: RoomOption
@@ -32,20 +34,52 @@ export const useBookingState = ({
   const [isPriceCalculating, setIsPriceCalculating] = useState<boolean>(false)
   const [showMobilePricing, setShowMobilePricing] = useState<boolean>(false)
 
+  // Bid upgrade management
+  const bidUpgradeState = useBidUpgrade({
+    onBidSubmit: (bid) => {
+      console.log('Bid submitted:', bid)
+      showToast(`Bid of €${bid.bidAmount} submitted for ${bid.roomName}`, 'success')
+      
+      // When a bid is accepted, it should replace the room selection
+      if (bid.status === 'accepted' && bid.targetRoom) {
+        setSelectedRoom({
+          id: bid.targetRoom.id,
+          roomType: bid.targetRoom.roomType,
+          description: '',
+          price: bid.bidAmount,
+          perNight: true,
+          image: '',
+          amenities: [],
+        })
+      }
+    },
+    onBidRemove: (bidId) => {
+      console.log('Bid removed:', bidId)
+    },
+  })
+
   // Update pricing when selections change
   useEffect(() => {
     setIsPriceCalculating(true)
     const timer = setTimeout(() => {
       const pricing = calculateTotalPrice(selectedRoom, selectedCustomizations, selectedOffers, 0.1, nights)
-      setSubtotal(pricing.subtotal)
+      // Add total bid amount to subtotal
+      const totalWithBids = pricing.subtotal + bidUpgradeState.totalBidAmount
+      setSubtotal(totalWithBids)
       setTax(pricing.tax)
       setIsPriceCalculating(false)
     }, 300)
     return () => clearTimeout(timer)
-  }, [selectedRoom, selectedCustomizations, selectedOffers, nights])
+  }, [selectedRoom, selectedCustomizations, selectedOffers, nights, bidUpgradeState.totalBidAmount])
 
   // Actions
-  const selectRoom = (room: RoomOption) => setSelectedRoom(room)
+  const selectRoom = (room: RoomOption) => {
+    setSelectedRoom(room)
+    // Clear any active bids when selecting a room
+    if (bidUpgradeState.activeBid) {
+      bidUpgradeState.removeBid(bidUpgradeState.activeBid.id)
+    }
+  }
 
   const updateCustomization = (category: string, optionId: string, optionLabel: string, optionPrice: number) => {
     setSelectedCustomizations((prev) => {
@@ -94,6 +128,7 @@ export const useBookingState = ({
         room: selectedRoom,
         customizations: selectedCustomizations,
         offers: selectedOffers,
+        bids: bidUpgradeState.bids.filter(bid => bid.status === 'submitted'),
         totalPrice: subtotal + tax,
       })
     }
@@ -117,6 +152,7 @@ export const useBookingState = ({
     state,
     isPriceCalculating,
     showMobilePricing,
+    bids: bidUpgradeState.bids,
 
     // Actions
     actions: {
@@ -130,6 +166,9 @@ export const useBookingState = ({
       resetState,
       showToast,
       setShowMobilePricing,
+      // Bid actions
+      addBid: bidUpgradeState.addBid,
+      removeBid: bidUpgradeState.removeBid,
     },
   }
 }

@@ -7,9 +7,10 @@ interface PriceChangeIndicatorProps {
   euroSuffix: string
   currency?: string
   locale?: string
+  className?: string
 }
 
-const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({ price, euroSuffix, currency, locale }) => {
+const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({ price, euroSuffix, currency, locale, className = '' }) => {
 
   // Use new currency utility for consistent formatting
   const formatCurrency = (price: number): string => {
@@ -30,7 +31,7 @@ const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({ price, euro
   }
 
   return (
-    <div className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+    <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200 ${className}`}>
       <ArrowUpCircle className="w-3 h-3 mr-1" />+{formatCurrency(price)}
     </div>
   )

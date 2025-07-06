@@ -23,6 +23,13 @@ export interface RoomSelectionTexts {
   nightText: string
   learnMoreText: string
   priceInfoText: string
+  makeOfferText?: string
+  proposePriceText?: string
+  availabilityText?: string
+  offerMadeText?: string
+  bidSubmittedText?: string
+  updateBidText?: string
+  cancelBidText?: string
 }
 
 export interface RoomSelectionSectionProps {
@@ -30,9 +37,17 @@ export interface RoomSelectionSectionProps {
   selectedRoom?: RoomOption
   onRoomSelected: (room: RoomOption) => void
   onLearnMore?: (room: RoomOption) => void
+  onMakeOffer?: (price: number, room: RoomOption) => void
+  onCancelBid?: (roomId: string) => void
   texts: RoomSelectionTexts
   className?: string
   isVisible?: boolean
+  showPriceSlider?: boolean
+  activeBid?: {
+    roomId: string
+    bidAmount: number
+    status: 'pending' | 'submitted' | 'accepted' | 'rejected'
+  }
 }
 
 // Convert RoomOption to CarouselRoomOption for compatibility
@@ -66,9 +81,13 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
   selectedRoom,
   onRoomSelected,
   onLearnMore,
+  onMakeOffer,
+  onCancelBid,
   texts,
   className = '',
   isVisible = true,
+  showPriceSlider = false,
+  activeBid,
 }) => {
   if (!isVisible || roomOptions.length === 0) {
     return null
@@ -91,9 +110,15 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
     }
   }
 
+  const handleMakeOffer = (price: number, room: CarouselRoomOption) => {
+    if (onMakeOffer) {
+      onMakeOffer(price, convertFromCarouselRoomOption(room))
+    }
+  }
+
   return (
     <section className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
-      <h2 className="text-2xl font-bold mb-4">{texts.roomTitle}</h2>
+      <h2 className="text-3xl font-bold mb-4">{texts.roomTitle}</h2>
       <p className="mb-6">{texts.roomSubtitle}</p>
       <RoomSelectionCarousel
         roomOptions={roomOptions.map(convertToCarouselRoomOption)}
@@ -105,6 +130,17 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
         learnMoreText={texts.learnMoreText}
         priceInfoText={texts.priceInfoText}
         onLearnMore={handleLearnMore}
+        onMakeOffer={handleMakeOffer}
+        onCancelBid={onCancelBid}
+        showPriceSlider={showPriceSlider}
+        makeOfferText={texts.makeOfferText}
+        proposePriceText={texts.proposePriceText}
+        availabilityText={texts.availabilityText}
+        offerMadeText={texts.offerMadeText}
+        bidSubmittedText={texts.bidSubmittedText}
+        updateBidText={texts.updateBidText}
+        cancelBidText={texts.cancelBidText}
+        activeBid={activeBid}
       />
     </section>
   )

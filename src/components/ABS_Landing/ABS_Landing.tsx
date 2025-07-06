@@ -28,6 +28,7 @@ import {
   convertRoomToPricingItem,
   convertCustomizationsToPricingItems,
   convertOffersToPricingItems,
+  convertBidsToPricingItems,
   generateAvailableSections,
   countCartItems,
   shouldShowSection,
@@ -46,6 +47,13 @@ export interface Translations extends RoomCustomizationTexts {
   nightText: string
   learnMoreText: string
   priceInfoText: string
+  makeOfferText: string
+  proposePriceText: string
+  availabilityText: string
+  offerMadeText: string
+  bidSubmittedText: string
+  updateBidText: string
+  cancelBidText: string
 
   // Customization section
   customizeTitle: string
@@ -215,7 +223,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   const nights = calculateNights(checkIn, checkOut)
   
   // Create combined stay dates display
-  const stayDates = checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'N/A'
+  const stayDates = checkIn && checkOut ? `From ${checkIn} to ${checkOut}` : 'N/A'
 
   // Use custom hooks for state management
   const {
@@ -226,6 +234,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     state,
     isPriceCalculating,
     showMobilePricing,
+    bids,
     actions,
   } = useBookingState({
     initialSelectedRoom,
@@ -303,6 +312,19 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     console.log('Learn more about:', room);
   }
 
+  const handleMakeOffer = (price: number, room: RoomOption) => {
+    actions.addBid(price, room);
+    showToast(t.offerMadeText.replace('{price}', price.toString()), 'success');
+  }
+
+  const handleCancelBid = (roomId: string) => {
+    const bidToRemove = bids.find(bid => bid.roomId === roomId);
+    if (bidToRemove) {
+      actions.removeBid(bidToRemove.id);
+      showToast('Bid cancelled', 'info');
+    }
+  }
+
   const handleEditSection = (_section: 'room' | 'customizations' | 'offer') => {
     if (state === 'confirmation') {
       actions.resetState();
@@ -349,6 +371,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       actions.removeOffer(itemId);
     } else if (itemType === 'room') {
       actions.removeRoom();
+    } else if (itemType === 'bid') {
+      actions.removeBid(itemId as string);
+      showToast(`Bid removed for ${itemName}`, 'info');
     }
   };
 
@@ -361,6 +386,13 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     nightText: t.nightText,
     learnMoreText: t.learnMoreText,
     priceInfoText: t.priceInfoText,
+    makeOfferText: t.makeOfferText,
+    proposePriceText: t.proposePriceText,
+    availabilityText: t.availabilityText,
+    offerMadeText: t.offerMadeText,
+    bidSubmittedText: t.bidSubmittedText,
+    updateBidText: t.updateBidText,
+    cancelBidText: t.cancelBidText,
   }
 
   const customizationTexts = {
@@ -472,8 +504,16 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             selectedRoom={selectedRoom}
             onRoomSelected={handleRoomSelect}
             onLearnMore={handleLearnMore}
+            onMakeOffer={handleMakeOffer}
+            onCancelBid={handleCancelBid}
             texts={roomTexts}
             isVisible={shouldShowSection('room', computedAvailableSections)}
+            showPriceSlider={true}
+            activeBid={bids.length > 0 ? {
+              roomId: bids[0].roomId,
+              bidAmount: bids[0].bidAmount,
+              status: bids[0].status
+            } : undefined}
           />
 
           {/* Room Customization Section */}
@@ -497,14 +537,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             texts={offersTexts}
             isVisible={shouldShowSection('offer', computedAvailableSections)}
           />
-
-          {/* Room Selection Map Section */}
-          {roomSelectionMap && (
-            <RoomSelectionMapSection
-              roomSelectionConfig={roomSelectionMap}
-              isVisible={true}
-            />
-          )}
         </div>
 
         <aside className="flex-shrink-0 max-w-md">
@@ -525,11 +557,16 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             <PricingSummaryPanel
               roomImage={selectedRoom?.image || fallbackImageUrl}
               items={[
-                ...(selectedRoom
-                  ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
-                  : []),
+                // Show either the selected room OR the bid, not both
+                ...(bids.length > 0 
+                  ? [] // Don't show selected room if there's an active bid
+                  : selectedRoom
+                    ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
+                    : []
+                ),
                 ...convertCustomizationsToPricingItems(selectedCustomizations),
                 ...convertOffersToPricingItems(selectedOffers),
+                ...convertBidsToPricingItems(bids, nights),
               ]}
               pricing={{ subtotal }}
               isLoading={isPriceCalculating}
@@ -592,7 +629,13 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           )}
         </aside>
       </main>
-
+                    {/* Room Selection Map Section */}
+                    {roomSelectionMap && (
+            <RoomSelectionMapSection
+              roomSelectionConfig={roomSelectionMap}
+              isVisible={true}
+            />
+          )}
       {/* Mobile Pricing Widget */}
       <MobilePricingWidget
         total={totalPrice}
@@ -609,11 +652,16 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         onClose={handleCloseMobilePricing}
         roomImage={selectedRoom?.image || fallbackImageUrl}
         items={[
-          ...(selectedRoom
-            ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
-            : []),
+          // Show either the selected room OR the bid, not both
+          ...(bids.length > 0 
+            ? [] // Don't show selected room if there's an active bid
+            : selectedRoom
+              ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
+              : []
+          ),
           ...convertCustomizationsToPricingItems(selectedCustomizations),
           ...convertOffersToPricingItems(selectedOffers),
+          ...convertBidsToPricingItems(bids, nights),
         ]}
         pricing={{ subtotal }}
         isLoading={isPriceCalculating}

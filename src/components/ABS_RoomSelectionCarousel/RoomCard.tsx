@@ -88,7 +88,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   )
 
   return (
-    <div className="relative rounded-lg overflow-hidden md:shadow-sm bg-white h-full">
+    <div className="relative rounded-lg overflow-hidden md:shadow-sm bg-white h-full max-w-lg">
       {/* Discount Badge */}
       {room.oldPrice && (
         <div className="absolute top-3 right-3 bg-black text-white py-1 px-2 rounded text-xs font-bold z-10">

@@ -535,7 +535,7 @@ export const viewOptions = [
 export const exactViewOptions = [
   {
     id: 'city-view',
-    name: 'City View',
+    name: 'Exact view.',
     description: 'Room with a view of the city',
     price: 0,
     icon: 'arrow-up',
@@ -544,7 +544,7 @@ export const exactViewOptions = [
   },
   {
     id: 'garden-view',
-    name: 'Garden View',
+    name: 'Exact view.',
     description: 'Room with a view of the garden',
     price: 2,
     icon: 'corner-up-right',
@@ -553,7 +553,7 @@ export const exactViewOptions = [
   },
   {
     id: 'lateral-sea-view',
-    name: 'Lateral Sea View',
+    name: 'Exact view.',
     description: 'Room with a lateral view of the sea',
     price: 6,
     icon: 'waves',
@@ -562,7 +562,7 @@ export const exactViewOptions = [
   },
   {
     id: 'pool-view',
-    name: 'Pool View',
+    name: 'Exact view.',
     description: 'Room with a view of the pool',
     price: 5,
     icon: 'waves',
@@ -571,7 +571,7 @@ export const exactViewOptions = [
   },
   {
     id: 'sea-frontal-view',
-    name: 'Sea Frontal View',
+    name: 'Exact view.',
     description: 'Room with a frontal view of the sea',
     price: 10,
     icon: 'waves',
@@ -580,7 +580,7 @@ export const exactViewOptions = [
   },
   {
     id: 'stage-view',
-    name: 'Stage View',
+    name: 'Exact view.',
     description: 'Room with a view of the stage',
     price: 6,
     icon: 'corner-up-right',
@@ -652,7 +652,9 @@ export const specialOffers = [
     image:
       'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2049&q=80',
     price: 100,
-    type: 'perStay' as const,
+    type: 'perPerson' as const,
+    requiresDateSelection: true,
+    allowsMultipleDates: true,
   },
   {
     id: 6,
@@ -686,6 +688,13 @@ export const translations = {
     nightText: 'night',
     learnMoreText: 'Learn More',
     priceInfoText: 'Price includes all taxes and fees',
+    makeOfferText: 'Make Offer',
+    proposePriceText: 'Propose your price:',
+    availabilityText: 'Subject to availability',
+    offerMadeText: 'You have proposed ${price} EUR per night',
+    bidSubmittedText: 'Bid submitted',
+    updateBidText: 'Update bid',
+    cancelBidText: 'Cancel',
 
     // New texts for RoomCustomization
     improveText: 'Upgrade',
@@ -865,6 +874,13 @@ export const translations = {
     nightText: 'noche',
     learnMoreText: 'Saber Más',
     priceInfoText: 'El precio incluye todos los impuestos y tarifas',
+    makeOfferText: 'Hacer Oferta',
+    proposePriceText: 'Propón tu precio:',
+    availabilityText: 'Sujeto a disponibilidad',
+    offerMadeText: 'Has propuesto ${price} EUR por noche',
+    bidSubmittedText: 'Oferta enviada',
+    updateBidText: 'Actualizar oferta',
+    cancelBidText: 'Cancelar',
 
     // New texts for RoomCustomization
     improveText: 'Mejorar',

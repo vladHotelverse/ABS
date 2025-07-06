@@ -3,6 +3,7 @@ import type { PricingItem } from '../../ABS_PricingSummaryPanel'
 import type { SelectedCustomizations } from '../../ABS_RoomCustomization/types'
 import type { RoomOption } from '../sections/RoomSelectionSection'
 import type { SelectedOffer } from '../sections/SpecialOffersSection'
+import type { BidItem } from '../../../hooks/useBidUpgrade'
 
 /**
  * Converts a RoomOption to a PricingItem for the pricing summary
@@ -62,6 +63,29 @@ export const convertOffersToPricingItems = (offers: SelectedOffer[]): PricingIte
     type: 'offer' as const,
     concept: 'enhance-your-stay',
   }))
+}
+
+/**
+ * Converts bids to PricingItems
+ */
+export const convertBidsToPricingItems = (bids: BidItem[], nights = 1): PricingItem[] => {
+  return bids
+    .filter((bid) => bid.status === 'submitted' || bid.status === 'pending')
+    .map((bid) => {
+      const totalPrice = bid.bidAmount * nights
+      const displayName = nights > 1 
+        ? `Bid for ${bid.roomName} (${nights} nights)` 
+        : `Bid for ${bid.roomName}`
+      
+      return {
+        id: bid.id,
+        name: displayName,
+        price: totalPrice,
+        type: 'bid' as const,
+        concept: 'bid-for-upgrade',
+        bidStatus: bid.status as 'pending' | 'submitted',
+      }
+    })
 }
 
 /**

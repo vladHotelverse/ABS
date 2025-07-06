@@ -26,6 +26,9 @@ export interface RoomSelectionCarouselTranslations {
   proposePriceText: string
   currencyText: string
   offerMadeText: string // Template: 'Has propuesto {price} EUR por noche'
+  bidSubmittedText: string
+  updateBidText: string
+  cancelBidText: string
 
   // Discount badge
   discountBadgeText: string // Template: '-{percentage}%'
@@ -56,6 +59,7 @@ export interface RoomSelectionCarouselProps {
   onRoomSelected?: (room: RoomOption | null) => void
   onMakeOffer?: (price: number, room: RoomOption) => void
   onLearnMore?: (room: RoomOption) => void
+  onCancelBid?: (roomId: string) => void
   minPrice?: number
   showPriceSlider?: boolean
   variant?: 'basic' | 'with-slider'
@@ -86,4 +90,17 @@ export interface RoomSelectionCarouselProps {
   currencyText?: string
   /** @deprecated Use translations.currencySymbol instead */
   currencySymbol?: string
+  /** @deprecated Use translations.bidSubmittedText instead */
+  bidSubmittedText?: string
+  /** @deprecated Use translations.updateBidText instead */
+  updateBidText?: string
+  /** @deprecated Use translations.cancelBidText instead */
+  cancelBidText?: string
+  
+  // Active bid information
+  activeBid?: {
+    roomId: string
+    bidAmount: number
+    status: 'pending' | 'submitted' | 'accepted' | 'rejected'
+  }
 }

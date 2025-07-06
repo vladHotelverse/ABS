@@ -30,13 +30,14 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   const { toasts, showToast, removeToast } = useToasts(PANEL_CONFIG.TOAST_DURATION)
 
   // Memoize expensive filtering operations - now grouped by concept
-  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, isEmpty } = useMemo(() => {
+  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, bidForUpgradeItems, isEmpty } = useMemo(() => {
     const safeItems = items || []
     return {
       chooseYourSuperiorRoomItems: safeItems.filter((item) => item.concept === 'choose-your-superior-room'),
       customizeYourRoomItems: safeItems.filter((item) => item.concept === 'customize-your-room'),
       chooseYourRoomItems: safeItems.filter((item) => item.concept === 'choose-your-room'),
       enhanceYourStayItems: safeItems.filter((item) => item.concept === 'enhance-your-stay'),
+      bidForUpgradeItems: safeItems.filter((item) => item.concept === 'bid-for-upgrade'),
       isEmpty: safeItems.length === 0,
     }
   }, [items])
@@ -152,7 +153,7 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
         )}
 
         {/* Separator after room section if there are customizations or special offers */}
-        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (customizeYourRoomItems.length > 0 || enhanceYourStayItems.length > 0) && (
+        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (customizeYourRoomItems.length > 0 || enhanceYourStayItems.length > 0 || bidForUpgradeItems.length > 0) && (
           <div className="h-px w-full bg-neutral-200" />
         )}
 
@@ -194,6 +195,34 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
             </div>
             <div className="space-y-2">
               {enhanceYourStayItems.map((item) => (
+                <PricingItemComponent
+                  key={item.id}
+                  item={item}
+                  euroSuffix={labels.euroSuffix}
+                  removeLabel={`Remove ${item.name}`}
+                  onRemove={() => {
+                    try {
+                      handleRemoveItem(item)
+                    } catch (error) {
+                      console.error('Error in remove item callback:', error)
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Bid Upgrades Section */}
+        {bidForUpgradeItems.length > 0 && (
+          <section aria-labelledby="bid-section-title">
+            <div className="flex justify-between items-center mb-2">
+              <h3 id="bid-section-title" className="text-base font-semibold">
+                Bid for Upgrades
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {bidForUpgradeItems.map((item) => (
                 <PricingItemComponent
                   key={item.id}
                   item={item}
