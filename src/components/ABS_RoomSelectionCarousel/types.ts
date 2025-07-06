@@ -47,6 +47,9 @@ export interface RoomSelectionCarouselTranslations {
     nextImage: string
     viewImage: string // Template: 'View image {index}'
   }
+
+  upgradeNowText?: string;
+  removeText?: string;
 }
 
 export interface RoomSelectionCarouselProps {
@@ -96,10 +99,14 @@ export interface RoomSelectionCarouselProps {
   updateBidText?: string
   /** @deprecated Use translations.cancelBidText instead */
   cancelBidText?: string
+  /** @deprecated Use translations.upgradeNowText instead */
+  upgradeNowText?: string
+  /** @deprecated Use translations.removeText instead */
+  removeText?: string
   
   // Active bid information
   activeBid?: {
-    roomId: string
+    roomId: string | number
     bidAmount: number
     status: 'pending' | 'submitted' | 'accepted' | 'rejected'
   }

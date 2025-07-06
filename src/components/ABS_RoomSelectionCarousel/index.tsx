@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import type React from 'react'
-import { CarouselNavigation, PriceSlider, RoomCard, useSlider } from './components'
+import { useState, useEffect } from 'react'
+import { CarouselNavigation, RoomCard } from './components'
 import { useCarouselState } from './hooks/useCarouselState'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
 
@@ -34,6 +35,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   bidSubmittedText,
   updateBidText,
   cancelBidText,
+  upgradeNowText,
+  removeText,
   activeBid,
 }) => {
   // Helper function to resolve text values (new translations object takes precedence)
@@ -72,6 +75,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     proposePriceText: getTranslation('proposePriceText', proposePriceText, 'Propon tu precio:'),
     currencyText: getTranslation('currencyText', currencyText, 'EUR'),
     currencySymbol: getTranslation('currencySymbol', currencySymbol, '€'),
+    upgradeNowText: getTranslation('upgradeNowText', upgradeNowText, 'Upgrade now'),
+    removeText: getTranslation('removeText', removeText, 'Remove'),
     offerMadeText: getTranslation('offerMadeText', offerMadeText, 'Has propuesto {price} EUR por noche'),
     discountBadgeText: getTranslation('discountBadgeText', discountBadgeText, '-{percentage}%'),
     noRoomsAvailableText: getTranslation('noRoomsAvailableText', undefined, 'No hay habitaciones disponibles.'),
@@ -96,52 +101,25 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     onRoomSelected,
   })
 
+  // State to manage which slider is active after a delay
+  const [sliderActiveIndex, setSliderActiveIndex] = useState<number | null>(null)
+
+  // Effect to update the active slider with a delay, and hide the old one immediately
+  useEffect(() => {
+    // Immediately hide any currently active slider to make it disappear without animation delay
+    setSliderActiveIndex(null)
+
+    const handler = setTimeout(() => {
+      setSliderActiveIndex(state.activeIndex)
+    }, 500) // 500ms delay
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [state.activeIndex])
+
   // Determine if slider should be shown
   const shouldShowSlider = showPriceSlider || variant === 'with-slider'
-
-  // Only initialize slider logic when needed
-  const sliderData = useSlider({
-    roomOptions,
-    activeIndex: state.activeIndex,
-    minPrice,
-    onMakeOffer,
-    offerMadeText: resolvedTexts.offerMadeText,
-    activeBid,
-  })
-
-
-  // Create price slider element without container for card integration
-  const createPriceSliderElement = (index: number) => {
-    if (!shouldShowSlider) return null
-
-    return (
-      <PriceSlider
-        proposedPrice={sliderData.proposedPrice}
-        minPrice={minPrice}
-        maxPrice={sliderData.maxPrice}
-        nightText={resolvedTexts.nightText}
-        makeOfferText={resolvedTexts.makeOfferText}
-        availabilityText={resolvedTexts.availabilityText}
-        proposePriceText={resolvedTexts.proposePriceText}
-        currencyText={resolvedTexts.currencyText}
-        bidStatus={sliderData.bidStatus}
-        submittedPrice={sliderData.submittedPrice}
-        bidSubmittedText={resolvedTexts.bidSubmittedText}
-        updateBidText={resolvedTexts.updateBidText}
-        cancelBidText={resolvedTexts.cancelBidText}
-        roomName={roomOptions[index]?.roomType}
-        onPriceChange={sliderData.setProposedPrice}
-        onMakeOffer={sliderData.makeOffer}
-        onCancelBid={() => {
-          const currentRoom = roomOptions[index]
-          if (currentRoom && onCancelBid) {
-            onCancelBid(currentRoom.id)
-          }
-          sliderData.resetBid()
-        }}
-      />
-    )
-  }
 
   if (roomOptions.length === 0) {
     return (
@@ -172,19 +150,32 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             learnMoreText={resolvedTexts.learnMoreText}
             priceInfoText={resolvedTexts.priceInfoText}
             selectedText={resolvedTexts.selectedText}
-            selectText={resolvedTexts.selectText}
+            selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
+            removeText={resolvedTexts.removeText}
             selectedRoom={state.selectedRoom}
             onSelectRoom={actions.selectRoom}
             activeImageIndex={state.activeImageIndices[0] || 0}
             onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(0, newImageIndex)}
             currencySymbol={resolvedTexts.currencySymbol}
             onLearnMore={onLearnMore}
+            activeBid={activeBid}
+            bidSubmittedText={resolvedTexts.bidSubmittedText}
             previousImageLabel={resolvedTexts.previousImage}
             nextImageLabel={resolvedTexts.nextImage}
             viewImageLabel={resolvedTexts.viewImage}
-            isActive={true}
+            isActive={sliderActiveIndex === 0}
             showPriceSlider={shouldShowSlider}
-            priceSliderElement={createPriceSliderElement(0)}
+            minPrice={minPrice}
+            onMakeOffer={onMakeOffer}
+            onCancelBid={onCancelBid}
+            proposePriceText={resolvedTexts.proposePriceText}
+            nightText={resolvedTexts.nightText}
+            makeOfferText={resolvedTexts.makeOfferText}
+            availabilityText={resolvedTexts.availabilityText}
+            currencyText={resolvedTexts.currencyText}
+            offerMadeText={resolvedTexts.offerMadeText}
+            updateBidText={resolvedTexts.updateBidText}
+            cancelBidText={resolvedTexts.cancelBidText}
           />
         </div>
       </div>
@@ -214,19 +205,32 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 learnMoreText={resolvedTexts.learnMoreText}
                 priceInfoText={resolvedTexts.priceInfoText}
                 selectedText={resolvedTexts.selectedText}
-                selectText={resolvedTexts.selectText}
+                selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
+                removeText={resolvedTexts.removeText}
                 selectedRoom={state.selectedRoom}
                 onSelectRoom={actions.selectRoom}
                 activeImageIndex={state.activeImageIndices[index] || 0}
                 onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
                 currencySymbol={resolvedTexts.currencySymbol}
                 onLearnMore={onLearnMore}
+                activeBid={activeBid}
+                bidSubmittedText={resolvedTexts.bidSubmittedText}
                 previousImageLabel={resolvedTexts.previousImage}
                 nextImageLabel={resolvedTexts.nextImage}
                 viewImageLabel={resolvedTexts.viewImage}
-                isActive={state.activeIndex === index}
+                isActive={sliderActiveIndex === index}
                 showPriceSlider={shouldShowSlider}
-                priceSliderElement={createPriceSliderElement(index)}
+                minPrice={minPrice}
+                onMakeOffer={onMakeOffer}
+                onCancelBid={onCancelBid}
+                proposePriceText={resolvedTexts.proposePriceText}
+                nightText={resolvedTexts.nightText}
+                makeOfferText={resolvedTexts.makeOfferText}
+                availabilityText={resolvedTexts.availabilityText}
+                currencyText={resolvedTexts.currencyText}
+                offerMadeText={resolvedTexts.offerMadeText}
+                updateBidText={resolvedTexts.updateBidText}
+                cancelBidText={resolvedTexts.cancelBidText}
               />
             </div>
           ))}
@@ -252,19 +256,32 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     learnMoreText={resolvedTexts.learnMoreText}
                     priceInfoText={resolvedTexts.priceInfoText}
                     selectedText={resolvedTexts.selectedText}
-                    selectText={resolvedTexts.selectText}
+                    selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
+                    removeText={resolvedTexts.removeText}
                     selectedRoom={state.selectedRoom}
                     onSelectRoom={actions.selectRoom}
                     activeImageIndex={state.activeImageIndices[index] || 0}
                     onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
                     currencySymbol={resolvedTexts.currencySymbol}
                     onLearnMore={onLearnMore}
+                    activeBid={activeBid}
+                    bidSubmittedText={resolvedTexts.bidSubmittedText}
                     previousImageLabel={resolvedTexts.previousImage}
                     nextImageLabel={resolvedTexts.nextImage}
                     viewImageLabel={resolvedTexts.viewImage}
-                    isActive={state.activeIndex === index}
+                    isActive={sliderActiveIndex === index}
                     showPriceSlider={shouldShowSlider}
-                    priceSliderElement={createPriceSliderElement(index)}
+                    minPrice={minPrice}
+                    onMakeOffer={onMakeOffer}
+                    onCancelBid={onCancelBid}
+                    proposePriceText={resolvedTexts.proposePriceText}
+                    nightText={resolvedTexts.nightText}
+                    makeOfferText={resolvedTexts.makeOfferText}
+                    availabilityText={resolvedTexts.availabilityText}
+                    currencyText={resolvedTexts.currencyText}
+                    offerMadeText={resolvedTexts.offerMadeText}
+                    updateBidText={resolvedTexts.updateBidText}
+                    cancelBidText={resolvedTexts.cancelBidText}
                   />
                 </div>
               ))}
@@ -379,19 +396,32 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     learnMoreText={resolvedTexts.learnMoreText}
                     priceInfoText={resolvedTexts.priceInfoText}
                     selectedText={resolvedTexts.selectedText}
-                    selectText={resolvedTexts.selectText}
+                    selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
+                    removeText={resolvedTexts.removeText}
                     selectedRoom={state.selectedRoom}
                     onSelectRoom={actions.selectRoom}
                     activeImageIndex={state.activeImageIndices[index] || 0}
                     onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
                     currencySymbol={resolvedTexts.currencySymbol}
                     onLearnMore={onLearnMore}
+                    activeBid={activeBid}
+                    bidSubmittedText={resolvedTexts.bidSubmittedText}
                     previousImageLabel={resolvedTexts.previousImage}
                     nextImageLabel={resolvedTexts.nextImage}
                     viewImageLabel={resolvedTexts.viewImage}
-                    isActive={state.activeIndex === index}
+                    isActive={sliderActiveIndex === index}
                     showPriceSlider={shouldShowSlider}
-                    priceSliderElement={createPriceSliderElement(index)}
+                    minPrice={minPrice}
+                    onMakeOffer={onMakeOffer}
+                    onCancelBid={onCancelBid}
+                    proposePriceText={resolvedTexts.proposePriceText}
+                    nightText={resolvedTexts.nightText}
+                    makeOfferText={resolvedTexts.makeOfferText}
+                    availabilityText={resolvedTexts.availabilityText}
+                    currencyText={resolvedTexts.currencyText}
+                    offerMadeText={resolvedTexts.offerMadeText}
+                    updateBidText={resolvedTexts.updateBidText}
+                    cancelBidText={resolvedTexts.cancelBidText}
                   />
                 </div>
               )

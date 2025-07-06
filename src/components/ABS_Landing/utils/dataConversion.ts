@@ -76,12 +76,11 @@ export const convertBidsToPricingItems = (bids: BidItem[], nights = 1): PricingI
     .filter((bid) => bid.status === 'submitted' || bid.status === 'pending')
     .map((bid) => {
       const totalPrice = bid.bidAmount * nights
-      const displayName = nights > 1 
-        ? `Bid for ${bid.roomName} (${nights} nights)` 
-        : `Bid for ${bid.roomName}`
-      
+      const displayName =
+        nights > 1 ? `Bid for ${bid.roomName} (${nights} nights)` : `Bid for ${bid.roomName}`
+
       return {
-        id: bid.id,
+        id: `bid-${bid.id}`, // Ensure a unique ID for the pricing item
         name: displayName,
         price: totalPrice,
         type: 'bid' as const,
@@ -190,11 +189,21 @@ export const generateAvailableSections = (
  * Counts total items in the cart
  */
 export const countCartItems = (
-  selectedRoom: RoomOption | undefined,
-  selectedCustomizations: SelectedCustomizations,
-  selectedOffers: SelectedOffer[]
+  state: {
+    selectedRoom?: RoomOption
+    selectedCustomizations?: SelectedCustomizations
+    selectedOffers?: SelectedOffer[]
+    activeBid?: { roomId: string; bidAmount: number; status: string } | null
+  }
 ): number => {
-  return selectedOffers.length + Object.keys(selectedCustomizations).length + (selectedRoom ? 1 : 0)
+  if (!state) return 0
+  
+  const roomCount = state.selectedRoom ? 1 : 0
+  const customizationCount = state.selectedCustomizations ? Object.keys(state.selectedCustomizations).length : 0
+  const offerCount = state.selectedOffers ? state.selectedOffers.length : 0
+  const bidCount = state.activeBid ? 1 : 0
+  
+  return roomCount + customizationCount + offerCount + bidCount
 }
 
 /**

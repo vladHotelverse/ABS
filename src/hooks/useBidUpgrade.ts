@@ -4,15 +4,9 @@ export interface BidItem {
   id: string
   roomId: string
   roomName: string
-  originalPrice: number
   bidAmount: number
   status: 'pending' | 'submitted' | 'accepted' | 'rejected'
-  targetRoom?: {
-    id: string
-    roomType: string
-    price: number
-  }
-  submittedAt?: Date
+  targetRoom?: RoomOption
 }
 
 export interface UseBidUpgradeProps {

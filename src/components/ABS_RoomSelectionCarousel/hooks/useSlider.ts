@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { RoomOption } from '../types'
 
 export interface UseSliderProps {
-  roomOptions: RoomOption[]
-  activeIndex: number
+  room: RoomOption
   minPrice: number
   onMakeOffer?: (price: number, room: RoomOption) => void
   offerMadeText?: string
   activeBid?: {
-    roomId: string
+    roomId: string | number
     bidAmount: number
     status: 'pending' | 'submitted' | 'accepted' | 'rejected'
   }
@@ -17,86 +16,66 @@ export interface UseSliderProps {
 export interface UseSliderReturn {
   proposedPrice: number
   setProposedPrice: (price: number) => void
-  makeOffer: () => void
   maxPrice: number
+  makeOffer: () => void
+  resetBid: () => void
+  formattedOfferText: string
   bidStatus: 'idle' | 'submitted'
   submittedPrice: number | null
-  resetBid: () => void
 }
 
 export const useSlider = ({
-  roomOptions,
-  activeIndex,
+  room,
   minPrice,
   onMakeOffer,
-  offerMadeText = 'Has propuesto {price} EUR por noche',
+  offerMadeText = 'You offered {price}',
   activeBid,
 }: UseSliderProps): UseSliderReturn => {
-  // Calculate max price based on active room
-  const maxPrice = useMemo(() => roomOptions[activeIndex]?.price || 20, [roomOptions, activeIndex])
+  const [maxPrice, setMaxPrice] = useState(room.price || 20)
+  const hasActiveBid = activeBid?.roomId === room.id
+  const [proposedPrice, setProposedPrice] = useState<number>(hasActiveBid ? activeBid.bidAmount : minPrice)
+  const [submittedPrice, setSubmittedPrice] = useState<number | null>(hasActiveBid ? activeBid.bidAmount : null)
+  const [bidStatus, setBidStatus] = useState<'idle' | 'submitted'>(hasActiveBid ? 'submitted' : 'idle')
 
-  // Calculate initial proposed price
-  const initialProposedPrice = useMemo(() => Math.round((minPrice + maxPrice) / 2), [minPrice, maxPrice])
-
-  const currentRoom = roomOptions[activeIndex]
-  const hasActiveBid = activeBid && currentRoom && activeBid.roomId === currentRoom.id
-
-  const [proposedPrice, setProposedPrice] = useState(
-    hasActiveBid ? activeBid.bidAmount : initialProposedPrice
-  )
-  const [bidStatus, setBidStatus] = useState<'idle' | 'submitted'>(
-    hasActiveBid && activeBid.status === 'submitted' ? 'submitted' : 'idle'
-  )
-  const [submittedPrice, setSubmittedPrice] = useState<number | null>(
-    hasActiveBid ? activeBid.bidAmount : null
-  )
-
-  // Update proposed price when active room changes
+  // Effect to recalculate prices when the active room changes
   useEffect(() => {
-    if (roomOptions[activeIndex]) {
-      const currentRoom = roomOptions[activeIndex]
-      const hasActiveBid = activeBid && activeBid.roomId === currentRoom.id
-      
-      if (hasActiveBid) {
-        // If there's an active bid for this room, show it
-        setProposedPrice(activeBid.bidAmount)
-        setBidStatus(activeBid.status === 'submitted' ? 'submitted' : 'idle')
-        setSubmittedPrice(activeBid.bidAmount)
-      } else {
-        // Otherwise, reset to default
-        const newPrice = Math.round((minPrice + currentRoom.price) / 2)
-        setProposedPrice(newPrice)
-        setBidStatus('idle')
-        setSubmittedPrice(null)
-      }
+    setMaxPrice(room.price)
+    // Reset proposed price to the minimum when room changes, unless there is an active bid
+    if (!hasActiveBid) {
+      setProposedPrice(minPrice)
     }
-  }, [activeIndex, minPrice, roomOptions, activeBid])
+  }, [room, minPrice, hasActiveBid])
 
-  // Handle making an offer
-  const makeOffer = useCallback(() => {
-    if (onMakeOffer && roomOptions[activeIndex]) {
-      onMakeOffer(proposedPrice, roomOptions[activeIndex])
-      setBidStatus('submitted')
-      setSubmittedPrice(proposedPrice)
-    } else {
-      alert(offerMadeText.replace('{price}', proposedPrice.toString()))
+  // Memoize the offer text to avoid re-creating it on every render
+  const formattedOfferText = useMemo(() => {
+    if (bidStatus === 'submitted' && submittedPrice) {
+      return offerMadeText.replace('{price}', submittedPrice.toString())
     }
-  }, [onMakeOffer, roomOptions, activeIndex, proposedPrice, offerMadeText])
+    return ''
+  }, [bidStatus, submittedPrice, offerMadeText])
 
-  // Reset bid status
-  const resetBid = useCallback(() => {
-    setBidStatus('idle')
+  const makeOffer = () => {
+    setSubmittedPrice(proposedPrice)
+    setBidStatus('submitted')
+    if (onMakeOffer) {
+      onMakeOffer(proposedPrice, room)
+    }
+  }
+
+  const resetBid = () => {
     setSubmittedPrice(null)
-    setProposedPrice(initialProposedPrice)
-  }, [initialProposedPrice])
+    setBidStatus('idle')
+    setProposedPrice(minPrice)
+  }
 
   return {
     proposedPrice,
     setProposedPrice,
-    makeOffer,
     maxPrice,
+    makeOffer,
+    resetBid,
+    formattedOfferText,
     bidStatus,
     submittedPrice,
-    resetBid,
   }
 }

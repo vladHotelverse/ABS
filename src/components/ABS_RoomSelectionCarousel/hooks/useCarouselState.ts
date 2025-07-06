@@ -13,11 +13,16 @@ export type CarouselAction =
   | { type: 'SET_ACTIVE_INDEX'; payload: number }
   | { type: 'SET_ACTIVE_IMAGE_INDEX'; payload: { roomIndex: number; imageIndex: number } }
   | { type: 'SET_SELECTED_ROOM'; payload: RoomOption | null }
+  | {
+      type: 'SET_SELECTED_ROOM_AND_INDEX'
+      payload: { room: RoomOption | null; index: number }
+    }
   | { type: 'NEXT_SLIDE'; roomCount: number }
   | { type: 'PREV_SLIDE'; roomCount: number }
   | { type: 'NEXT_IMAGE'; roomIndex: number; imageCount: number }
   | { type: 'PREV_IMAGE'; roomIndex: number; imageCount: number }
   | { type: 'RESET_STATE'; payload: CarouselState }
+  | { type: 'RESET_VIEW'; payload: { activeIndex: number; activeImageIndices: Record<number, number> } }
 
 // Reducer function - removed slider-specific cases
 const carouselReducer = (state: CarouselState, action: CarouselAction): CarouselState => {
@@ -36,6 +41,13 @@ const carouselReducer = (state: CarouselState, action: CarouselAction): Carousel
 
     case 'SET_SELECTED_ROOM':
       return { ...state, selectedRoom: action.payload }
+
+    case 'SET_SELECTED_ROOM_AND_INDEX':
+      return {
+        ...state,
+        selectedRoom: action.payload.room,
+        activeIndex: action.payload.index,
+      }
 
     case 'NEXT_SLIDE':
       return {
@@ -72,6 +84,13 @@ const carouselReducer = (state: CarouselState, action: CarouselAction): Carousel
 
     case 'RESET_STATE':
       return action.payload
+
+    case 'RESET_VIEW':
+      return {
+        ...state,
+        activeIndex: action.payload.activeIndex,
+        activeImageIndices: action.payload.activeImageIndices,
+      }
 
     default:
       return state
@@ -142,12 +161,24 @@ export const useCarouselState = ({
 
   const selectRoom = useCallback(
     (room: RoomOption | null) => {
-      dispatch({ type: 'SET_SELECTED_ROOM', payload: room })
+      // Find the index of the selected room to sync the activeIndex
+      const newIndex = room ? roomOptions.findIndex((option) => option.id === room.id) : -1
+
+      if (newIndex !== -1) {
+        dispatch({
+          type: 'SET_SELECTED_ROOM_AND_INDEX',
+          payload: { room, index: newIndex },
+        })
+      } else {
+        // If room is deselected (null), just update the selected room
+        dispatch({ type: 'SET_SELECTED_ROOM', payload: room })
+      }
+
       if (onRoomSelected) {
         onRoomSelected(room)
       }
     },
-    [onRoomSelected]
+    [roomOptions, onRoomSelected]
   )
 
   const nextSlide = useCallback(() => {
@@ -180,22 +211,22 @@ export const useCarouselState = ({
     [setActiveIndex, setActiveImageIndex, selectRoom, nextSlide, prevSlide, nextImage, prevImage]
   )
 
-  // Reinitialize state when roomOptions change
+  // This effect now ONLY resets the view when the list of rooms changes.
   useEffect(() => {
     const newActiveIndex = getInitialActiveIndex(roomOptions.length)
-    // Initialize image indices for all rooms dynamically
     const newImageIndices: Record<number, number> = {}
     roomOptions.forEach((_, index) => {
       newImageIndices[index] = 0
     })
-    
-    const newState: CarouselState = {
-      activeIndex: newActiveIndex,
-      activeImageIndices: newImageIndices,
-      selectedRoom: initialSelectedRoom,
+    dispatch({ type: 'RESET_VIEW', payload: { activeIndex: newActiveIndex, activeImageIndices: newImageIndices } })
+  }, [roomOptions, dispatch])
+
+  // This new effect ONLY syncs the selected room from the parent without changing the view.
+  useEffect(() => {
+    if (state.selectedRoom?.id !== initialSelectedRoom?.id) {
+      dispatch({ type: 'SET_SELECTED_ROOM', payload: initialSelectedRoom })
     }
-    dispatch({ type: 'RESET_STATE', payload: newState })
-  }, [roomOptions.length, initialSelectedRoom])
+  }, [initialSelectedRoom, state.selectedRoom, dispatch])
 
   return {
     state,

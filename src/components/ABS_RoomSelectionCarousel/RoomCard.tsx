@@ -1,8 +1,12 @@
 import clsx from 'clsx'
+import { Star, Tag } from 'lucide-react'
 import type React from 'react'
 import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
-import type { RoomOption } from './types'
+import { PriceSlider } from './components'
+import { useSlider } from './hooks'
+import { UiButton } from '../ui/button'
 import { UiTooltip, UiTooltipContent, UiTooltipTrigger, TooltipProvider } from '../ui/tooltip'
+import type { RoomOption } from './types'
 
 interface RoomCardProps {
   room: RoomOption
@@ -12,12 +16,20 @@ interface RoomCardProps {
   priceInfoText: string
   selectedText: string
   selectText: string
+  removeText: string
   selectedRoom: RoomOption | null
   onSelectRoom: (room: RoomOption | null) => void
   activeImageIndex: number
   onImageChange: (newImageIndex: number) => void
   currencySymbol?: string
   onLearnMore?: (room: RoomOption) => void
+  instantConfirmationText?: string
+  activeBid?: {
+    roomId: string | number
+    bidAmount: number
+    status: 'pending' | 'submitted' | 'accepted' | 'rejected'
+  }
+  bidSubmittedText?: string
   // Translation props for image navigation
   previousImageLabel?: string
   nextImageLabel?: string
@@ -25,7 +37,16 @@ interface RoomCardProps {
   // Price slider props
   isActive?: boolean
   showPriceSlider?: boolean
-  priceSliderElement?: React.ReactNode
+  minPrice?: number
+  onMakeOffer?: (price: number, room: RoomOption) => void
+  onCancelBid?: (roomId: string) => void
+  proposePriceText?: string
+  availabilityText?: string
+  currencyText?: string
+  offerMadeText?: string
+  updateBidText?: string
+  cancelBidText?: string
+  // priceSliderElement?: React.ReactNode; // This is now handled internally
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -36,22 +57,52 @@ const RoomCard: React.FC<RoomCardProps> = ({
   priceInfoText,
   selectedText,
   selectText,
+  removeText,
   selectedRoom,
   onSelectRoom,
   activeImageIndex,
   onImageChange,
   currencySymbol = '€',
   onLearnMore,
+  instantConfirmationText = 'Instant Confirmation',
+  activeBid,
+  bidSubmittedText = 'Bid Submitted',
   previousImageLabel = 'Previous image',
   nextImageLabel = 'Next image',
   viewImageLabel = 'View image {index}',
   isActive = false,
   showPriceSlider = false,
-  priceSliderElement,
+  minPrice = 10,
+  onMakeOffer,
+  onCancelBid,
+  proposePriceText,
+  availabilityText,
+  currencyText,
+  offerMadeText,
+  updateBidText,
+  cancelBidText,
 }) => {
+  const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false)
   const descriptionRef = useRef<HTMLParagraphElement>(null)
+
+  // Slider logic is now local to each card
+  const {
+    proposedPrice,
+    setProposedPrice,
+    maxPrice,
+    makeOffer,
+    resetBid,
+    bidStatus,
+    submittedPrice,
+  } = useSlider({
+    room,
+    minPrice,
+    onMakeOffer,
+    offerMadeText,
+    activeBid,
+  })
 
   // Check if description needs truncation
   useEffect(() => {
@@ -95,12 +146,19 @@ const RoomCard: React.FC<RoomCardProps> = ({
   )
 
   return (
-    <div className={clsx(
-      "relative rounded-lg overflow-visible md:shadow-sm max-w-lg transition-all duration-300",
-      isActive && showPriceSlider ? "bg-gray-50 ring-2 ring-gray-200" : "bg-white"
-    )}>
+    <div
+      className={clsx(
+        'relative rounded-lg overflow-visible md:shadow-sm max-w-lg transition-all duration-300',
+        isActive && showPriceSlider ? 'bg-gray-50 ring-2 ring-gray-200' : 'bg-white',
+        {
+          'border-2 border-green-300 bg-green-50/30': selectedRoom?.id === room.id,
+          'border-2 border-blue-300 bg-blue-50/30': isBidActive && selectedRoom?.id !== room.id,
+          'border border-transparent': selectedRoom?.id !== room.id && !isBidActive,
+        }
+      )}
+    >
       {/* Discount Badge */}
-      {room.oldPrice && (
+      {room.oldPrice && !selectedRoom?.id && !isBidActive && (
         <div className="absolute top-3 right-3 bg-black text-white py-1 px-2 rounded text-xs font-bold z-10">
           <span>
             {useMemo(() => {
@@ -111,6 +169,22 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 : `${discountBadgeText}${discountPercentage}%`
             }, [discountBadgeText, room.price, room.oldPrice])}
           </span>
+        </div>
+      )}
+
+      {/* Bid Submitted Badge */}
+      {isBidActive && selectedRoom?.id !== room.id && (
+        <div className="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
+          <Tag className="h-3 w-3" />
+          <span>{bidSubmittedText}</span>
+        </div>
+      )}
+
+      {/* Selected Badge */}
+      {selectedRoom?.id === room.id && (
+        <div className="absolute top-2 left-2 z-10 bg-green-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
+          <Star className="h-3 w-3" />
+          <span>{selectedText}</span>
         </div>
       )}
 
@@ -203,7 +277,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         </div>
 
         {/* Amenities */}
-        <div className="flex flex-nowrap gap-2 mb-2 w-full overflow-auto">
+        <div className="flex flex-nowrap gap-2 mb-2 w-full overflow-x-auto no-scrollbar">
           {room.amenities.map((amenity) => (
             <span
               key={`${room.id}-${amenity}`}
@@ -214,39 +288,28 @@ const RoomCard: React.FC<RoomCardProps> = ({
           ))}
         </div>
 
-        {/* Price Display */}
-        <div className="flex items-center gap-2 mb-2">
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between gap-4 mt-2">
+          <div className='flex flex-col'>
+            {/* Price Display */}
+        <div className="flex items-center gap-2">
           <span className="text-2xl font-bold">{`${currencySymbol}${room.price}`}</span>
           {room.oldPrice && (
             <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${room.oldPrice}`}</span>
           )}
           <span className="text-sm text-neutral-500">{nightText}</span>
         </div>
+        <span className="text-sm font-bold mt-1">{instantConfirmationText}</span>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-4 mt-2">
-          <button
-            className={clsx(
-              'px-6 py-2.5 text-sm font-medium rounded-md uppercase tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black',
-              {
-                'bg-green-600 text-white shadow-md': selectedRoom?.id === room.id,
-                'bg-black text-white hover:bg-neutral-900': selectedRoom?.id !== room.id,
-              }
-            )}
+          </div>
+          <UiButton
+            variant={selectedRoom?.id === room.id ? 'destructive' : 'black'}
+            size="sm"
+            className="w-fit uppercase tracking-wide"
             onClick={handleSelectRoom}
           >
-            <span>{selectedRoom?.id === room.id ? selectedText : selectText}</span>
-          </button>
-
-          <button
-            className="text-sm text-neutral-500 underline hover:text-neutral-700 transition-colors duration-200"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleLearnMore()
-            }}
-          >
-            {learnMoreText}
-          </button>
+            <span>{selectedRoom?.id === room.id ? removeText : selectText}</span>
+          </UiButton>
         </div>
 
         {/* Additional Info */}
@@ -254,11 +317,40 @@ const RoomCard: React.FC<RoomCardProps> = ({
       </div>
 
       {/* Price Slider - integrated within the card */}
-      {isActive && showPriceSlider && priceSliderElement && (
+      <div
+        className={clsx(
+          'overflow-hidden',
+          // Apply transition only when expanding to make it smooth
+          isActive && showPriceSlider ? 'transition-all duration-500 ease-in-out' : 'transition-none',
+          isActive && showPriceSlider ? 'max-h-96' : 'max-h-0'
+        )}
+      >
         <div className="border-t border-gray-200 p-4 bg-gray-50">
-          {priceSliderElement}
+          <PriceSlider
+            proposedPrice={proposedPrice}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            nightText={nightText}
+            proposePriceText={proposePriceText}
+            availabilityText={availabilityText}
+            currencyText={currencyText}
+            bidStatus={bidStatus}
+            submittedPrice={submittedPrice}
+            bidSubmittedText={bidSubmittedText}
+            updateBidText={updateBidText}
+            cancelBidText={cancelBidText}
+            roomName={room.roomType}
+            onPriceChange={setProposedPrice}
+            onMakeOffer={makeOffer}
+            onCancelBid={() => {
+              if (onCancelBid) {
+                onCancelBid(room.id)
+              }
+              resetBid()
+            }}
+          />
         </div>
-      )}
+      </div>
     </div>
   )
 }

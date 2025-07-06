@@ -1,4 +1,5 @@
 import type React from 'react'
+import { useMemo } from 'react'
 import RoomSelectionCarousel from '../../ABS_RoomSelectionCarousel'
 import type { RoomOption as CarouselRoomOption } from '../../ABS_RoomSelectionCarousel/types'
 
@@ -95,10 +96,8 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
 
   const handleRoomSelect = (room: CarouselRoomOption | null) => {
     if (room === null) {
-      // Handle deselection - pass null or undefined based on your API design
-      // Option 1: If your onRoomSelected supports null
-      // onRoomSelected(null as any)
-      // Option 2: If you want to ignore deselection in this component
+      // Handle deselection
+      onRoomSelected(null as any)
       return
     }
     onRoomSelected(convertFromCarouselRoomOption(room))
@@ -116,12 +115,18 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
     }
   }
 
+  // Memoize the converted room options to prevent unnecessary re-renders in the carousel
+  const carouselRoomOptions = useMemo(
+    () => roomOptions.map(convertToCarouselRoomOption),
+    [roomOptions]
+  )
+
   return (
     <section className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
       <h2 className="text-3xl font-bold mb-4">{texts.roomTitle}</h2>
       <p className="mb-6">{texts.roomSubtitle}</p>
       <RoomSelectionCarousel
-        roomOptions={roomOptions.map(convertToCarouselRoomOption)}
+        roomOptions={carouselRoomOptions}
         onRoomSelected={handleRoomSelect}
         initialSelectedRoom={selectedRoom ? convertToCarouselRoomOption(selectedRoom) : null}
         selectText={texts.selectText}

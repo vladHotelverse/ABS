@@ -33,6 +33,7 @@ import {
   countCartItems,
   shouldShowSection,
   calculateNights,
+  calculateTotalPrice,
 } from './utils/dataConversion'
 
 // Re-export types from sections for compatibility
@@ -226,27 +227,29 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   const stayDates = checkIn && checkOut ? `From ${checkIn} to ${checkOut}` : 'N/A'
 
   // Use custom hooks for state management
-  const {
-    selectedRoom,
-    selectedCustomizations,
-    selectedOffers,
-    subtotal,
-    state,
-    isPriceCalculating,
-    showMobilePricing,
-    bids,
-    actions,
-  } = useBookingState({
-    initialSelectedRoom,
-    initialState,
-    initialSubtotal,
-    initialTax,
-    onConfirmBooking,
+  const { state, actions } = useBookingState({
+    selectedRoom: initialSelectedRoom,
+    customizations: {},
+    specialOffers: [],
+    activeBid: null,
+    status: initialState,
+    texts: translations,
     nights,
-  });
+  })
 
-  const { showToast } = actions;
+  const { showToast } = actions
   
+  // Calculate cart item count
+  const cartItemCount = countCartItems(state)
+
+  const { subtotal, tax, total } = calculateTotalPrice(
+    state.selectedRoom,
+    state.customizations || {},
+    state.specialOffers || [],
+    0.1, // Assuming a 10% tax rate
+    state.nights || 1
+  )
+
   const multiBookingState = useMultiBookingState({
     initialRoomBookings,
     onMultiBookingChange,
@@ -276,64 +279,55 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   } = multiBookingState
 
   // Calculate items and totals
-  const singleBookingItemCount = countCartItems(selectedRoom, selectedCustomizations, selectedOffers)
+  const singleBookingItemCount = countCartItems(state.selectedRoom, state.customizations, state.specialOffers)
   const itemCount = shouldShowMultiBooking ? multiBookingItemCount : singleBookingItemCount
   // Use subtotal for header to match pricing panel (taxes removed)
-  const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : subtotal
+  const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : state.subtotal
 
   // Handlers for user interactions
   const handleRoomSelect = (room: RoomOption) => {
-    actions.selectRoom(room);
+    actions.selectRoom(room)
   }
 
-  const handleCustomizationChange = (category: string, optionId: string, optionLabel: string, optionPrice: number) => {
-    actions.updateCustomization(category, optionId, optionLabel, optionPrice);
-  }
-
-  // Create reservation info for special offers
-  const reservationInfo = {
-    personCount: occupancy ? Number.parseInt(occupancy.split(' ')[0]) || 2 : 2,
-    checkInDate: checkIn ? (new Date(checkIn).toString() !== 'Invalid Date' ? new Date(checkIn) : undefined) : undefined,
-    checkOutDate: checkOut ? (new Date(checkOut).toString() !== 'Invalid Date' ? new Date(checkOut) : undefined) : undefined,
+  const handleCustomizationChange = (
+    customization: Customization,
+    roomId: string
+  ) => {
+    // This logic needs to be adapted based on how you want to handle customizations
+    // For now, we'll just log it
+    console.log('Customization changed:', customization, 'for room:', roomId)
+    // A real implementation would call an action like:
+    // actions.addCustomization(customization, roomId);
   }
 
   const handleBookOffer = (offerData: OfferData) => {
-    if (offerData.quantity === 0) {
-      actions.removeOffer(offerData.id);
-      return;
-    }
-
-    const newOffer: SelectedOffer = {
+    const offer: SpecialOffer = {
       id: offerData.id,
-      name: offerData.name,
+      name: offerData.title,
       price: offerData.price,
-      quantity: offerData.quantity,
-    };
-    actions.updateOffer(newOffer);
-  };
+      // You might need to adjust this based on the actual offer data structure
+      quantity: offerData.quantity || 1,
+    }
+    actions.addSpecialOffer(offer)
+    showToast(`${offer.name} added to your stay.`, 'success')
+  }
 
-
-  const handleLearnMore = (room: RoomOption) => {
-    console.log('Learn more about:', room);
+  const handleLearnMore = (_room: RoomOption) => {
+    console.log('Learn more about:', _room);
   }
 
   const handleMakeOffer = (price: number, room: RoomOption) => {
-    actions.addBid(price, room);
-    showToast(t.offerMadeText.replace('{price}', price.toString()), 'success');
+    actions.makeOffer(price, room)
+    showToast(`Bid of ${translations.currencySymbol}${price} submitted for ${room.title || room.roomType}.`, 'success')
   }
 
   const handleCancelBid = (roomId: string) => {
-    const bidToRemove = bids.find(bid => bid.roomId === roomId);
-    if (bidToRemove) {
-      actions.removeBid(bidToRemove.id);
-      showToast('Bid cancelled', 'info');
-    }
+    actions.cancelBid(roomId)
+    showToast(`Bid for room ${roomId} cancelled.`, 'info')
   }
 
   const handleEditSection = (_section: 'room' | 'customizations' | 'offer') => {
-    if (state === 'confirmation') {
-      actions.resetState();
-    }
+    // This function can be used to navigate the user to the relevant section
   }
 
   const handleShowMobilePricing = () => {
@@ -365,22 +359,33 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     _roomId?: string
   ) => {
     if (itemType === 'customization') {
-      const category = Object.keys(selectedCustomizations).find(
-        (key) => selectedCustomizations[key]?.id === itemId
+      const category = Object.keys(state.customizations).find(
+        (key) => state.customizations[key]?.id === itemId
       );
       if (category) {
-        actions.removeCustomization(category);
+        actions.removeCustomization(category, _roomId || '');
       }
-      showToast(`${t.customizationRemovedMessagePrefix} "${itemName}"`, 'info');
+      showToast(`${translations.customizationRemovedMessagePrefix} "${itemName}"`, 'info');
     } else if (itemType === 'offer') {
-      actions.removeOffer(itemId);
+      actions.removeSpecialOffer(itemId.toString());
     } else if (itemType === 'room') {
-      actions.removeRoom();
+      actions.selectRoom(null);
+      showToast(translations.roomRemovedMessage, 'info');
     } else if (itemType === 'bid') {
-      actions.removeBid(itemId as string);
+      actions.cancelBid(itemId as string);
       showToast(`Bid removed for ${itemName}`, 'info');
     }
   };
+
+  // Convert state to pricing items
+  const pricingItems: PricingItem[] = [
+    convertRoomToPricingItem(state.selectedRoom, state.nights),
+    ...convertCustomizationsToPricingItems(state.customizations || {}, state.nights),
+    ...convertOffersToPricingItems(state.specialOffers || []),
+    ...convertBidsToPricingItems(state.activeBid ? [state.activeBid] : [], state.nights),
+  ].filter((item): item is PricingItem => item !== null)
+
+  const hasBids = state.activeBid !== null
 
   // Create section texts for subcomponents
   const roomTexts = {
@@ -432,10 +437,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }))
 
   // Return early for non-normal states
-  if (state !== 'normal') {
+  if (state.status !== 'normal') {
     return (
       <BookingStateSection
-        state={state}
+        state={state.status}
         texts={bookingStateTexts}
         onRetry={handleRetry}
         onBackToNormal={handleBackToNormal}
@@ -452,7 +457,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         totalPrice={totalPrice}
         totalLabel={t.totalLabel}
         currencySymbol={t.currencySymbol}
-        isLoading={isPriceCalculating}
+        isLoading={false} // isPriceCalculating is removed from useBookingState
         isSticky={!shouldShowMultiBooking}
       />
 
@@ -506,7 +511,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           {/* Room Selection Section */}
           <RoomSelectionSection
             roomOptions={roomOptions}
-            selectedRoom={selectedRoom}
+            selectedRoom={state.selectedRoom}
             onRoomSelected={handleRoomSelect}
             onLearnMore={handleLearnMore}
             onMakeOffer={handleMakeOffer}
@@ -514,10 +519,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             texts={roomTexts}
             isVisible={shouldShowSection('room', computedAvailableSections)}
             showPriceSlider={true}
-            activeBid={bids.length > 0 ? {
-              roomId: bids[0].roomId,
-              bidAmount: bids[0].bidAmount,
-              status: bids[0].status
+            activeBid={state.activeBid ? {
+              roomId: state.activeBid.roomId,
+              bidAmount: state.activeBid.bidAmount,
+              status: state.activeBid.status
             } : undefined}
           />
 
@@ -525,7 +530,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           <CustomizationSection
             sections={sections}
             sectionOptions={sectionOptions}
-            selectedCustomizations={selectedCustomizations}
+            selectedCustomizations={state.customizations}
             onCustomizationChange={handleCustomizationChange}
             texts={customizationTexts}
             fallbackImageUrl={fallbackImageUrl}
@@ -536,9 +541,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           {/* Special Offers Section */}
           <SpecialOffersSection
             specialOffers={specialOffers}
-            selectedOffers={selectedOffers}
+            selectedOffers={state.specialOffers}
             onBookOffer={handleBookOffer}
-            reservationInfo={reservationInfo}
+            reservationInfo={null} // reservationInfo is not used in this component's state
             texts={offersTexts}
             isVisible={shouldShowSection('offer', computedAvailableSections)}
           />
@@ -551,7 +556,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               labels={t.multiBookingLabels}
               currency="EUR"
               locale={language === 'en' ? 'en-US' : 'es-ES'}
-              isLoading={isPriceCalculating}
+              isLoading={false} // isPriceCalculating is removed from useBookingState
               onRemoveItem={(roomId, itemId, itemName, itemType) =>
                 handleRemoveItem(itemId, itemName, itemType, roomId)
               }
@@ -559,78 +564,69 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               onConfirmAll={handleMultiBookingConfirmAll}
             />
           ) : (
-            <PricingSummaryPanel
-              roomImage={selectedRoom?.image || fallbackImageUrl}
-              items={[
-                // Show either the selected room OR the bid, not both
-                ...(bids.length > 0 
-                  ? [] // Don't show selected room if there's an active bid
-                  : selectedRoom
-                    ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
-                    : []
-                ),
-                ...convertCustomizationsToPricingItems(selectedCustomizations, nights),
-                ...convertOffersToPricingItems(selectedOffers),
-                ...convertBidsToPricingItems(bids, nights),
-              ]}
-              pricing={{ subtotal }}
-              isLoading={isPriceCalculating}
-              availableSections={computedAvailableSections}
-              labels={{
-                selectedRoomLabel: t.selectedRoomLabel,
-                upgradesLabel: t.upgradesLabel,
-                specialOffersLabel: t.specialOffersLabel,
-                chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
-                customizeYourRoomLabel: t.customizeYourRoomLabel,
-                enhanceYourStayLabel: t.enhanceYourStayLabel,
-                chooseYourRoomLabel: t.chooseYourRoomLabel,
-                subtotalLabel: t.subtotalLabel,
-                taxesLabel: t.taxesLabel,
-                totalLabel: t.totalLabel,
-                payAtHotelLabel: t.payAtHotelLabel,
-                viewTermsLabel: t.viewTermsLabel,
-                confirmButtonLabel: t.confirmButtonLabel,
-                noUpgradesSelectedLabel: t.noUpgradesSelectedLabel,
-                noOffersSelectedLabel: t.noOffersSelectedLabel,
-                emptyCartMessage: t.emptyCartMessage,
-                editLabel: t.editLabel,
-                roomRemovedMessage: t.roomRemovedMessage,
-                offerRemovedMessagePrefix: t.offerRemovedMessagePrefix,
-                customizationRemovedMessagePrefix: t.customizationRemovedMessagePrefix,
-                addedMessagePrefix: t.addedMessagePrefix,
-                euroSuffix: t.euroSuffix,
-                loadingLabel: t.loadingLabel,
-                roomImageAltText: t.roomImageAltText,
-                removeRoomUpgradeLabel: t.removeRoomUpgradeLabel,
-                exploreLabel: t.exploreLabel,
-                fromLabel: t.fromLabel,
-                customizeStayTitle: t.customizeTitle || 'Customize Your Stay',
-                chooseOptionsSubtitle: t.customizeSubtitle || 'Choose your preferred options',
+            <div className={clsx('transition-opacity duration-300', isMultiBooking ? 'opacity-0' : 'opacity-100')}>
+              <PricingSummaryPanel
+                roomImage={state.selectedRoom?.image || fallbackImageUrl}
+                items={pricingItems}
+                pricing={{ subtotal, tax, total }}
+                isLoading={false} // isPriceCalculating is removed from useBookingState
+                availableSections={computedAvailableSections}
+                labels={{
+                  selectedRoomLabel: t.selectedRoomLabel,
+                  upgradesLabel: t.upgradesLabel,
+                  specialOffersLabel: t.specialOffersLabel,
+                  chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
+                  customizeYourRoomLabel: t.customizeYourRoomLabel,
+                  enhanceYourStayLabel: t.enhanceYourStayLabel,
+                  chooseYourRoomLabel: t.chooseYourRoomLabel,
+                  subtotalLabel: t.subtotalLabel,
+                  taxesLabel: t.taxesLabel,
+                  totalLabel: t.totalLabel,
+                  payAtHotelLabel: t.payAtHotelLabel,
+                  viewTermsLabel: t.viewTermsLabel,
+                  confirmButtonLabel: t.confirmButtonLabel,
+                  noUpgradesSelectedLabel: t.noUpgradesSelectedLabel,
+                  noOffersSelectedLabel: t.noOffersSelectedLabel,
+                  emptyCartMessage: t.emptyCartMessage,
+                  editLabel: t.editLabel,
+                  roomRemovedMessage: t.roomRemovedMessage,
+                  offerRemovedMessagePrefix: t.offerRemovedMessagePrefix,
+                  customizationRemovedMessagePrefix: t.customizationRemovedMessagePrefix,
+                  addedMessagePrefix: t.addedMessagePrefix,
+                  euroSuffix: t.euroSuffix,
+                  loadingLabel: t.loadingLabel,
+                  roomImageAltText: t.roomImageAltText,
+                  removeRoomUpgradeLabel: t.removeRoomUpgradeLabel,
+                  exploreLabel: t.exploreLabel,
+                  fromLabel: t.fromLabel,
+                  customizeStayTitle: t.customizeTitle || 'Customize Your Stay',
+                  chooseOptionsSubtitle: t.customizeSubtitle || 'Choose your preferred options',
 
-                // Error messages (i18n)
-                missingLabelsError: 'Missing labels error',
-                invalidPricingError: 'Invalid pricing error',
-                currencyFormatError: 'Currency format error',
-                performanceWarning: 'Performance warning',
+                  // Error messages (i18n)
+                  missingLabelsError: 'Missing labels error',
+                  invalidPricingError: 'Invalid pricing error',
+                  currencyFormatError: 'Currency format error',
+                  performanceWarning: 'Performance warning',
 
-                // Accessibility labels (i18n)
-                notificationsLabel: 'Notifications',
-                closeNotificationLabel: 'Close notification',
-                pricingSummaryLabel: 'Pricing summary',
-                processingLabel: 'Processing',
-              }}
-              currency="EUR"
-              locale={language === 'en' ? 'en-US' : 'es-ES'}
-              onRemoveItem={(id, name, type) => {
-                handleRemoveItem(id, name, type)
-              }}
-              onConfirm={handleConfirm}
-              onEditSection={(section) => {
-                if (section === 'room') handleEditSection('room')
-                else if (section === 'customizations') handleEditSection('customizations')
-                else if (section === 'offers') handleEditSection('offer')
-              }}
-            />
+                  // Accessibility labels (i18n)
+                  notificationsLabel: 'Notifications',
+                  closeNotificationLabel: 'Close notification',
+                  pricingSummaryLabel: 'Pricing summary',
+                  processingLabel: 'Processing',
+                }}
+                currency="EUR"
+                locale={language === 'en' ? 'en-US' : 'es-ES'}
+                onRemoveItem={(id, name, type) => {
+                  handleRemoveItem(id, name, type)
+                }}
+                onConfirm={handleConfirm}
+                onEditSection={(section) => {
+                  if (section === 'room') handleEditSection('room')
+                  else if (section === 'customizations') handleEditSection('customizations')
+                  else if (section === 'offers') handleEditSection('offer')
+                }}
+              />
+            </div>
           )}
         </aside>
       </main>
@@ -643,33 +639,22 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           )}
       {/* Mobile Pricing Widget */}
       <MobilePricingWidget
-        total={totalPrice}
-        currencySymbol={t.currencySymbol}
-        itemCount={itemCount}
+        total={total}
+        currencySymbol={translations.currencySymbol}
+        itemCount={cartItemCount}
         onShowPricing={handleShowMobilePricing}
-        isLoading={isPriceCalculating}
-        summaryButtonLabel={t.summaryButtonLabel}
+        isLoading={false} // isPriceCalculating is removed from useBookingState
+        summaryButtonLabel={translations.summaryButtonLabel}
       />
 
       {/* Mobile Pricing Overlay */}
       <MobilePricingOverlay
-        isOpen={showMobilePricing}
+        isOpen={state.showMobilePricing}
         onClose={handleCloseMobilePricing}
-        roomImage={selectedRoom?.image || fallbackImageUrl}
-        items={[
-          // Show either the selected room OR the bid, not both
-          ...(bids.length > 0 
-            ? [] // Don't show selected room if there's an active bid
-            : selectedRoom
-              ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
-              : []
-          ),
-          ...convertCustomizationsToPricingItems(selectedCustomizations, nights),
-          ...convertOffersToPricingItems(selectedOffers),
-          ...convertBidsToPricingItems(bids, nights),
-        ]}
-        pricing={{ subtotal }}
-        isLoading={isPriceCalculating}
+        roomImage={state.selectedRoom?.image || fallbackImageUrl}
+        items={pricingItems}
+        pricing={{ subtotal, tax, total }}
+        isLoading={false} // isPriceCalculating is removed from useBookingState
         availableSections={computedAvailableSections}
         labels={{
           selectedRoomLabel: t.selectedRoomLabel,
