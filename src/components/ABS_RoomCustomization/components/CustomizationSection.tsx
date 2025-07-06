@@ -1,4 +1,4 @@
-import { InfoIcon, Minus, Plus, X } from 'lucide-react'
+import { Icon } from '@iconify/react'
 import type React from 'react'
 import { useState } from 'react'
 import type {
@@ -71,15 +71,15 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
           <h2 className="text-xl font-semibold">{config.title}</h2>
           {config.infoText && (
             <button onClick={handleInfoToggle} className="ml-2 text-neutral-500 hover:text-neutral-700">
-              <InfoIcon className="h-5 w-5" data-testid="info-icon" />
+              <Icon icon="solar:info-circle-bold" className="h-5 w-5" data-testid="info-icon" />
             </button>
           )}
         </div>
         <button className="text-neutral-400">
           {isOpen ? (
-            <Minus className="h-6 w-6" data-testid="minus-icon" />
+            <Icon icon="solar:alt-arrow-up-bold" className="h-6 w-6" data-testid="minus-icon" />
           ) : (
-            <Plus className="h-6 w-6" data-testid="plus-icon" />
+            <Icon icon="solar:alt-arrow-down-bold" className="h-6 w-6" data-testid="plus-icon" />
           )}
         </button>
       </div>
@@ -94,7 +94,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                   onClick={() => setShowInfo(false)}
                   className="ml-4 p-1 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <X className="h-4 w-4 text-blue-700" />
+                  <Icon icon="solar:close-circle-bold" className="h-4 w-4 text-blue-700" />
                 </button>
               </div>
             </div>

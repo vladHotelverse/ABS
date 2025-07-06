@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Check } from 'lucide-react'
+import { Icon } from '@iconify/react'
 import { UiTooltip, UiTooltipContent, TooltipProvider, UiTooltipTrigger } from '@/components/ui/tooltip'
 import type { RoomCustomizationTexts, ExactViewOption } from '../types'
 import { UiButton } from '@/components/ui/button'
@@ -78,7 +78,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({
         {/* Selected indicator */}
         {isSelected && !isDisabled && (
           <div className="absolute top-2 left-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
-            <Check className="h-3 w-3" />
+            <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
             Selected
           </div>
         )}

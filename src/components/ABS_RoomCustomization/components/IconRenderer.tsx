@@ -1,104 +1,106 @@
-import { 
-  Building2, 
-  Home, 
-  Hotel, 
-  Layers, 
-  LayoutGrid, 
-  Square, 
-  Waves,
-  Utensils,
-  Baby,
-  Heart,
-  Umbrella,
-  VolumeX,
-  Flower,
-  DoorOpen,
-  Link,
-  Sofa,
-  Users,
-  Compass,
-  Eye,
-  Package,
-  TreePine,
-  Mountain,
-  Theater,
-  Building,
-  Sparkles,
-  MapPin,
-  Accessibility,
-  BedDouble,
-  Bed as BedSingle,
-  Sunset,
-  Circle
-} from 'lucide-react'
+import { Icon } from '@iconify/react'
 import type React from 'react'
 
 const iconMap = {
   // Bed icons - more specific representations
-  bed: BedSingle, // Default bed icon
-  'bed-twin': BedSingle, // Twin beds
-  'bed-king': BedDouble, // King size bed
-  'bed-double': BedDouble, // Double bed
+  bed: 'mdi:bed-single', // Default bed icon
+  'bed-twin': 'mdi:bed-single', // Twin beds
+  'bed-king': 'mdi:bed-king', // King size bed
+  'bed-double': 'mdi:bed-double', // Double bed
   
   // Building and structure icons
-  hotel: Hotel,
-  building: Building2,
-  home: Home,
-  layout: LayoutGrid,
-  layers: Layers,
-  floor: Layers,
+  hotel: 'solar:buildings-3-bold-duotone',
+  building: 'solar:buildings-2-bold-duotone',
+  home: 'solar:home-bold-duotone',
+  layout: 'solar:widget-2-bold-duotone',
+  layers: 'solar:layers-bold-duotone',
+  floor: 'solar:layers-bold-duotone',
   
   // View icons - more specific to what guests see
-  'city-view': Building, // City view - use building icon
-  'garden-view': TreePine, // Garden view - use tree icon
-  'stage-view': Theater, // Stage view - use theater icon
-  'mountain-view': Mountain, // Mountain view if needed
+  'city-view': 'solar:city-bold-duotone', // City view - shows skyline
+  'garden-view': 'mdi:flower', // Garden view - flower icon
+  'stage-view': 'mdi:theater', // Stage view - clear theater design
+  'mountain-view': 'solar:mountains-bold-duotone', // Mountain view
   
   // Water/Sea view icons - differentiated
-  waves: Waves, // Generic water/sea view
-  'pool-view': Circle, // Pool view - use circle icon to represent pool shape
-  'lateral-sea-view': Waves, // Lateral sea view - waves icon
-  'sea-frontal-view': Waves, // Sea frontal view - waves icon
+  waves: 'solar:swimming-bold', // Access to Pool / Close to Pool
+  'pool-view': 'mdi:pool', // Pool view - actual pool icon
+  'lateral-sea-view': 'mdi:waves-arrow-right', // Lateral sea view
+  'sea-frontal-view': 'mdi:waves-arrow-up', // Sea frontal view
   
   // Location and amenity icons
-  location: MapPin, // Better location indicator
-  utensils: Utensils,
-  baby: Baby,
-  heart: Heart, // Wellness/spa
-  umbrella: Umbrella, // Beach access
-  'volume-x': VolumeX, // Quiet zone
+  location: 'solar:map-point-wave-bold-duotone', // Better location indicator
+  utensils: 'solar:cup-hot-bold', // Restaurant/dining
+  baby: 'solar:users-group-rounded-bold', // Family
+  heart: 'mdi:spa', // Wellness/spa
+  umbrella: 'mdi:beach', // Beach access
+  'volume-x': 'solar:soundwave-bold', // Quiet zone
   
   // Distribution and room feature icons
-  flower: Flower, // Garden access
-  'door-open': DoorOpen, // Balcony
-  link: Link, // Connecting rooms
-  sofa: Sofa, // Living room/sofa bed
-  sun: Sunset, // Terrace/afternoon sun exposure
+  flower: 'mdi:flower-tulip', // Garden access
+  'door-open': 'mdi:balcony', // Balcony
+  link: 'solar:link-round-bold', // Connecting rooms
+  sofa: 'mdi:sofa-single', // Living room/sofa bed
+  sun: 'mdi:weather-sunset', // Terrace/sun exposure
   
   // Special feature icons
-  users: Users,
-  compass: Compass,
-  eye: Eye, // Best views
-  package: Package,
-  accessibility: Accessibility, // Proper accessibility icon
-  sparkles: Sparkles, // Premium features
+  users: 'solar:users-group-two-rounded-bold',
+  compass: 'solar:compass-big-bold',
+  eye: 'solar:eye-bold', // Best views
+  package: 'solar:box-bold',
+  accessibility: 'mdi:wheelchair-accessibility', // Proper accessibility icon
+  sparkles: 'solar:star-bold', // Premium features
+  
+  // Additional mappings from mockData
+  'arrow-up': 'solar:arrow-up-bold', // Upper floor
+  'corner-up-right': 'mdi:flower-tulip-outline', // Garden/Stage view fallback
 } as const
+
+// Context-based icon overrides for specific labels
+const labelIconMap: Record<string, string> = {
+  'Close to Pool': 'mdi:swim',
+  'Access to Pool': 'mdi:pool',
+  'Pool View': 'mdi:pool',
+  'Lateral Sea View': 'mdi:beach',
+  'Sea Frontal View': 'mdi:island',
+  'Garden View': 'mdi:tree',
+  'Stage View': 'mdi:theater',
+  'Afternoon Sun': 'mdi:weather-sunset',
+  'All-day Sun': 'mdi:weather-sunny',
+  'Terrace': 'mdi:balcony',
+}
 
 interface IconRendererProps {
   iconName?: string
   className?: string
   fallbackImageUrl?: string
+  label?: string // Add label prop to help differentiate icons
 }
 
-export const IconRenderer: React.FC<IconRendererProps> = ({ iconName, className = 'h-10 w-10', fallbackImageUrl }) => {
+export const IconRenderer: React.FC<IconRendererProps> = ({ 
+  iconName, 
+  className = 'h-10 w-10', 
+  fallbackImageUrl,
+  label 
+}) => {
   if (!iconName) {
     return fallbackImageUrl ? (
       <img src={fallbackImageUrl} alt="Icon" className="object-contain w-12 aspect-square" />
     ) : (
-      <Square className={className} />
+      <Icon icon="solar:widget-bold" className={className} />
     )
   }
 
-  const IconComponent = iconMap[iconName as keyof typeof iconMap] || Square
-  return <IconComponent className={className} />
+  // First check if we have a label-specific icon
+  if (label && labelIconMap[label]) {
+    return <Icon icon={labelIconMap[label]} className={className} />
+  }
+
+  const iconString = iconMap[iconName as keyof typeof iconMap]
+  if (!iconString) {
+    console.warn(`Icon not found in iconMap: ${iconName}`)
+    return <Icon icon="solar:widget-bold" className={className} />
+  }
+  
+  return <Icon icon={iconString} className={className} />
 }

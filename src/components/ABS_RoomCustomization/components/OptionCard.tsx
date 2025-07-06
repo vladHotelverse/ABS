@@ -49,7 +49,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
                 'text-neutral-400': isDisabled,
               }
             )}>
-              <IconRenderer iconName={option.icon} fallbackImageUrl={fallbackImageUrl} />
+              <IconRenderer iconName={option.icon} fallbackImageUrl={fallbackImageUrl} label={option.label} />
             </div>
           </div>
           <h3 className={clsx(

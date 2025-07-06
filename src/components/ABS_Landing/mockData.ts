@@ -300,16 +300,16 @@ export const bedsOptions = [
   },
 ]
 
-export const roomSizeOptions = [
-  {
-    id: 'large-size',
-    name: '35 to 40 m2 / 375 to 430 sqft',
-    description: 'Spacious room with ample living space',
-    price: 4,
-    icon: 'home',
-    label: '35 to 40 m2 / 375 to 430 sqft',
-  },
-]
+// export const roomSizeOptions = [
+//   {
+//     id: 'large-size',
+//     name: '35 to 40 m2 / 375 to 430 sqft',
+//     description: 'Spacious room with ample living space',
+//     price: 4,
+//     icon: 'home',
+//     label: '35 to 40 m2 / 375 to 430 sqft',
+//   },
+// ]
 
 export const featuresOptions = [
   {
@@ -341,16 +341,16 @@ export const orientationOptions = [
   },
 ]
 
-export const bestChoiceOptions = [
-  {
-    id: 'best-views',
-    name: 'Best views',
-    description: 'Rooms with the most spectacular views available',
-    price: 6,
-    icon: 'eye',
-    label: 'Best views',
-  },
-]
+// export const bestChoiceOptions = [
+//   {
+//     id: 'best-views',
+//     name: 'Best views',
+//     description: 'Rooms with the most spectacular views available',
+//     price: 6,
+//     icon: 'eye',
+//     label: 'Best views',
+//   },
+// ]
 
 export const locationOptions = [
   {
@@ -771,16 +771,16 @@ export const translations = {
     // Section info texts
     bedsInfoText:
       'Choose the type of bed you prefer for your stay. Each option offers different levels of comfort and space according to your needs. King-size beds are ideal for couples who want more space, while twin beds are perfect for friends or family.',
-    roomSizeInfoText:
-      'Select the room size that best fits your needs. Larger rooms provide more space and comfort, while standard rooms offer great value. Room size affects the overall comfort and available amenities.',
+    // roomSizeInfoText:
+    //   'Select the room size that best fits your needs. Larger rooms provide more space and comfort, while standard rooms offer great value. Room size affects the overall comfort and available amenities.',
     locationInfoText:
       'The location of your room can significantly affect your experience. Corner rooms offer more privacy, while suites with sea views provide impressive ocean panoramas. Choose the location that best suits your preferences.',
     featuresInfoText:
       'Choose special room features that enhance your stay. From accessible accommodations to family-friendly amenities, each feature is designed to meet specific guest needs and preferences.',
     orientationInfoText:
       'Room orientation determines the natural light and views you\'ll enjoy throughout the day. Morning sun rooms are perfect for early risers, while all-day sun rooms offer maximum brightness.',
-    bestChoiceInfoText:
-      'Select the option that best matches your travel purpose. Whether you\'re here for business, romance, or family time, we have the perfect room configuration for your needs.',
+    // bestChoiceInfoText:
+    //   'Select the option that best matches your travel purpose. Whether you\'re here for business, romance, or family time, we have the perfect room configuration for your needs.',
     viewInfoText:
       "Select the exact view from your room. Each option offers a unique perspective of the hotel's surroundings, from panoramic city views to impressive sunrises over the sea.",
     floorInfoText:
@@ -788,13 +788,13 @@ export const translations = {
     distributionInfoText:
       'Choose how your room is distributed and what amenities are included. Each option offers different space configurations and access to specific hotel features like gardens, pools, or additional living areas.',
     bedsTitle: 'Beds',
-    roomSizeTitle: 'Room Size',
+    // roomSizeTitle: 'Room Size',
     locationTitle: 'Location',
     floorTitle: 'Floor',
     distributionTitle: 'Distribution',
     featuresTitle: 'Features',
     orientationTitle: 'Orientation',
-    bestChoiceTitle: 'Best Choice for',
+    // bestChoiceTitle: 'Best Choice for',
     viewTitle: 'View',
     exactViewTitle: 'Exact View',
 
@@ -957,16 +957,16 @@ export const translations = {
     // Section info texts
     bedsInfoText:
       'Elige el tipo de cama que prefieras para tu estancia. Cada opción ofrece diferentes niveles de comodidad y espacio según tus necesidades. Las camas king-size son ideales para parejas que desean más espacio, mientras que las camas individuales son perfectas para amigos o familiares.',
-    roomSizeInfoText:
-      'Selecciona el tamaño de la habitación que mejor se adapte a tus necesidades. Las habitaciones más grandes proporcionan más espacio y comodidad, mientras que las habitaciones estándar ofrecen un gran valor. El tamaño de la habitación afecta la comodidad general y las comodidades disponibles.',
+    // roomSizeInfoText:
+    //   'Selecciona el tamaño de la habitación que mejor se adapte a tus necesidades. Las habitaciones más grandes proporcionan más espacio y comodidad, mientras que las habitaciones estándar ofrecen un gran valor. El tamaño de la habitación afecta la comodidad general y las comodidades disponibles.',
     locationInfoText:
       'La ubicación de tu habitación puede afectar significativamente tu experiencia. Las habitaciones en esquina ofrecen más privacidad, mientras que las suites con vista al mar te brindan panoramas impresionantes del océano. Elige la ubicación que mejor se adapte a tus preferencias.',
     featuresInfoText:
       'Elige las características especiales de la habitación que mejoran tu estancia. Desde acomodaciones accesibles hasta comodidades para familias, cada característica está diseñada para satisfacer las necesidades y preferencias específicas de los huéspedes.',
     orientationInfoText:
       'La orientación de la habitación determina la luz natural y las vistas que disfrutarás a lo largo del día. Las habitaciones con sol de la mañana son perfectas para los que se levantan temprano, mientras que las habitaciones con sol de todo el día ofrecen la máxima luminosidad.',
-    bestChoiceInfoText:
-      'Selecciona la opción que mejor coincida con tu propósito de viaje. Ya sea para negocios, romántico o tiempo de familia, tenemos la configuración de habitación perfecta para tus necesidades.',
+    // bestChoiceInfoText:
+    //   'Selecciona la opción que mejor coincida con tu propósito de viaje. Ya sea para negocios, romántico o tiempo de familia, tenemos la configuración de habitación perfecta para tus necesidades.',
     viewInfoText:
       'Selecciona la vista exacta desde tu habitación. Cada opción ofrece una perspectiva única del entorno del hotel, desde vistas panorámicas de la ciudad hasta impresionantes amaneceres sobre el mar.',
     floorInfoText:
@@ -974,13 +974,13 @@ export const translations = {
     distributionInfoText:
       'Elige cómo se distribuye tu habitación y qué comodidades están incluidas. Cada opción ofrece diferentes configuraciones de espacio y acceso a características específicas del hotel como jardines, piscinas o áreas de estar adicionales.',
     bedsTitle: 'Camas',
-    roomSizeTitle: 'Tamaño de la Habitación',
+    // roomSizeTitle: 'Tamaño de la Habitación',
     locationTitle: 'Ubicación',
     floorTitle: 'Piso',
     distributionTitle: 'Distribución',
     featuresTitle: 'Características',
     orientationTitle: 'Orientación',
-    bestChoiceTitle: 'Mejor Opción para',
+    // bestChoiceTitle: 'Mejor Opción para',
     viewTitle: 'Vista',
     exactViewTitle: 'Vista Exacta',
 
@@ -1110,14 +1110,14 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       hasFeatures: false,
       infoText: texts.bedsInfoText,
     },
-    {
-      key: 'roomSize',
-      title: texts.roomSizeTitle || 'Room Size',
-      icon: Home,
-      hasModal: true,
-      hasFeatures: false,
-      infoText: texts.roomSizeInfoText,
-    },
+    // {
+    //   key: 'roomSize',
+    //   title: texts.roomSizeTitle || 'Room Size',
+    //   icon: Home,
+    //   hasModal: true,
+    //   hasFeatures: false,
+    //   infoText: texts.roomSizeInfoText,
+    // },
     {
       key: 'distribucion',
       title: texts.distributionTitle || 'Distribución',
@@ -1142,14 +1142,14 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       hasFeatures: false,
       infoText: texts.orientationInfoText,
     },
-    {
-      key: 'bestChoice',
-      title: texts.bestChoiceTitle || 'Best Choice for',
-      icon: Heart,
-      hasModal: true,
-      hasFeatures: false,
-      infoText: texts.bestChoiceInfoText,
-    },
+    // {
+    //   key: 'bestChoice',
+    //   title: texts.bestChoiceTitle || 'Best Choice for',
+    //   icon: Heart,
+    //   hasModal: true,
+    //   hasFeatures: false,
+    //   infoText: texts.bestChoiceInfoText,
+    // },
     {
       key: 'vista',
       title: (texts.viewTitle || 'Vista').replace('exacta', '').trim(),
@@ -1256,11 +1256,11 @@ export const mockAvailableOffers = [
 // Section options for RoomCustomization
 export const sectionOptions = {
   camas: bedsOptions,
-  roomSize: roomSizeOptions,
+  // roomSize: roomSizeOptions,
   distribucion: distributionOptions,
   features: featuresOptions,
   orientation: orientationOptions,
-  bestChoice: bestChoiceOptions,
+  // bestChoice: bestChoiceOptions,
   vista: viewOptions, // Simple views without images
   ubicacion: locationOptions,
   vistaExacta: exactViewOptions, // Exact views with images
