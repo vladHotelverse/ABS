@@ -45,7 +45,7 @@ export const useBidUpgrade = ({ onBidSubmit, onBidRemove }: UseBidUpgradeProps =
       submittedAt: new Date(),
     }
 
-    setBids((prevBids) => {
+    setBids((_prevBids) => {
       // Remove any existing bids (only one active bid allowed)
       return [newBid]
     })

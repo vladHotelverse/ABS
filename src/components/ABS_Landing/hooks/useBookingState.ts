@@ -5,7 +5,6 @@ import type { SelectedOffer } from '../sections/SpecialOffersSection'
 import type { BookingState } from '../sections/BookingStateSection'
 import { calculateTotalPrice } from '../utils/dataConversion'
 import { useBidUpgrade } from '../../../hooks/useBidUpgrade'
-import type { BidItem } from '../../../hooks/useBidUpgrade'
 
 export interface UseBookingStateProps {
   initialSelectedRoom?: RoomOption
