@@ -1,6 +1,8 @@
 import clsx from 'clsx'
 import { Icon } from '@iconify/react'
+import { useState } from 'react'
 import { UiTooltip, UiTooltipContent, TooltipProvider, UiTooltipTrigger } from '@/components/ui/tooltip'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import type { RoomCustomizationTexts, ExactViewOption } from '../types'
 import { UiButton } from '@/components/ui/button'
 
@@ -23,6 +25,8 @@ export const ViewCard: React.FC<ViewCardProps> = ({
   texts,
   fallbackImageUrl = 'https://picsum.photos/600/400',
 }) => {
+  const [isZoomed, setIsZoomed] = useState(false)
+
   const handleClick = () => {
     if (isDisabled) return
     onSelect()
@@ -37,20 +41,45 @@ export const ViewCard: React.FC<ViewCardProps> = ({
       }
     )}>
       <div className="relative">
-        <img
-          src={view.imageUrl || fallbackImageUrl}
-          alt={`Room view option - ${view.name}`}
-          className={clsx(
-            'w-full h-56 object-cover',
-            {
-              'filter grayscale': isDisabled,
-            }
-          )}
-        />
+        <Dialog open={isZoomed} onOpenChange={setIsZoomed}>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              disabled={isDisabled}
+              className={clsx(
+                'w-full h-56 block relative',
+                !isDisabled && 'cursor-zoom-in'
+              )}
+              aria-label="View larger image"
+            >
+              <img
+                src={view.imageUrl || fallbackImageUrl}
+                alt={`Room view option - ${view.name}`}
+                className={clsx(
+                  'w-full h-full object-cover',
+                  { 'filter grayscale': isDisabled }
+                )}
+              />
+              {/* Zoom icon as visual cue */}
+              {!isDisabled && (
+                <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                  <Icon icon="lucide:expand" className="h-5 w-5" />
+                </div>
+              )}
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl p-0 z-[101]">
+            <img
+              src={view.imageUrl || fallbackImageUrl}
+              alt={`Enlarged view of ${view.name}`}
+              className="w-full h-auto rounded-lg"
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Disabled overlay */}
         {isDisabled && (
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center pointer-events-none">
             <div className="bg-white bg-opacity-90 px-3 py-2 rounded-lg text-sm font-medium text-neutral-700">
               {texts.optionDisabledText}
             </div>

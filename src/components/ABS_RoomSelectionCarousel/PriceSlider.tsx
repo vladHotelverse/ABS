@@ -29,7 +29,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   minPrice,
   maxPrice,
   nightText = '/noche',
-  makeOfferText = 'Hacer oferta',
+  makeOfferText = 'Place a bid',
   availabilityText = 'Sujeto a disponibilidad',
   proposePriceText = 'Propon tu precio:',
   currencyText = 'EUR',
