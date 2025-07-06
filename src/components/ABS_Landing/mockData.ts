@@ -1,4 +1,4 @@
-import { Bed, Hotel, Waves, Package, Home, Users, Compass, Eye, Heart } from 'lucide-react'
+import { Bed, Hotel, Waves, Package, Users, Compass, Eye } from 'lucide-react'
 
 // Mock data for ABS_Landing stories
 export const roomOptions = [

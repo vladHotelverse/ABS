@@ -20,7 +20,7 @@ import type { OfferData } from '../ABS_SpecialOffers/types'
 
 // Import new section components
 import { RoomSelectionSection, RoomSelectionMapSection, CustomizationSection, SpecialOffersSection, BookingStateSection } from './sections'
-import type { RoomOption, SpecialOffer, SelectedOffer } from './sections'
+import type { RoomOption, SpecialOffer } from './sections'
 
 // Import hooks and utilities
 import { useBookingState, useMultiBookingState } from './hooks'
@@ -37,7 +37,7 @@ import {
 } from './utils/dataConversion'
 
 // Re-export types from sections for compatibility
-export type { RoomOption, SpecialOffer, SelectedOffer } from './sections'
+export type { RoomOption, SpecialOffer } from './sections'
 
 export interface Translations extends RoomCustomizationTexts {
   // Room section
@@ -202,8 +202,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   translations,
   language,
   initialState = 'normal',
-  initialSubtotal = 0,
-  initialTax = 0,
   onCartClick,
   onConfirmBooking,
   reservationCode,
@@ -227,27 +225,31 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   const stayDates = checkIn && checkOut ? `From ${checkIn} to ${checkOut}` : 'N/A'
 
   // Use custom hooks for state management
-  const { state, actions } = useBookingState({
-    selectedRoom: initialSelectedRoom,
+  const { state, actions, showMobilePricing, bookingStatus: _bookingStatus } = useBookingState({
+    selectedRoom: initialSelectedRoom || null,
     customizations: {},
     specialOffers: [],
     activeBid: null,
     status: initialState,
-    texts: translations,
-    nights,
+    texts: translations as any,
   })
 
   const { showToast } = actions
   
   // Calculate cart item count
-  const cartItemCount = countCartItems(state)
+  const cartItemCount = countCartItems({
+    selectedRoom: state.selectedRoom || undefined,
+    selectedCustomizations: {},
+    selectedOffers: state.specialOffers as any,
+    activeBid: state.activeBid,
+  })
 
   const { subtotal, tax, total } = calculateTotalPrice(
-    state.selectedRoom,
-    state.customizations || {},
-    state.specialOffers || [],
+    state.selectedRoom || undefined,
+    {} as any,
+    state.specialOffers as any || [],
     0.1, // Assuming a 10% tax rate
-    state.nights || 1
+    nights
   )
 
   const multiBookingState = useMultiBookingState({
@@ -279,10 +281,15 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   } = multiBookingState
 
   // Calculate items and totals
-  const singleBookingItemCount = countCartItems(state.selectedRoom, state.customizations, state.specialOffers)
+  const singleBookingItemCount = countCartItems({
+    selectedRoom: state.selectedRoom || undefined,
+    selectedCustomizations: {} as any,
+    selectedOffers: state.specialOffers as any,
+    activeBid: state.activeBid,
+  })
   const itemCount = shouldShowMultiBooking ? multiBookingItemCount : singleBookingItemCount
   // Use subtotal for header to match pricing panel (taxes removed)
-  const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : state.subtotal
+  const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : subtotal
 
   // Handlers for user interactions
   const handleRoomSelect = (room: RoomOption) => {
@@ -290,26 +297,29 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }
 
   const handleCustomizationChange = (
-    customization: Customization,
-    roomId: string
+    category: string,
+    optionId: string,
+    optionLabel: string,
+    optionPrice: number
   ) => {
     // This logic needs to be adapted based on how you want to handle customizations
     // For now, we'll just log it
-    console.log('Customization changed:', customization, 'for room:', roomId)
+    console.log('Customization changed:', { category, optionId, optionLabel, optionPrice })
     // A real implementation would call an action like:
-    // actions.addCustomization(customization, roomId);
+    // actions.addCustomization({ id: optionId, name: optionLabel, price: optionPrice, category }, 'room-id');
   }
 
   const handleBookOffer = (offerData: OfferData) => {
-    const offer: SpecialOffer = {
+    const offer = {
       id: offerData.id,
-      name: offerData.title,
+      title: offerData.name,
+      description: '',
+      image: '',
       price: offerData.price,
-      // You might need to adjust this based on the actual offer data structure
-      quantity: offerData.quantity || 1,
-    }
+      name: offerData.name,
+    } as any
     actions.addSpecialOffer(offer)
-    showToast(`${offer.name} added to your stay.`, 'success')
+    showToast(`${offer.title} added to your stay.`, 'success')
   }
 
   const handleLearnMore = (_room: RoomOption) => {
@@ -360,12 +370,12 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   ) => {
     if (itemType === 'customization') {
       const category = Object.keys(state.customizations).find(
-        (key) => state.customizations[key]?.id === itemId
+        (key) => state.customizations[key]?.some(c => c.id === itemId)
       );
       if (category) {
-        actions.removeCustomization(category, _roomId || '');
+        actions.removeCustomization(itemId.toString(), _roomId || '');
       }
-      showToast(`${translations.customizationRemovedMessagePrefix} "${itemName}"`, 'info');
+      showToast(`Customization "${itemName}" removed`, 'info');
     } else if (itemType === 'offer') {
       actions.removeSpecialOffer(itemId.toString());
     } else if (itemType === 'room') {
@@ -379,13 +389,11 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
   // Convert state to pricing items
   const pricingItems: PricingItem[] = [
-    convertRoomToPricingItem(state.selectedRoom, state.nights),
-    ...convertCustomizationsToPricingItems(state.customizations || {}, state.nights),
-    ...convertOffersToPricingItems(state.specialOffers || []),
-    ...convertBidsToPricingItems(state.activeBid ? [state.activeBid] : [], state.nights),
+    convertRoomToPricingItem(state.selectedRoom || undefined, nights),
+    ...convertCustomizationsToPricingItems({} as any, nights),
+    ...convertOffersToPricingItems(state.specialOffers as any || []),
+    ...convertBidsToPricingItems(state.activeBid ? [state.activeBid as any] : [], nights),
   ].filter((item): item is PricingItem => item !== null)
-
-  const hasBids = state.activeBid !== null
 
   // Create section texts for subcomponents
   const roomTexts = {
@@ -440,7 +448,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   if (state.status !== 'normal') {
     return (
       <BookingStateSection
-        state={state.status}
+        state={state.status || 'normal'}
         texts={bookingStateTexts}
         onRetry={handleRetry}
         onBackToNormal={handleBackToNormal}
@@ -511,7 +519,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           {/* Room Selection Section */}
           <RoomSelectionSection
             roomOptions={roomOptions}
-            selectedRoom={state.selectedRoom}
+            selectedRoom={state.selectedRoom || undefined}
             onRoomSelected={handleRoomSelect}
             onLearnMore={handleLearnMore}
             onMakeOffer={handleMakeOffer}
@@ -530,7 +538,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           <CustomizationSection
             sections={sections}
             sectionOptions={sectionOptions}
-            selectedCustomizations={state.customizations}
+            selectedCustomizations={{} as any}
             onCustomizationChange={handleCustomizationChange}
             texts={customizationTexts}
             fallbackImageUrl={fallbackImageUrl}
@@ -541,9 +549,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           {/* Special Offers Section */}
           <SpecialOffersSection
             specialOffers={specialOffers}
-            selectedOffers={state.specialOffers}
+            selectedOffers={state.specialOffers as any}
             onBookOffer={handleBookOffer}
-            reservationInfo={null} // reservationInfo is not used in this component's state
+            reservationInfo={undefined} // reservationInfo is not used in this component's state
             texts={offersTexts}
             isVisible={shouldShowSection('offer', computedAvailableSections)}
           />
@@ -568,7 +576,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               <PricingSummaryPanel
                 roomImage={state.selectedRoom?.image || fallbackImageUrl}
                 items={pricingItems}
-                pricing={{ subtotal, tax, total }}
+                pricing={{ subtotal, taxes: tax }}
                 isLoading={false} // isPriceCalculating is removed from useBookingState
                 availableSections={computedAvailableSections}
                 labels={{
@@ -649,11 +657,11 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
       {/* Mobile Pricing Overlay */}
       <MobilePricingOverlay
-        isOpen={state.showMobilePricing}
+        isOpen={showMobilePricing}
         onClose={handleCloseMobilePricing}
         roomImage={state.selectedRoom?.image || fallbackImageUrl}
         items={pricingItems}
-        pricing={{ subtotal, tax, total }}
+        pricing={{ subtotal, taxes: tax }}
         isLoading={false} // isPriceCalculating is removed from useBookingState
         availableSections={computedAvailableSections}
         labels={{

@@ -46,6 +46,7 @@ interface RoomCardProps {
   offerMadeText?: string
   updateBidText?: string
   cancelBidText?: string
+  makeOfferText?: string
   // priceSliderElement?: React.ReactNode; // This is now handled internally
 }
 
@@ -53,7 +54,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   room,
   discountBadgeText,
   nightText,
-  learnMoreText,
+  learnMoreText: _learnMoreText,
   priceInfoText,
   selectedText,
   selectText,
@@ -63,7 +64,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   activeImageIndex,
   onImageChange,
   currencySymbol = '€',
-  onLearnMore,
+  onLearnMore: _onLearnMore,
   instantConfirmationText = 'Instant Confirmation',
   activeBid,
   bidSubmittedText = 'Bid Submitted',
@@ -81,6 +82,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   offerMadeText,
   updateBidText,
   cancelBidText,
+  makeOfferText: _makeOfferText,
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
@@ -126,14 +128,14 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [room.images.length, activeImageIndex, onImageChange]
   )
 
-  const handleLearnMore = useCallback(() => {
-    if (onLearnMore) {
-      onLearnMore(room)
-    } else {
-      // Default behavior - could open a modal, navigate to room details, etc.
-      console.log('Learn more about room:', room.title || room.roomType)
-    }
-  }, [onLearnMore, room])
+  // const _handleLearnMore = useCallback(() => {
+  //   if (onLearnMore) {
+  //     onLearnMore(room)
+  //   } else {
+  //     // Default behavior - could open a modal, navigate to room details, etc.
+  //     console.log('Learn more about room:', room.title || room.roomType)
+  //   }
+  // }, [onLearnMore, room])
 
   const handleSelectRoom = useCallback(
     (e: React.MouseEvent) => {

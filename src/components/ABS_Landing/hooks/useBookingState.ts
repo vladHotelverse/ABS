@@ -1,21 +1,26 @@
 import { useState, useMemo } from 'react'
-import type { Room, Customization, SpecialOffer, BookingState } from '../types'
+import type { RoomOption, Customization, SpecialOffer, BookingState } from '../types'
 import { useBidUpgrade } from '../../../hooks/useBidUpgrade'
+import type { BidItem } from '../../../hooks/useBidUpgrade'
 
 export const useBookingState = (initialState: BookingState) => {
   const [state, setState] = useState(initialState)
+  const [showMobilePricing, setShowMobilePricing] = useState(false)
+  const [bookingStatus, setBookingStatus] = useState<'normal' | 'loading' | 'error' | 'confirmation'>('normal')
+  
   const bidUpgradeState = useBidUpgrade({
-    initialBids: [],
-    onBidsChange: (bids) => {
-      // This is where you might handle side effects of bids changing, like logging
-      console.log('Bids updated:', bids)
+    onBidSubmit: (bid: BidItem) => {
+      console.log('Bid submitted:', bid)
+    },
+    onBidRemove: (bidId: string) => {
+      console.log('Bid removed:', bidId)
     },
   })
 
   // Memoize texts to prevent unnecessary re-renders if they are passed as props
   const texts = useMemo(() => state.texts, [state.texts])
 
-  const selectRoom = (room: Room | null) => {
+  const selectRoom = (room: RoomOption | null) => {
     setState((prevState) => ({
       ...prevState,
       selectedRoom: room,
@@ -23,7 +28,7 @@ export const useBookingState = (initialState: BookingState) => {
     }))
   }
 
-  const makeOffer = (price: number, room: Room) => {
+  const makeOffer = (price: number, room: RoomOption) => {
     setState((prevState) => ({
       ...prevState,
       selectedRoom: null, // Clear selected room when a bid is made
@@ -37,7 +42,7 @@ export const useBookingState = (initialState: BookingState) => {
     }))
   }
 
-  const cancelBid = (roomId: string) => {
+  const cancelBid = (_roomId: string) => {
     setState((prevState) => ({
       ...prevState,
       activeBid: null, // Clear active bid
@@ -84,9 +89,21 @@ export const useBookingState = (initialState: BookingState) => {
     console.log(`Toast: [${type}] ${message}`)
   }
 
+  const confirmBooking = () => {
+    setBookingStatus('confirmation')
+  }
+
+  const resetState = () => {
+    setBookingStatus('normal')
+    setState(initialState)
+    setShowMobilePricing(false)
+  }
+
   return {
     state,
     texts,
+    showMobilePricing,
+    bookingStatus,
     actions: {
       selectRoom,
       addCustomization,
@@ -98,6 +115,9 @@ export const useBookingState = (initialState: BookingState) => {
       makeOffer,
       cancelBid,
       showToast,
+      setShowMobilePricing,
+      confirmBooking,
+      resetState,
     },
   }
 }
