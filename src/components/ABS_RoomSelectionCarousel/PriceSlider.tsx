@@ -17,6 +17,7 @@ export interface PriceSliderProps {
   bidSubmittedText?: string
   updateBidText?: string
   cancelBidText?: string
+  roomName?: string
   onPriceChange: (price: number) => void
   onMakeOffer: () => void
   onCancelBid?: () => void
@@ -37,6 +38,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   bidSubmittedText = 'Bid submitted',
   updateBidText = 'Update bid',
   cancelBidText = 'Cancel',
+  roomName,
   onPriceChange,
   onMakeOffer,
   onCancelBid,
@@ -44,8 +46,13 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   // Calculate slider percentage
   const sliderPercentage = ((proposedPrice - minPrice) / (maxPrice - minPrice)) * 100
 
+  // Generate dynamic propose text
+  const dynamicProposeText = roomName 
+    ? `${proposePriceText.replace(':', '')} for ${roomName}:`
+    : proposePriceText
+
   return (
-    <div className={clsx('mt-1 mb-6 w-full sm:max-w-lg mx-auto border rounded-lg p-4', className)}>
+    <div className={clsx('w-full', className)}>
       {bidStatus === 'submitted' && submittedPrice ? (
         // Submitted bid view
         <div className="space-y-3">
@@ -53,7 +60,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-blue-800">{bidSubmittedText}</span>
               <span className="text-lg font-bold text-blue-900">
-                {`${submittedPrice} ${currencyText}${nightText}`}
+                {`${submittedPrice} ${currencyText}/${nightText}`}
               </span>
             </div>
             <p className="text-xs text-blue-600">{availabilityText}</p>
@@ -83,8 +90,8 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
         // Normal slider view
         <>
           <div className="text-sm font-medium mb-2 flex justify-between items-center">
-            <span>{proposePriceText}</span>
-            <span className="text-black font-bold">{`${proposedPrice} ${currencyText}${nightText}`}</span>
+            <span>{dynamicProposeText}</span>
+            <span className="text-black font-bold">{`${proposedPrice} ${currencyText}/${nightText}`}</span>
           </div>
           <div className="relative w-full">
             <input
@@ -100,8 +107,8 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               }}
             />
             <div className="w-full flex justify-between text-xs text-neutral-500 mt-2">
-              <span>{`${minPrice} ${currencyText}${nightText}`}</span>
-              <span>{`${maxPrice} ${currencyText}${nightText}`}</span>
+              <span>{`${minPrice} ${currencyText}/${nightText}`}</span>
+              <span>{`${maxPrice} ${currencyText}/${nightText}`}</span>
             </div>
           </div>
           <button

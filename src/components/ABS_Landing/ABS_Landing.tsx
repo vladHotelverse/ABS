@@ -569,7 +569,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                     ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
                     : []
                 ),
-                ...convertCustomizationsToPricingItems(selectedCustomizations),
+                ...convertCustomizationsToPricingItems(selectedCustomizations, nights),
                 ...convertOffersToPricingItems(selectedOffers),
                 ...convertBidsToPricingItems(bids, nights),
               ]}
@@ -664,7 +664,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               ? [convertRoomToPricingItem(selectedRoom, nights)].filter((item): item is PricingItem => item !== null)
               : []
           ),
-          ...convertCustomizationsToPricingItems(selectedCustomizations),
+          ...convertCustomizationsToPricingItems(selectedCustomizations, nights),
           ...convertOffersToPricingItems(selectedOffers),
           ...convertBidsToPricingItems(bids, nights),
         ]}

@@ -22,6 +22,10 @@ interface RoomCardProps {
   previousImageLabel?: string
   nextImageLabel?: string
   viewImageLabel?: string // Template: 'View image {index}'
+  // Price slider props
+  isActive?: boolean
+  showPriceSlider?: boolean
+  priceSliderElement?: React.ReactNode
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -41,6 +45,9 @@ const RoomCard: React.FC<RoomCardProps> = ({
   previousImageLabel = 'Previous image',
   nextImageLabel = 'Next image',
   viewImageLabel = 'View image {index}',
+  isActive = false,
+  showPriceSlider = false,
+  priceSliderElement,
 }) => {
   // State for checking if description is truncated
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false)
@@ -88,7 +95,10 @@ const RoomCard: React.FC<RoomCardProps> = ({
   )
 
   return (
-    <div className="relative rounded-lg overflow-hidden md:shadow-sm bg-white h-full max-w-lg">
+    <div className={clsx(
+      "relative rounded-lg overflow-visible md:shadow-sm max-w-lg transition-all duration-300",
+      isActive && showPriceSlider ? "bg-gray-50 ring-2 ring-gray-200" : "bg-white"
+    )}>
       {/* Discount Badge */}
       {room.oldPrice && (
         <div className="absolute top-3 right-3 bg-black text-white py-1 px-2 rounded text-xs font-bold z-10">
@@ -242,6 +252,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
         {/* Additional Info */}
         <p className="text-xs text-neutral-500 mt-2">{priceInfoText}</p>
       </div>
+
+      {/* Price Slider - integrated within the card */}
+      {isActive && showPriceSlider && priceSliderElement && (
+        <div className="border-t border-gray-200 p-4 bg-gray-50">
+          {priceSliderElement}
+        </div>
+      )}
     </div>
   )
 }

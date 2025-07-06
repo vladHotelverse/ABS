@@ -33,7 +33,7 @@ export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 
 /**
  * Converts selected customizations to PricingItems
  */
-export const convertCustomizationsToPricingItems = (customizations: SelectedCustomizations): PricingItem[] => {
+export const convertCustomizationsToPricingItems = (customizations: SelectedCustomizations, nights = 1): PricingItem[] => {
   return Object.values(customizations)
     .filter((c) => c !== undefined)
     .map((c) => {
@@ -42,10 +42,13 @@ export const convertCustomizationsToPricingItems = (customizations: SelectedCust
         ? 'choose-your-superior-room' 
         : 'customize-your-room'
       
+      const totalPrice = c.price * nights
+      const displayName = nights > 1 ? `${c.label} (${nights} nights)` : c.label
+
       return {
         id: c.id,
-        name: c.label,
-        price: c.price,
+        name: displayName,
+        price: totalPrice,
         type: 'customization' as const,
         concept,
       }
@@ -109,7 +112,7 @@ export const calculateTotalPrice = (
   for (const categoryKey in selectedCustomizations) {
     const customization = selectedCustomizations[categoryKey]
     if (customization) {
-      subtotal += customization.price
+      subtotal += customization.price * nights
     }
   }
 

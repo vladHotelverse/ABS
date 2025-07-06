@@ -587,6 +587,60 @@ export const exactViewOptions = [
     imageUrl:
       'https://hvdatauatstgweu.blob.core.windows.net/roommediaimages/h83/r18364/outside/bd15466f-eef8-4464-bc45-d5dc5a6daeba/image_c.webp',
   },
+  {
+    id: 'stage-view-2',
+    name: 'Exact view.',
+    description: 'Room with a view of the stage',
+    price: 6,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://cdn.hotelverse.tech/roommediaimages/h83/r18017/outside/894ba4dc-1796-441d-afe8-af844e31fae5/image_c.webp',
+  },
+  {
+    id: 'sea-view-2',
+    name: 'Exact view.',
+    description: 'Room with a view of the stage',
+    price: 15,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://cdn.hotelverse.tech/roommediaimages/h83/r18024/outside/4f2bf927-81de-406e-966f-f233af5e561f/image_c.webp',
+  },
+  {
+    id: 'sea-view-3',
+    name: 'Exact view.',
+    description: 'Room with a view of the stage',
+    price: 5,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://cdn.hotelverse.tech/roommediaimages/h83/r18028/outside/80b088b2-b4aa-4e81-973f-4261b7a9c9ed/image_c.webp',
+  },
+  {
+    id: 'sea-view-4',
+    name: 'Exact view.',
+    description: 'Room with a view of the stage',
+    price: 5,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://cdn.hotelverse.tech/roommediaimages/h83/r18039/outside/7fe3b203-7a33-4398-a127-446217b00e55/image_c.webp',
+  },
+  {
+    id: 'sea-view-5',
+    name: 'Exact view.',
+    description: 'Room with a view of the stage',
+    price: 12,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://cdn.hotelverse.tech/roommediaimages/h83/r18054/outside/9eb8a6f8-33e2-4cba-b020-4d95f1171f5c/image_c.webp',
+  },
+  {
+    id: 'sea-view-6',
+    name: 'Exact view.',
+    description: 'Room with a view of the stage',
+    price: 12,
+    icon: 'corner-up-right',
+    imageUrl:
+      'https://cdn.hotelverse.tech/roommediaimages/h83/r18054/outside/9eb8a6f8-33e2-4cba-b020-4d95f1171f5c/image_c.webp',
+  },
 ]
 
 export const roomSelectionMap = {

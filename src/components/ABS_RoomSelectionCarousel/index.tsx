@@ -109,37 +109,37 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     activeBid,
   })
 
-  // Create a reusable slider component render function
-  const renderPriceSlider = (containerClass = '') => {
+
+  // Create price slider element without container for card integration
+  const createPriceSliderElement = (index: number) => {
     if (!shouldShowSlider) return null
 
     return (
-      <div className={clsx('mt-6', containerClass)}>
-        <PriceSlider
-          proposedPrice={sliderData.proposedPrice}
-          minPrice={minPrice}
-          maxPrice={sliderData.maxPrice}
-          nightText={resolvedTexts.nightText}
-          makeOfferText={resolvedTexts.makeOfferText}
-          availabilityText={resolvedTexts.availabilityText}
-          proposePriceText={resolvedTexts.proposePriceText}
-          currencyText={resolvedTexts.currencyText}
-          bidStatus={sliderData.bidStatus}
-          submittedPrice={sliderData.submittedPrice}
-          bidSubmittedText={resolvedTexts.bidSubmittedText}
-          updateBidText={resolvedTexts.updateBidText}
-          cancelBidText={resolvedTexts.cancelBidText}
-          onPriceChange={sliderData.setProposedPrice}
-          onMakeOffer={sliderData.makeOffer}
-          onCancelBid={() => {
-            const currentRoom = roomOptions[state.activeIndex]
-            if (currentRoom && onCancelBid) {
-              onCancelBid(currentRoom.id)
-            }
-            sliderData.resetBid()
-          }}
-        />
-      </div>
+      <PriceSlider
+        proposedPrice={sliderData.proposedPrice}
+        minPrice={minPrice}
+        maxPrice={sliderData.maxPrice}
+        nightText={resolvedTexts.nightText}
+        makeOfferText={resolvedTexts.makeOfferText}
+        availabilityText={resolvedTexts.availabilityText}
+        proposePriceText={resolvedTexts.proposePriceText}
+        currencyText={resolvedTexts.currencyText}
+        bidStatus={sliderData.bidStatus}
+        submittedPrice={sliderData.submittedPrice}
+        bidSubmittedText={resolvedTexts.bidSubmittedText}
+        updateBidText={resolvedTexts.updateBidText}
+        cancelBidText={resolvedTexts.cancelBidText}
+        roomName={roomOptions[index]?.roomType}
+        onPriceChange={sliderData.setProposedPrice}
+        onMakeOffer={sliderData.makeOffer}
+        onCancelBid={() => {
+          const currentRoom = roomOptions[index]
+          if (currentRoom && onCancelBid) {
+            onCancelBid(currentRoom.id)
+          }
+          sliderData.resetBid()
+        }}
+      />
     )
   }
 
@@ -182,11 +182,11 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             previousImageLabel={resolvedTexts.previousImage}
             nextImageLabel={resolvedTexts.nextImage}
             viewImageLabel={resolvedTexts.viewImage}
+            isActive={true}
+            showPriceSlider={shouldShowSlider}
+            priceSliderElement={createPriceSliderElement(0)}
           />
         </div>
-
-        {/* Price Slider for single room if needed */}
-        {renderPriceSlider('max-w-md mx-auto')}
       </div>
     )
   }
@@ -224,6 +224,9 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 previousImageLabel={resolvedTexts.previousImage}
                 nextImageLabel={resolvedTexts.nextImage}
                 viewImageLabel={resolvedTexts.viewImage}
+                isActive={state.activeIndex === index}
+                showPriceSlider={shouldShowSlider}
+                priceSliderElement={createPriceSliderElement(index)}
               />
             </div>
           ))}
@@ -232,7 +235,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         {/* Mobile/Tablet: Carousel layout */}
         <div className="lg:hidden">
           <div className="relative w-full overflow-visible h-full">
-            <div className="w-full relative perspective-[1000px] h-[550px] overflow-hidden">
+            <div className="w-full relative perspective-[1000px] min-h-[550px] overflow-visible">
               {roomOptions.map((room, index) => (
                 <div
                   key={room.id}
@@ -259,6 +262,9 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     previousImageLabel={resolvedTexts.previousImage}
                     nextImageLabel={resolvedTexts.nextImage}
                     viewImageLabel={resolvedTexts.viewImage}
+                    isActive={state.activeIndex === index}
+                    showPriceSlider={shouldShowSlider}
+                    priceSliderElement={createPriceSliderElement(index)}
                   />
                 </div>
               ))}
@@ -325,8 +331,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
           </div>
         </div>
 
-        {/* Price Slider for two rooms */}
-        {renderPriceSlider('max-w-md mx-auto lg:max-w-none')}
       </div>
     )
   }
@@ -346,7 +350,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         {/* Slider Container with Visible Cards */}
         <div className="relative w-full overflow-visible h-full">
           {/* Main Carousel Area */}
-          <div className="w-full relative perspective-[1000px] h-[550px] overflow-hidden">
+          <div className="w-full relative perspective-[1000px] h-[750px] overflow-hidden">
             {roomOptions.map((room, index) => {
               // Calculate if this card should be visible (previous, current, or next)
               const prevIndex = (state.activeIndex - 1 + roomOptions.length) % roomOptions.length
@@ -385,6 +389,9 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     previousImageLabel={resolvedTexts.previousImage}
                     nextImageLabel={resolvedTexts.nextImage}
                     viewImageLabel={resolvedTexts.viewImage}
+                    isActive={state.activeIndex === index}
+                    showPriceSlider={shouldShowSlider}
+                    priceSliderElement={createPriceSliderElement(index)}
                   />
                 </div>
               )
@@ -452,8 +459,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         </div>
       </div>
 
-      {/* Price Slider for three+ rooms */}
-      {renderPriceSlider()}
     </div>
   )
 }
