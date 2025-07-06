@@ -557,7 +557,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           />
         </div>
 
-        <aside className="flex-shrink-0 max-w-md">
+        <aside className="flex-shrink-0 max-w-md sticky top-24 self-start">
           {shouldShowMultiBooking ? (
             <MultiBookingPricingSummaryPanel
               roomBookings={roomBookings}

@@ -1,6 +1,7 @@
 import { UiButton } from '@/components/ui/button'
 import { UiTooltip, UiTooltipContent, TooltipProvider, UiTooltipTrigger } from '@/components/ui/tooltip'
 import clsx from 'clsx'
+import { Icon } from '@iconify/react'
 import type { CustomizationOption, RoomCustomizationTexts } from '../types'
 import { IconRenderer } from './IconRenderer'
 
@@ -34,12 +35,19 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
   const cardContent = (
     <div className={clsx(
-      'flex-none sm:w-auto h-full bg-white border border-neutral-300 rounded-lg overflow-hidden snap-center transition-all duration-200',
+      'flex-none sm:w-auto h-full bg-white border border-neutral-300 rounded-lg overflow-hidden snap-center transition-all duration-200 relative',
       {
         'opacity-50 cursor-not-allowed': isDisabled,
         'hover:shadow-md': !isDisabled,
       }
     )}>
+      {/* Selected indicator */}
+      {isSelected && !isDisabled && (
+        <div className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
+          <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
+          Selected
+        </div>
+      )}
       <div className="p-4 flex flex-col h-full">
         <div className="flex flex-col mb-1">
           <div className="flex gap-2.5 items-center w-20">
@@ -84,9 +92,14 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         <div className="flex flex-col space-y-2 mt-auto">
           <UiButton 
             onClick={handleClick} 
-            variant={isSelected ? 'link' : 'secondary'} 
+            variant={isSelected ? 'destructive' : 'secondary'} 
             size="sm" 
-            className="w-full hover:bg-black hover:text-white transition-all border"
+            className={clsx(
+              "w-full transition-all border",
+              {
+                "hover:bg-black hover:text-white": !isSelected,
+              }
+            )}
             disabled={isDisabled}
           >
             {isSelected 

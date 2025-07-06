@@ -306,7 +306,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
           </div>
           <UiButton
             variant={selectedRoom?.id === room.id ? 'destructive' : 'black'}
-            size="sm"
             className="w-fit uppercase tracking-wide"
             onClick={handleSelectRoom}
           >
