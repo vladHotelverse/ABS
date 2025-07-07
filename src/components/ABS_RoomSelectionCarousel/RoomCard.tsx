@@ -342,7 +342,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         )}
       >
         <div className={clsx(
-          "border-t border-gray-200 p-4 bg-gray-50",
+          "border-t border-gray-200 p-4 bg-gray-50 raunded-b-lg",
           sliderVisible ? 'opacity-100' : 'opacity-0'
         )}>
           <PriceSlider

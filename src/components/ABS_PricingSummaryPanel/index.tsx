@@ -152,8 +152,36 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </section>
         )}
 
+                {/* Bid Upgrades Section */}
+                {bidForUpgradeItems.length > 0 && (
+          <section aria-labelledby="bid-section-title">
+            <div className="flex justify-between items-center mb-2">
+              <h3 id="bid-section-title" className="text-base font-semibold">
+                Bid for Upgrades
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {bidForUpgradeItems.map((item) => (
+                <PricingItemComponent
+                  key={item.id}
+                  item={item}
+                  euroSuffix={labels.euroSuffix}
+                  removeLabel={`Remove ${item.name}`}
+                  onRemove={() => {
+                    try {
+                      handleRemoveItem(item)
+                    } catch (error) {
+                      console.error('Error in remove item callback:', error)
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Separator after room section if there are customizations or special offers */}
-        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (customizeYourRoomItems.length > 0 || enhanceYourStayItems.length > 0 || bidForUpgradeItems.length > 0) && (
+        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0 || bidForUpgradeItems.length > 0) && (customizeYourRoomItems.length > 0 || enhanceYourStayItems.length > 0) && (
           <div className="h-px w-full bg-neutral-200" />
         )}
 
@@ -185,6 +213,11 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </section>
         )}
 
+        {/* Separator after room section if there are customizations or special offers */}
+        {(customizeYourRoomItems.length > 0 && enhanceYourStayItems.length > 0) && (
+          <div className="h-px w-full bg-neutral-200" />
+        )}
+
         {/* Special Offers Section */}
         {enhanceYourStayItems.length > 0 && (
           <section aria-labelledby="offers-section-title">
@@ -195,34 +228,6 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
             </div>
             <div className="space-y-2">
               {enhanceYourStayItems.map((item) => (
-                <PricingItemComponent
-                  key={item.id}
-                  item={item}
-                  euroSuffix={labels.euroSuffix}
-                  removeLabel={`Remove ${item.name}`}
-                  onRemove={() => {
-                    try {
-                      handleRemoveItem(item)
-                    } catch (error) {
-                      console.error('Error in remove item callback:', error)
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Bid Upgrades Section */}
-        {bidForUpgradeItems.length > 0 && (
-          <section aria-labelledby="bid-section-title">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="bid-section-title" className="text-base font-semibold">
-                Bid for Upgrades
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {bidForUpgradeItems.map((item) => (
                 <PricingItemComponent
                   key={item.id}
                   item={item}
