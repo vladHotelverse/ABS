@@ -19,5 +19,6 @@ export { default as BookingStateSection } from './BookingStateSection'
 export type {
   BookingStateSectionProps,
   BookingState,
-  BookingStateTexts,
+  SelectionStateTexts,
+  SelectionSummary,
 } from './BookingStateSection'
