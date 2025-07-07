@@ -55,7 +55,15 @@ export const useBookingState = (initialState: BookingState) => {
       if (!newCustomizations[roomId]) {
         newCustomizations[roomId] = []
       }
+      
+      // Remove any existing customization for the same category
+      newCustomizations[roomId] = newCustomizations[roomId].filter(
+        (c) => c.category !== customization.category
+      )
+      
+      // Add the new customization
       newCustomizations[roomId].push(customization)
+      
       return { ...prevState, customizations: newCustomizations }
     })
   }

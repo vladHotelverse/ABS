@@ -322,8 +322,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         className={clsx(
           'overflow-hidden',
           // Apply transition only when expanding to make it smooth
-          isActive && showPriceSlider ? 'transition-all duration-500 ease-in-out' : 'transition-none',
-          isActive && showPriceSlider ? 'max-h-96' : 'max-h-0'
+          isActive && showPriceSlider ? 'transition-all duration-500 ease-in-out max-h-96' : 'transition-none max-h-0'
         )}
       >
         <div className="border-t border-gray-200 p-4 bg-gray-50">

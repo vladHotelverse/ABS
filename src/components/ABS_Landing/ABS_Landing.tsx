@@ -15,6 +15,7 @@ import type {
   ViewOption,
   ExactViewOption,
   CompatibilityRules,
+  SelectedCustomizations,
 } from '../ABS_RoomCustomization/types'
 import type { OfferData } from '../ABS_SpecialOffers/types'
 
@@ -35,6 +36,7 @@ import {
   calculateNights,
   calculateTotalPrice,
 } from './utils/dataConversion'
+import type { Customization } from './types'
 
 // Re-export types from sections for compatibility
 export type { RoomOption, SpecialOffer } from './sections'
@@ -239,14 +241,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Calculate cart item count
   const cartItemCount = countCartItems({
     selectedRoom: state.selectedRoom || undefined,
-    selectedCustomizations: {},
+    selectedCustomizations: state.customizations,
     selectedOffers: state.specialOffers as any,
     activeBid: state.activeBid,
   })
 
   const { subtotal, tax, total } = calculateTotalPrice(
     state.selectedRoom || undefined,
-    {} as any,
+    state.customizations,
     state.specialOffers as any || [],
     0.1, // Assuming a 10% tax rate
     nights
@@ -283,7 +285,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Calculate items and totals
   const singleBookingItemCount = countCartItems({
     selectedRoom: state.selectedRoom || undefined,
-    selectedCustomizations: {} as any,
+    selectedCustomizations: state.customizations,
     selectedOffers: state.specialOffers as any,
     activeBid: state.activeBid,
   })
@@ -302,11 +304,27 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     optionLabel: string,
     optionPrice: number
   ) => {
-    // This logic needs to be adapted based on how you want to handle customizations
-    // For now, we'll just log it
-    console.log('Customization changed:', { category, optionId, optionLabel, optionPrice })
-    // A real implementation would call an action like:
-    // actions.addCustomization({ id: optionId, name: optionLabel, price: optionPrice, category }, 'room-id');
+    if (optionId) {
+      // Add customization
+      const customization: Customization = {
+        id: optionId,
+        name: optionLabel,
+        price: optionPrice,
+        category: category,
+      }
+      // Use the selected room's ID if available, otherwise use a default
+      const roomId = state.selectedRoom?.id || 'default-room'
+      actions.addCustomization(customization, roomId)
+      showToast(`${optionLabel} added to your customizations`, 'success')
+    } else {
+      // Remove customization (optionId is empty when deselecting)
+      const roomId = state.selectedRoom?.id || 'default-room'
+      const existingCustomization = state.customizations[roomId]?.find(c => c.category === category)
+      if (existingCustomization) {
+        actions.removeCustomization(existingCustomization.id, roomId)
+        showToast(`${existingCustomization.name} removed from your customizations`, 'info')
+      }
+    }
   }
 
   const handleBookOffer = (offerData: OfferData) => {
@@ -390,7 +408,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Convert state to pricing items
   const pricingItems: PricingItem[] = [
     convertRoomToPricingItem(state.selectedRoom || undefined, nights),
-    ...convertCustomizationsToPricingItems({} as any, nights),
+    ...convertCustomizationsToPricingItems(state.customizations, nights),
     ...convertOffersToPricingItems(state.specialOffers as any || []),
     ...convertBidsToPricingItems(state.activeBid ? [state.activeBid as any] : [], nights),
   ].filter((item): item is PricingItem => item !== null)
@@ -538,7 +556,25 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           <CustomizationSection
             sections={sections}
             sectionOptions={sectionOptions}
-            selectedCustomizations={{} as any}
+            selectedCustomizations={(() => {
+              // Convert Record<string, Customization[]> to SelectedCustomizations format
+              const converted: SelectedCustomizations = {}
+              const roomId = state.selectedRoom?.id || 'default-room'
+              const customizationsForRoom = state.customizations[roomId] || []
+              
+              // For each customization, use its category as the key
+              customizationsForRoom.forEach((customization) => {
+                if (customization.category) {
+                  converted[customization.category] = {
+                    id: customization.id,
+                    label: customization.name,
+                    price: customization.price,
+                  }
+                }
+              })
+              
+              return converted
+            })()}
             onCustomizationChange={handleCustomizationChange}
             texts={customizationTexts}
             fallbackImageUrl={fallbackImageUrl}

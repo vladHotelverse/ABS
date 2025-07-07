@@ -33,26 +33,52 @@ export const convertRoomToPricingItem = (room: RoomOption | undefined, nights = 
 /**
  * Converts selected customizations to PricingItems
  */
-export const convertCustomizationsToPricingItems = (customizations: SelectedCustomizations, nights = 1): PricingItem[] => {
-  return Object.values(customizations)
-    .filter((c) => c !== undefined)
-    .map((c) => {
-      // Determine concept based on customization type
-      const concept = c.label.toLowerCase().includes('upgrade') || c.label.toLowerCase().includes('superior') 
-        ? 'choose-your-superior-room' 
-        : 'customize-your-room'
-      
-      const totalPrice = c.price * nights
-      const displayName = nights > 1 ? `${c.label} (${nights} nights)` : c.label
+export const convertCustomizationsToPricingItems = (customizations: Record<string, any[]> | SelectedCustomizations, nights = 1): PricingItem[] => {
+  const items: PricingItem[] = []
+  
+  // Handle both formats: Record<string, Customization[]> and SelectedCustomizations
+  if (customizations && typeof customizations === 'object') {
+    Object.entries(customizations).forEach(([_key, value]) => {
+      if (Array.isArray(value)) {
+        // Handle Record<string, Customization[]> format
+        value.forEach((c) => {
+          const concept = c.name?.toLowerCase().includes('upgrade') || c.name?.toLowerCase().includes('superior') 
+            ? 'choose-your-superior-room' 
+            : 'customize-your-room'
+          
+          const totalPrice = c.price * nights
+          const displayName = nights > 1 ? `${c.name} (${nights} nights)` : c.name
 
-      return {
-        id: c.id,
-        name: displayName,
-        price: totalPrice,
-        type: 'customization' as const,
-        concept,
+          items.push({
+            id: c.id,
+            name: displayName,
+            price: totalPrice,
+            type: 'customization' as const,
+            concept,
+          })
+        })
+      } else if (value && typeof value === 'object' && 'id' in value) {
+        // Handle SelectedCustomizations format
+        const c = value as { id: string; label: string; price: number }
+        const concept = c.label.toLowerCase().includes('upgrade') || c.label.toLowerCase().includes('superior') 
+          ? 'choose-your-superior-room' 
+          : 'customize-your-room'
+        
+        const totalPrice = c.price * nights
+        const displayName = nights > 1 ? `${c.label} (${nights} nights)` : c.label
+
+        items.push({
+          id: c.id,
+          name: displayName,
+          price: totalPrice,
+          type: 'customization' as const,
+          concept,
+        })
       }
     })
+  }
+  
+  return items
 }
 
 /**
@@ -95,7 +121,7 @@ export const convertBidsToPricingItems = (bids: BidItem[], nights = 1): PricingI
  */
 export const calculateTotalPrice = (
   selectedRoom: RoomOption | undefined,
-  selectedCustomizations: SelectedCustomizations,
+  selectedCustomizations: Record<string, any[]> | SelectedCustomizations,
   selectedOffers: SelectedOffer[],
   taxRate = 0.1,
   nights = 1
@@ -107,12 +133,19 @@ export const calculateTotalPrice = (
     subtotal += selectedRoom.price * (selectedRoom.perNight ? nights : 1)
   }
 
-  // Add customizations
-  for (const categoryKey in selectedCustomizations) {
-    const customization = selectedCustomizations[categoryKey]
-    if (customization) {
-      subtotal += customization.price * nights
-    }
+  // Add customizations - handle both formats
+  if (selectedCustomizations && typeof selectedCustomizations === 'object') {
+    Object.entries(selectedCustomizations).forEach(([_key, value]) => {
+      if (Array.isArray(value)) {
+        // Handle Record<string, Customization[]> format
+        value.forEach((c) => {
+          subtotal += c.price * nights
+        })
+      } else if (value && typeof value === 'object' && 'price' in value) {
+        // Handle SelectedCustomizations format
+        subtotal += value.price * nights
+      }
+    })
   }
 
   // Add special offers
@@ -191,7 +224,7 @@ export const generateAvailableSections = (
 export const countCartItems = (
   state: {
     selectedRoom?: RoomOption
-    selectedCustomizations?: SelectedCustomizations
+    selectedCustomizations?: Record<string, any[]> | SelectedCustomizations
     selectedOffers?: SelectedOffer[]
     activeBid?: { roomId: string; bidAmount: number; status: string } | null
   }
@@ -199,7 +232,21 @@ export const countCartItems = (
   if (!state) return 0
   
   const roomCount = state.selectedRoom ? 1 : 0
-  const customizationCount = state.selectedCustomizations ? Object.keys(state.selectedCustomizations).length : 0
+  
+  // Count customizations - handle both formats
+  let customizationCount = 0
+  if (state.selectedCustomizations && typeof state.selectedCustomizations === 'object') {
+    Object.entries(state.selectedCustomizations).forEach(([_key, value]) => {
+      if (Array.isArray(value)) {
+        // Handle Record<string, Customization[]> format
+        customizationCount += value.length
+      } else if (value && typeof value === 'object' && 'id' in value) {
+        // Handle SelectedCustomizations format
+        customizationCount += 1
+      }
+    })
+  }
+  
   const offerCount = state.selectedOffers ? state.selectedOffers.length : 0
   const bidCount = state.activeBid ? 1 : 0
   
