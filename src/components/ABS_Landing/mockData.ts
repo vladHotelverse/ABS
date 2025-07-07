@@ -7,7 +7,7 @@ export const roomOptions = [
     title: "Live luxury’s pinnacle by the sea",
     roomType: 'DELUXE GOLD',
     description: 'True rock stars look down from above. A space covering 33 square metres with spectacular sea views, a private furnished terrace and elegant décor for a superior experience from the fifth floor upwards. Exceed even your own expectations, and relax with chromotherapy lighting that you can personalise. Lie back like a rock star in a luxurious king-sized bed, or in two full-sized single beds, and enjoy this room\'s ultra-modern facilities: thoughtfully selected state-of-the-art furniture, a 43 SMART TV screen, a dock station and a comfortable reading corner with a sofa bed.',
-    price: 302,
+    price: 22,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt633/c37cc822-a6bf-4345-93f8-deb22d186d10/image.webp',
     images: [
@@ -47,7 +47,7 @@ export const roomOptions = [
     title: "Dive in from your private terrace",
     roomType: 'DELUXE SWIM-UP',
     description: 'What about adding to your Double room a furnished outdoors terrace with a direct access to the meandering pool and private sun lounger waiting for you to enjoy the splash.',
-    price: 468,
+    price: 31,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/cdf69769-f553-4c82-aa06-e3e8867954fb/image.webp',
     images: [
@@ -88,7 +88,7 @@ export const roomOptions = [
     roomType: 'ROCK SUITE',
     title: "Supreme luxury with divine views",
     description: 'Our contemporary Hard Rock Ibiza Suites perfectly capture the authenticity and irreverence of rock \'n\' roll with the sensuality and sophistication of Ibiza Island. Three connecting spaces - Living/ lounge, bedroom and bathroom - allowing you to decide when it\'s time for plugging in or chilling out. Totally unpredictable, totally Ibiza Hard Rock.',
-    price: 378,
+    price: 89,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt640/3e7e2260-63e3-4934-9358-ebf08bb6d96a/image.webp',
     images: [
@@ -135,7 +135,7 @@ export const roomOptions = [
     roomType: '80S SUITE',
     title: "80s nostalgia unleashed",
     description: '60 square-meter space with an 80s setting, among which vinyl, mirror ball, music cassettes with 80s music and some 80\'s gifts like a welcome kit that includes a t-shirt.',
-    price: 606,
+    price: 120,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
     images: [
@@ -182,7 +182,7 @@ export const roomOptions = [
     roomType: 'ROCK SUITE DIAMOND',
     title: "Glam rock with infinite views",
     description: 'Llega a la cima del rock en este espacio de 75 metros cuadrados auténticamente inspirado en estrellas del rock y que ofrece ese toque de vida glamourosa. Con una exuberancia sin límites, incluye unas vistas infinitas que se prolongan desde la suite hasta la terraza, y una bañera de grifería vista en mitad del dormitorio principal para que no te pierdas el mínimo detalle del paisaje mientras disfrutas de un placer infinito. Estancia de 75 metros cuadrados con capacidad hasta cuatro personas.',
-    price: 493,
+    price: 199,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt643/5a6459fb-7a86-4d9d-9d9d-acd9a80033d5/original.webp',
     images: [
@@ -229,7 +229,7 @@ export const roomOptions = [
     roomType: 'ROCK SUITE LEGEND',
     title: "Live the rock legend",
     description: 'Llega a la cima del rock en este espacio de 75 metros cuadrados auténticamente inspirado en estrellas del rock y que ofrece ese toque de vida glamourosa. Con una exuberancia sin límites, incluye unas vistas infinitas que se prolongan desde la suite hasta la terraza, y una bañera de grifería vista en mitad del dormitorio principal para que no te pierdas el mínimo detalle del paisaje mientras disfrutas de un placer infinito. Estancia de 75 metros cuadrados con capacidad hasta cuatro personas.',
-    price: 867,
+    price: 300,
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt644/b15ce84f-709d-4d46-a0af-2654a645c643/original.webp',
     images: [
@@ -645,8 +645,8 @@ export const exactViewOptions = [
 
 export const roomSelectionMap = {
   id: 'room-selection',
-  title: 'Choose your Superior Room!',
-  description: 'Choose from our selection of premium rooms and suites',
+  title: 'Choose your Room Number!',
+  description: 'Select the exact room you want to stay in',
   url: 'https://map-uat.hotelverse.tech/Webmap/en/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUk0TWpSbU5EUmtaakZqWXpneFlXUTBOelkxT1dWaVpEUTJNbVJpTXpsbVlUTTBNRFprTUdZelpHSTJNVFkwWTJZMVpqRmhNVGRrWWpZNE16Y3paVFl4WkRRM1pXVmtNekUwTXpreVpHWm1ZbVU1WXpKa00yRTFPRGsxTkRBNE1tTXhNMkk1Wm1ZM056SXpaVEE1WWpjMVpXSmhZakl6Tm1FMU1EUTVPV1k0TkNJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxTVRVME9UYzFOalUwTUgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=en&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0IiwiZXh0ZXJuYWxDaGFubmVsSWQiOjAsInBsYXRmb3JtIjoiT3Ryb3MiLCJib29raW5nRGF0YSI6eyJmaXJzdE5hbWUiOiJURVNUIiwibGFzdE5hbWUiOiJURVNUIiwiZW1haWwiOiJmcmFuY2lzY28uY29zdGlsbG9AaG90ZWx2ZXJzZS50ZWNoIiwiY2hlY2tJbiI6IjIwMjUtMTAtMTAiLCJjaGVja091dCI6IjIwMjUtMTAtMTUiLCJodlJvb21UeXBlIjo2MzIsIm9jY3VwYW5jeSI6eyJhZHVsdHMiOjIsImNoaWxkcmVuIjowLCJjaGlsZEFnZXMiOltdLCJpbmZhbnRzIjowLCJjdXJyZW5jeSI6IiJ9LCJleHRlcm5hbENoYW5uZWxJZCI6MCwiaXNPd25Ib3RlbCI6ZmFsc2V9fQ%3D%3D',
   type: 'iframe' as const,
   iframe: {

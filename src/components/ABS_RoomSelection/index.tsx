@@ -30,7 +30,7 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
   // Dynamic height based on screen size: 800px for desktop, 400px for mobile
   const getResponsiveHeight = () => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth >= 768 ? '800px' : '400px'
+      return window.innerWidth >= 768 ? '1000px' : '400px'
     }
     return '400px' // Fallback for SSR
   }
@@ -57,7 +57,7 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm md:text-base">
+          <p className="text-gray-600 text-sm md:text-base mb-0">
             {description}
           </p>
           <iframe
@@ -67,7 +67,7 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
             frameBorder={dynamicIframe.frameBorder}
             allowFullScreen={dynamicIframe.allowFullScreen}
             title={dynamicIframe.title}
-            className="w-full"
+            className="w-full rounded-lg"
             style={{ minHeight: height, borderRadius: '10px' }}
           />
       </div>
