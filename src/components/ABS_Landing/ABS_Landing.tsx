@@ -480,6 +480,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       specialOffers: (state.specialOffers as any[])?.map(o => o.title || o.name) || [],
       totalPrice: `${t.currencySymbol}${subtotal.toFixed(2)}`,
       nights: nights,
+      activeBid: state.activeBid ? {
+        roomName: state.activeBid.roomName,
+        bidAmount: state.activeBid.bidAmount,
+      } : undefined,
     } : undefined
 
     return (

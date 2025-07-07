@@ -19,6 +19,10 @@ export interface SelectionSummary {
   specialOffers?: string[]
   totalPrice?: string
   nights?: number
+  activeBid?: {
+    roomName: string
+    bidAmount: number
+  }
 }
 
 export interface BookingStateSectionProps {
@@ -87,6 +91,15 @@ export const BookingStateSection: React.FC<BookingStateSectionProps> = ({
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 mb-1">Selected Room</p>
                   <p className="font-medium text-gray-800">{selectionSummary.selectedRoom}</p>
+                </div>
+              )}
+
+              {selectionSummary.activeBid && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-1">Room Bid</p>
+                  <p className="font-medium text-gray-800">
+                    {selectionSummary.activeBid.roomName} - €{selectionSummary.activeBid.bidAmount}
+                  </p>
                 </div>
               )}
 

@@ -73,7 +73,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
         onClick={onConfirm}
         disabled={isLoading}
         variant="black"
-        className="inline-flex w-full items-center justify-center py-3 transition-all duration-200 hover:shadow-md disabled:hover:shadow-none"
+        className="inline-flex w-full items-center justify-center py-3 transition-all duration-200 hover:shadow-md disabled:hover:shadow-none cursor-pointer"
       >
         {isLoading ? (
           <div className="flex items-center space-x-2">
