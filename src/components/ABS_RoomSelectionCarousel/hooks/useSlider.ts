@@ -31,13 +31,13 @@ export const useSlider = ({
   offerMadeText = 'You offered {price}',
   activeBid,
 }: UseSliderProps): UseSliderReturn => {
-  const maxPrice = useMemo(() => room.price * 2, [room.price])
+  const maxPrice = useMemo(() => room.price, [room.price])
   const hasActiveBid = activeBid?.roomId === room.id
 
-  // Calculate default price: 5% of max, but not less than minPrice
+  // Calculate default price: 80% of room price, but not less than minPrice
   const defaultPrice = useMemo(() => {
-    const fivePercentOfMax = Math.round(maxPrice * 0.05)
-    return Math.max(fivePercentOfMax, minPrice)
+    const eightyPercentOfMax = Math.round(maxPrice * 0.8)
+    return Math.max(eightyPercentOfMax, minPrice)
   }, [maxPrice, minPrice])
 
   const initialPrice = hasActiveBid ? activeBid.bidAmount : defaultPrice
