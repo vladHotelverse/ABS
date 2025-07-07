@@ -167,6 +167,7 @@ export const useOfferBooking = ({
           id: offer.id,
           name: offer.title,
           price: 0,
+          basePrice: offer.price,
           quantity: 0,
           type: offer.type,
         }
