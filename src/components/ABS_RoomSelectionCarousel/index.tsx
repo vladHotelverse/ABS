@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import type React from 'react'
-import { useState, useEffect } from 'react'
 import { CarouselNavigation, RoomCard } from './components'
 import { useCarouselState } from './hooks/useCarouselState'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
