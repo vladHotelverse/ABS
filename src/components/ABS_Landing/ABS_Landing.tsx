@@ -227,7 +227,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   const stayDates = checkIn && checkOut ? `From ${checkIn} to ${checkOut}` : 'N/A'
 
   // Use custom hooks for state management
-  const { state, actions, showMobilePricing, bookingStatus: _bookingStatus } = useBookingState({
+  const { state, actions, showMobilePricing, bookingStatus } = useBookingState({
     selectedRoom: initialSelectedRoom || null,
     customizations: {},
     specialOffers: [],
@@ -250,6 +250,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     state.selectedRoom || undefined,
     state.customizations,
     state.specialOffers as any || [],
+    state.activeBid,
     0.1, // Assuming a 10% tax rate
     nights
   )
@@ -452,12 +453,12 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     specialOffersLabels: t.specialOffersLabels,
   }
 
-  const bookingStateTexts = {
+  const selectionStateTexts = {
     loadingLabel: t.loadingLabel,
     errorTitle: t.errorTitle,
     errorMessage: t.errorMessage,
     tryAgainLabel: t.tryAgainLabel,
-    bookingConfirmedTitle: t.bookingConfirmedTitle,
+    selectionConfirmedTitle: t.bookingConfirmedTitle,
     confirmationMessage: t.confirmationMessage,
     backToHomeLabel: t.backToHomeLabel,
   }
@@ -471,14 +472,24 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }))
 
   // Return early for non-normal states
-  if (state.status !== 'normal') {
+  if (bookingStatus !== 'normal') {
+    // Prepare selection summary for confirmation state
+    const selectionSummary = bookingStatus === 'confirmation' ? {
+      selectedRoom: state.selectedRoom?.title || state.selectedRoom?.roomType,
+      customizations: Object.values(state.customizations).flat().map(c => c.name),
+      specialOffers: (state.specialOffers as any[])?.map(o => o.title || o.name) || [],
+      totalPrice: `${t.currencySymbol}${subtotal.toFixed(2)}`,
+      nights: nights,
+    } : undefined
+
     return (
       <BookingStateSection
-        state={state.status || 'normal'}
-        texts={bookingStateTexts}
+        state={bookingStatus}
+        texts={selectionStateTexts}
         onRetry={handleRetry}
         onBackToNormal={handleBackToNormal}
         className={className}
+        selectionSummary={selectionSummary}
       />
     )
   }

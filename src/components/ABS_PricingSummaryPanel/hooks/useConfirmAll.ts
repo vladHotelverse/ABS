@@ -17,8 +17,8 @@ export const useConfirmAll = ({ roomCount, labels, onConfirmAll, showToast }: Us
       await onConfirmAll()
       showToast(`${labels.confirmAllButtonLabel.replace('All', `All ${roomCount}`)} confirmed successfully!`, 'success')
     } catch (error) {
-      console.error('Error confirming bookings:', error)
-      showToast('Error confirming bookings. Please try again.', 'error')
+      console.error('Error confirming selections:', error)
+      showToast('Error confirming selections. Please try again.', 'error')
     } finally {
       setConfirmingAll(false)
     }

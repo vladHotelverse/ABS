@@ -734,7 +734,7 @@ export const translations = {
     offersSubtitle: 'Enhance your stay with these exclusive offers',
     emptyCartMessage: 'Select a room and customize your stay to see your booking summary here.',
     errorMessage: 'Sorry, there was an error loading the booking information. Please try again later.',
-    confirmationMessage: 'Thank you for your booking! A confirmation email will be sent shortly.',
+    confirmationMessage: 'Your room customization has been saved successfully. Thank you for personalizing your stay!',
     totalLabel: 'Total',
     currencySymbol: '€',
     selectText: 'Select',
@@ -839,7 +839,7 @@ export const translations = {
     taxesLabel: 'Taxes',
     payAtHotelLabel: 'Pay at Hotel',
     viewTermsLabel: 'View Terms & Conditions',
-    confirmButtonLabel: 'Confirm Booking',
+    confirmButtonLabel: 'Confirm Selection',
     noUpgradesSelectedLabel: 'No upgrades selected',
     noOffersSelectedLabel: 'No offers selected',
     editLabel: 'Edit',
@@ -857,7 +857,7 @@ export const translations = {
     // UI text
     backToHomeLabel: 'Back to Home',
     tryAgainLabel: 'Try Again',
-    bookingConfirmedTitle: 'Booking Confirmed!',
+    bookingConfirmedTitle: 'Customization Complete!',
     errorTitle: 'Error',
     summaryButtonLabel: 'Summary',
     removeRoomUpgradeLabel: 'Remove Room Upgrade',
@@ -869,7 +869,7 @@ export const translations = {
 
     // Multi-booking labels
     multiBookingLabels: {
-      multiRoomBookingsTitle: 'Multi-Room Bookings',
+      multiRoomBookingsTitle: 'Multi-Room Selections',
       roomsCountLabel: 'rooms',
       singleRoomLabel: 'room',
       clickToExpandLabel: 'Click to expand/collapse',
@@ -886,7 +886,7 @@ export const translations = {
       totalLabel: 'Total',
       payAtHotelLabel: 'Payment will be made at the hotel',
       viewTermsLabel: 'View Terms & Conditions',
-      confirmAllButtonLabel: 'Confirm All Bookings',
+      confirmAllButtonLabel: 'Confirm All Selections',
       confirmingAllLabel: 'Confirming...',
       editLabel: 'Edit',
       addLabel: 'Add',

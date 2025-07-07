@@ -123,6 +123,7 @@ export const calculateTotalPrice = (
   selectedRoom: RoomOption | undefined,
   selectedCustomizations: Record<string, any[]> | SelectedCustomizations,
   selectedOffers: SelectedOffer[],
+  activeBid: BidItem | undefined | null,
   taxRate = 0.1,
   nights = 1
 ): { subtotal: number; tax: number; total: number } => {
@@ -152,6 +153,11 @@ export const calculateTotalPrice = (
   selectedOffers.forEach((offer) => {
     subtotal += offer.price
   })
+
+  // Add active bid if submitted
+  if (activeBid && (activeBid.status === 'submitted' || activeBid.status === 'pending')) {
+    subtotal += activeBid.bidAmount * nights
+  }
 
   const tax = subtotal * taxRate
   const total = subtotal + tax

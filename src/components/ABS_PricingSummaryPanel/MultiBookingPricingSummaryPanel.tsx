@@ -157,7 +157,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
               viewTermsLabel: labels.viewTermsLabel,
               confirmButtonLabel: confirmingAll
                 ? labels.confirmingAllLabel
-                : `${labels.confirmAllButtonLabel} ${roomBookings.length} Bookings`,
+                : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
               loadingLabel: labels.confirmingAllLabel,
               euroSuffix: labels.euroSuffix,
             }}
