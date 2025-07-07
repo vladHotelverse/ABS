@@ -225,6 +225,13 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   
   // Create combined stay dates display
   const stayDates = checkIn && checkOut ? `From ${checkIn} to ${checkOut}` : 'N/A'
+  
+  // Create reservation info for special offers
+  const reservationInfo = checkIn && checkOut ? {
+    checkInDate: new Date(checkIn),
+    checkOutDate: new Date(checkOut),
+    personCount: occupancy ? parseInt(occupancy.match(/\d+/)?.[0] || '1', 10) : 1
+  } : undefined
 
   // Use custom hooks for state management
   const { state, actions, showMobilePricing, bookingStatus } = useBookingState({
@@ -339,8 +346,16 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         title: offerData.name,
         description: '',
         image: '',
-        price: offerData.price,
+        price: offerData.price, // Use calculated total for price summary
+        basePrice: offerData.basePrice, // Store base price separately
         name: offerData.name,
+        // Store selection data to preserve state
+        quantity: offerData.quantity,
+        type: offerData.type,
+        persons: offerData.persons,
+        nights: offerData.nights,
+        selectedDate: offerData.selectedDate,
+        selectedDates: offerData.selectedDates,
       } as any
       actions.addSpecialOffer(offer)
       showToast(`${offer.title} added to your stay.`, 'success')
@@ -610,7 +625,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             specialOffers={specialOffers}
             selectedOffers={state.specialOffers as any}
             onBookOffer={handleBookOffer}
-            reservationInfo={undefined} // reservationInfo is not used in this component's state
+            reservationInfo={reservationInfo}
             texts={offersTexts}
             isVisible={shouldShowSection('offer', computedAvailableSections)}
           />

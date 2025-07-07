@@ -24,6 +24,7 @@ export interface OfferData {
   id: number
   name: string
   price: number
+  basePrice: number // Add base price to preserve original offer price
   quantity: number
   type: 'perStay' | 'perPerson' | 'perNight'
   persons?: number

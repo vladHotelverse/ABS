@@ -62,6 +62,7 @@ export const useOfferBooking = ({
         id: offer.id,
         name: offer.title,
         price: calculateTotal(offer, selection),
+        basePrice: offer.price, // Add base price
         quantity: finalQuantity,
         type: offer.type,
       }

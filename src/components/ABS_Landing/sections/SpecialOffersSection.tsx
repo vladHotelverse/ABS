@@ -24,6 +24,8 @@ export interface SelectedOffer {
   quantity?: number
   persons?: number
   nights?: number
+  selectedDate?: Date
+  selectedDates?: Date[]
 }
 
 export interface SpecialOffersTexts {
@@ -110,7 +112,7 @@ const convertToOfferType = (offer: SpecialOffer, index: number): OfferType => {
     id: typeof offer.id === 'string' ? index + 1 : offer.id,
     title: offer.title,
     description: offer.description,
-    price: offer.price,
+    price: (offer as any).basePrice || offer.price, // Use basePrice if available
     type,
     image: offer.image,
     requiresDateSelection: offer.requiresDateSelection,
@@ -140,7 +142,10 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
             (acc, offer) => {
               acc[offer.id] = {
                 quantity: offer.quantity ?? 1,
-                // persons and nights will be managed automatically by reservation data
+                persons: offer.persons,
+                nights: offer.nights,
+                selectedDate: offer.selectedDate,
+                selectedDates: offer.selectedDates,
               }
               return acc
             },
