@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import type React from 'react'
-import './slider-styles.css'
+import { Slider } from '@/components/ui/slider'
 
 export interface PriceSliderProps {
   className?: string
@@ -43,11 +43,8 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   onMakeOffer,
   onCancelBid,
 }) => {
-  // Calculate slider percentage
-  const sliderPercentage = ((proposedPrice - minPrice) / (maxPrice - minPrice)) * 100
-
   // Generate dynamic propose text
-  const dynamicProposeText = roomName 
+  const dynamicProposeText = roomName
     ? `${proposePriceText.replace(':', '')} for ${roomName}:`
     : proposePriceText
 
@@ -93,18 +90,14 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             <span>{dynamicProposeText}</span>
             <span className="text-black font-bold">{`${proposedPrice} ${currencyText}/${nightText}`}</span>
           </div>
-          <div className="relative w-full">
-            <input
-              type="range"
+          <div className="relative w-full py-2">
+            <Slider
               min={minPrice}
               max={maxPrice}
               step={1}
-              value={proposedPrice}
-              onChange={(e) => onPriceChange(Number.parseInt(e.target.value))}
-              className="w-full price-slider"
-              style={{
-                background: `linear-gradient(to right, black 0%, black ${sliderPercentage}%, #e5e7eb ${sliderPercentage}%, #e5e7eb 100%)`,
-              }}
+              value={[proposedPrice]}
+              onValueChange={(value) => onPriceChange(value[0])}
+              className="w-full transition-all"
             />
             <div className="w-full flex justify-between text-xs text-neutral-500 mt-2">
               <span>{`${minPrice} ${currencyText}/${nightText}`}</span>

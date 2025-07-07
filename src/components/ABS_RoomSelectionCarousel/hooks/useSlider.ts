@@ -31,20 +31,34 @@ export const useSlider = ({
   offerMadeText = 'You offered {price}',
   activeBid,
 }: UseSliderProps): UseSliderReturn => {
-  const [maxPrice, setMaxPrice] = useState(room.price || 20)
+  const maxPrice = useMemo(() => room.price * 2, [room.price])
   const hasActiveBid = activeBid?.roomId === room.id
-  const [proposedPrice, setProposedPrice] = useState<number>(hasActiveBid ? activeBid.bidAmount : minPrice)
+
+  // Calculate default price: 5% of max, but not less than minPrice
+  const defaultPrice = useMemo(() => {
+    const fivePercentOfMax = Math.round(maxPrice * 0.05)
+    return Math.max(fivePercentOfMax, minPrice)
+  }, [maxPrice, minPrice])
+
+  const initialPrice = hasActiveBid ? activeBid.bidAmount : defaultPrice
+  const [proposedPrice, setProposedPrice] = useState<number>(initialPrice)
   const [submittedPrice, setSubmittedPrice] = useState<number | null>(hasActiveBid ? activeBid.bidAmount : null)
   const [bidStatus, setBidStatus] = useState<'idle' | 'submitted'>(hasActiveBid ? 'submitted' : 'idle')
 
-  // Effect to recalculate prices when the active room changes
+  // Effect to sync with external activeBid changes
   useEffect(() => {
-    setMaxPrice(room.price)
-    // Reset proposed price to the minimum when room changes, unless there is an active bid
-    if (!hasActiveBid) {
-      setProposedPrice(minPrice)
+    const isCurrentlyActive = activeBid?.roomId === room.id
+    if (isCurrentlyActive) {
+      setProposedPrice(activeBid.bidAmount)
+      setBidStatus('submitted')
+      setSubmittedPrice(activeBid.bidAmount)
+    } else {
+      // If the bid for this room is cancelled or another is made, reset it
+      setProposedPrice(defaultPrice)
+      setBidStatus('idle')
+      setSubmittedPrice(null)
     }
-  }, [room, minPrice, hasActiveBid])
+  }, [activeBid, room.id, defaultPrice])
 
   // Memoize the offer text to avoid re-creating it on every render
   const formattedOfferText = useMemo(() => {
@@ -65,7 +79,7 @@ export const useSlider = ({
   const resetBid = () => {
     setSubmittedPrice(null)
     setBidStatus('idle')
-    setProposedPrice(minPrice)
+    setProposedPrice(defaultPrice)
   }
 
   return {

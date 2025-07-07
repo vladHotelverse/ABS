@@ -101,23 +101,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     onRoomSelected,
   })
 
-  // State to manage which slider is active after a delay
-  const [sliderActiveIndex, setSliderActiveIndex] = useState<number | null>(null)
-
-  // Effect to update the active slider with a delay, and hide the old one immediately
-  useEffect(() => {
-    // Immediately hide any currently active slider to make it disappear without animation delay
-    setSliderActiveIndex(null)
-
-    const handler = setTimeout(() => {
-      setSliderActiveIndex(state.activeIndex)
-    }, 500) // 500ms delay
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [state.activeIndex])
-
   // Determine if slider should be shown
   const shouldShowSlider = showPriceSlider || variant === 'with-slider'
 
@@ -163,7 +146,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             previousImageLabel={resolvedTexts.previousImage}
             nextImageLabel={resolvedTexts.nextImage}
             viewImageLabel={resolvedTexts.viewImage}
-            isActive={sliderActiveIndex === 0}
+            isActive={state.activeIndex === 0}
             showPriceSlider={shouldShowSlider}
             minPrice={minPrice}
             onMakeOffer={onMakeOffer}
@@ -217,7 +200,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 previousImageLabel={resolvedTexts.previousImage}
                 nextImageLabel={resolvedTexts.nextImage}
                 viewImageLabel={resolvedTexts.viewImage}
-                isActive={sliderActiveIndex === index}
+                isActive={state.activeIndex === index}
                 showPriceSlider={shouldShowSlider}
                 minPrice={minPrice}
                 onMakeOffer={onMakeOffer}
@@ -267,7 +250,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     previousImageLabel={resolvedTexts.previousImage}
                     nextImageLabel={resolvedTexts.nextImage}
                     viewImageLabel={resolvedTexts.viewImage}
-                    isActive={sliderActiveIndex === index}
+                    isActive={state.activeIndex === index}
                     showPriceSlider={shouldShowSlider}
                     minPrice={minPrice}
                     onMakeOffer={onMakeOffer}
@@ -406,7 +389,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     previousImageLabel={resolvedTexts.previousImage}
                     nextImageLabel={resolvedTexts.nextImage}
                     viewImageLabel={resolvedTexts.viewImage}
-                    isActive={sliderActiveIndex === index}
+                    isActive={state.activeIndex === index}
                     showPriceSlider={shouldShowSlider}
                     minPrice={minPrice}
                     onMakeOffer={onMakeOffer}

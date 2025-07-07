@@ -88,6 +88,9 @@ const RoomCard: React.FC<RoomCardProps> = ({
   // State for checking if description is truncated
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false)
   const descriptionRef = useRef<HTMLParagraphElement>(null)
+  
+  // State to control slider visibility with smooth transition
+  const [sliderVisible, setSliderVisible] = useState(false)
 
   // Slider logic is now local to each card
   const {
@@ -113,6 +116,19 @@ const RoomCard: React.FC<RoomCardProps> = ({
       setIsDescriptionTruncated(element.scrollHeight > element.clientHeight)
     }
   }, [room.description])
+  
+  // Handle slider visibility with a small delay to ensure smooth transition
+  useEffect(() => {
+    if (isActive && showPriceSlider) {
+      // Small delay to ensure the Slider component is ready
+      const timer = setTimeout(() => {
+        setSliderVisible(true)
+      }, 50)
+      return () => clearTimeout(timer)
+    } else {
+      setSliderVisible(false)
+    }
+  }, [isActive, showPriceSlider])
   // Memoized handlers
   const handleImageNavigation = useCallback(
     (direction: 'prev' | 'next') => {
@@ -322,10 +338,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
         className={clsx(
           'overflow-hidden',
           // Apply transition only when expanding to make it smooth
-          isActive && showPriceSlider ? 'transition-all duration-500 ease-in-out max-h-96' : 'transition-none max-h-0'
+          sliderVisible ? 'transition-all duration-500 ease-in-out max-h-96 opacity-100' : 'transition-none max-h-0 opacity-0'
         )}
       >
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <div className={clsx(
+          "border-t border-gray-200 p-4 bg-gray-50",
+          sliderVisible ? 'opacity-100' : 'opacity-0'
+        )}>
           <PriceSlider
             proposedPrice={proposedPrice}
             minPrice={minPrice}
