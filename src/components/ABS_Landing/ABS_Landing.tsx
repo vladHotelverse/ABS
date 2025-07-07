@@ -328,16 +328,22 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }
 
   const handleBookOffer = (offerData: OfferData) => {
-    const offer = {
-      id: offerData.id,
-      title: offerData.name,
-      description: '',
-      image: '',
-      price: offerData.price,
-      name: offerData.name,
-    } as any
-    actions.addSpecialOffer(offer)
-    showToast(`${offer.title} added to your stay.`, 'success')
+    // Check if this is a removal (quantity 0 indicates removal from useOfferBooking)
+    if (offerData.quantity === 0) {
+      actions.removeSpecialOffer(offerData.id.toString())
+      showToast(`${offerData.name} removed from your stay.`, 'info')
+    } else {
+      const offer = {
+        id: offerData.id,
+        title: offerData.name,
+        description: '',
+        image: '',
+        price: offerData.price,
+        name: offerData.name,
+      } as any
+      actions.addSpecialOffer(offer)
+      showToast(`${offer.title} added to your stay.`, 'success')
+    }
   }
 
   const handleLearnMore = (_room: RoomOption) => {
@@ -387,15 +393,17 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     _roomId?: string
   ) => {
     if (itemType === 'customization') {
-      const category = Object.keys(state.customizations).find(
+      // Find the roomId that contains this customization
+      const roomId = _roomId || state.selectedRoom?.id || Object.keys(state.customizations).find(
         (key) => state.customizations[key]?.some(c => c.id === itemId)
       );
-      if (category) {
-        actions.removeCustomization(itemId.toString(), _roomId || '');
+      if (roomId) {
+        actions.removeCustomization(itemId.toString(), roomId);
+        showToast(`Customization "${itemName}" removed`, 'info');
       }
-      showToast(`Customization "${itemName}" removed`, 'info');
     } else if (itemType === 'offer') {
       actions.removeSpecialOffer(itemId.toString());
+      showToast(`Special offer "${itemName}" removed`, 'info');
     } else if (itemType === 'room') {
       actions.selectRoom(null);
       showToast(translations.roomRemovedMessage, 'info');

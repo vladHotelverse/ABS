@@ -88,7 +88,7 @@ export const useBookingState = (initialState: BookingState) => {
   const removeSpecialOffer = (offerId: string) => {
     setState((prevState) => ({
       ...prevState,
-      specialOffers: prevState.specialOffers.filter((o) => o.id !== offerId),
+      specialOffers: prevState.specialOffers.filter((o) => o.id.toString() !== offerId),
     }))
   }
 
