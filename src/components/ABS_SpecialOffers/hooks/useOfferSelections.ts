@@ -8,14 +8,30 @@ interface UseOfferSelectionsProps {
 }
 
 export const useOfferSelections = ({ offers, initialSelections, reservationInfo }: UseOfferSelectionsProps) => {
+  // Helper function to check if offer is All Inclusive
+  const isAllInclusive = (offer: OfferType): boolean => {
+    return offer.title.toLowerCase().includes('all inclusive')
+  }
+
+  // Helper function to calculate nights between dates
+  const calculateNights = (checkIn?: Date, checkOut?: Date): number => {
+    if (!checkIn || !checkOut) return 1
+    const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return Math.max(1, diffDays)
+  }
+
   // Initialize selections with lazy initialization
   const [selections, setSelections] = useState<Record<number, OfferSelection>>(() => {
     const defaultSelections: Record<number, OfferSelection> = {}
     offers.forEach((offer) => {
+      const isAllInclusiveOffer = isAllInclusive(offer)
+      const nights = calculateNights(reservationInfo?.checkInDate, reservationInfo?.checkOutDate)
+      
       defaultSelections[offer.id] = {
-        quantity: 0,
+        quantity: isAllInclusiveOffer ? 1 : 0, // All inclusive starts with quantity 1
         persons: offer.type === 'perPerson' ? reservationInfo?.personCount || 1 : 1,
-        nights: 1,
+        nights: isAllInclusiveOffer ? nights : 1, // All inclusive uses full stay duration
         selectedDate: undefined,
         startDate: undefined,
         endDate: undefined,
@@ -29,10 +45,13 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
   useEffect(() => {
     const defaultSelections: Record<number, OfferSelection> = {}
     offers.forEach((offer) => {
+      const isAllInclusiveOffer = isAllInclusive(offer)
+      const nights = calculateNights(reservationInfo?.checkInDate, reservationInfo?.checkOutDate)
+      
       defaultSelections[offer.id] = {
-        quantity: 0,
+        quantity: isAllInclusiveOffer ? 1 : 0, // All inclusive starts with quantity 1
         persons: offer.type === 'perPerson' ? reservationInfo?.personCount || 1 : 1,
-        nights: 1,
+        nights: isAllInclusiveOffer ? nights : 1, // All inclusive uses full stay duration
         selectedDate: undefined,
         startDate: undefined,
         endDate: undefined,
@@ -78,6 +97,11 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
 
   const updateQuantity = useCallback(
     (id: number, change: number): void => {
+      const offer = offers.find((o) => o.id === id)
+      if (!offer || isAllInclusive(offer)) {
+        return // Don't allow quantity changes for All Inclusive packages
+      }
+      
       setSelections((prev) => {
         const currentSelection = prev[id]
         const newQuantity = Math.max(0, currentSelection.quantity + change)
@@ -92,7 +116,7 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
       })
       clearOfferState(id)
     },
-    [clearOfferState]
+    [offers, clearOfferState]
   )
 
   const updateSelectedDate = useCallback(
@@ -137,23 +161,6 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
     [offers, clearOfferState]
   )
 
-  const updatePersons = useCallback((id: number, persons: number): void => {
-    setSelections((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        persons,
-      },
-    }))
-    setBookedOffers((prevBooked) => {
-      if (prevBooked.has(id)) {
-        const newBooked = new Set(prevBooked)
-        newBooked.delete(id)
-        return newBooked
-      }
-      return prevBooked
-    })
-  }, [])
 
   return {
     selections,
@@ -162,7 +169,6 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
     updateQuantity,
     updateSelectedDate,
     updateSelectedDates,
-    updatePersons,
     setBookedOffers,
     setBookingAttempts,
     setSelections,

@@ -7,7 +7,6 @@ import OfferBookingButton from './OfferBookingButton'
 import OfferImage from './OfferImage'
 import OfferPriceDisplay from './OfferPriceDisplay'
 import OfferTotalDisplay from './OfferTotalDisplay'
-import PersonSelector from './PersonSelector'
 
 interface OfferCardProps {
   offer: OfferType
@@ -15,7 +14,6 @@ interface OfferCardProps {
   onUpdateQuantity: (change: number) => void
   onUpdateSelectedDate: (date: Date | undefined) => void
   onUpdateSelectedDates: (dates: Date[]) => void
-  onUpdatePersons: (persons: number) => void
   onBook: () => void
   formatPrice: (price: number) => string
   calculateTotal: (offer: OfferType, selection: OfferSelection) => number
@@ -32,7 +30,6 @@ const OfferCard: React.FC<OfferCardProps> = ({
   onUpdateQuantity,
   onUpdateSelectedDate,
   onUpdateSelectedDates,
-  onUpdatePersons,
   onBook,
   formatPrice,
   calculateTotal,
@@ -43,6 +40,9 @@ const OfferCard: React.FC<OfferCardProps> = ({
   showValidation = false,
 }) => {
   const total = calculateTotal(offer, selection)
+  
+  // Check if this is an All Inclusive package
+  const isAllInclusive = offer.title.toLowerCase().includes('all inclusive')
 
   // Create appropriate handlers based on offer requirements
   const dateChangeHandler = offer.requiresDateSelection && !offer.allowsMultipleDates ? onUpdateSelectedDate : undefined
@@ -91,7 +91,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
           onDecreaseQuantity={() => onUpdateQuantity(-1)}
           isBooked={isBooked}
           labels={labels}
-          showQuantityControls={!offer.requiresDateSelection && offer.type !== 'perNight'}
+          showQuantityControls={!offer.requiresDateSelection && offer.type !== 'perNight' && !isAllInclusive}
           selectedDate={selection.selectedDate}
           selectedDates={selection.selectedDates}
           onDateChange={dateChangeHandler}
@@ -102,16 +102,6 @@ const OfferCard: React.FC<OfferCardProps> = ({
           offerId={offer.id}
         />
 
-        {/* Person Selector - show for perPerson offers */}
-        {offer.type === 'perPerson' && (
-          <PersonSelector
-            value={selection.persons || 1}
-            onChange={onUpdatePersons}
-            disabled={isBooked}
-            labels={labels}
-            maxPersons={3}
-          />
-        )}
 
         {/* Total Display - show for quantity-based offers, date-based offers with selected date, or perNight offers with date range */}
         {(selection.quantity > 0 ||
@@ -126,8 +116,10 @@ const OfferCard: React.FC<OfferCardProps> = ({
             persons={selection.persons}
             nights={selection.nights}
             offerType={offer.type}
+            offerTitle={offer.title}
             isBooked={isBooked}
             labels={labels}
+            reservationPersonCount={reservationInfo?.personCount}
           />
         )}
       </CardContent>
@@ -155,7 +147,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
               !selection.selectedDate &&
               (!selection.selectedDates || selection.selectedDates.length === 0)) ||
               (offer.type === 'perNight' && (!selection.startDate || !selection.endDate)) ||
-              (!offer.requiresDateSelection && offer.type !== 'perNight' && selection.quantity === 0))
+              (!offer.requiresDateSelection && offer.type !== 'perNight' && !isAllInclusive && selection.quantity === 0))
           }
           isBooked={isBooked}
           bookText={labels.bookNow}

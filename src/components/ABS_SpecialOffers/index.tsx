@@ -68,7 +68,6 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
     updateQuantity,
     updateSelectedDate,
     updateSelectedDates,
-    updatePersons,
     setBookedOffers,
     setBookingAttempts,
     setSelections,
@@ -103,7 +102,6 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
             onUpdateQuantity={(change) => updateQuantity(offer.id, change)}
             onUpdateSelectedDate={(date) => updateSelectedDate(offer.id, date)}
             onUpdateSelectedDates={(dates) => updateSelectedDates(offer.id, dates)}
-            onUpdatePersons={(persons) => updatePersons(offer.id, persons)}
             onBook={() => handleBookOrCancel(offer.id)}
             formatPrice={formatPrice}
             calculateTotal={calculateTotal}

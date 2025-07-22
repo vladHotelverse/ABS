@@ -25,6 +25,18 @@ export const useOfferBooking = ({
   calculateTotal,
   reservationInfo,
 }: UseOfferBookingProps) => {
+  // Helper function to check if offer is All Inclusive
+  const isAllInclusive = (offer: OfferType): boolean => {
+    return offer.title.toLowerCase().includes('all inclusive')
+  }
+
+  // Helper function to calculate nights between dates
+  const calculateNights = (checkIn?: Date, checkOut?: Date): number => {
+    if (!checkIn || !checkOut) return 1
+    const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return Math.max(1, diffDays)
+  }
   const validateBooking = useCallback((offer: OfferType, selection: OfferSelection): string | null => {
     // For non-date-based offers, quantity must be greater than 0
     if (!offer.requiresDateSelection && offer.type !== 'perNight' && selection.quantity === 0) {
@@ -148,12 +160,15 @@ export const useOfferBooking = ({
       })
 
       // Reset selection to default
+      const isAllInclusiveOffer = isAllInclusive(offer)
+      const nights = calculateNights(reservationInfo?.checkInDate, reservationInfo?.checkOutDate)
+      
       setSelections((prev) => ({
         ...prev,
         [id]: {
-          quantity: 0,
+          quantity: isAllInclusiveOffer ? 1 : 0, // All inclusive resets to 1, others to 0
           persons: offer.type === 'perPerson' ? reservationInfo?.personCount || 1 : 1,
-          nights: 1,
+          nights: isAllInclusiveOffer ? nights : 1, // All inclusive uses full stay duration
           selectedDate: undefined,
           selectedDates: [],
           startDate: undefined,

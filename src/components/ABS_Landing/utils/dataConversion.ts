@@ -82,12 +82,43 @@ export const convertCustomizationsToPricingItems = (customizations: Record<strin
 }
 
 /**
+ * Helper function to get the appropriate unit for quantity display in pricing
+ */
+const getQuantityUnit = (quantity: number, offerName: string): string => {
+  if (quantity <= 1) return ''
+  
+  const lowerName = offerName.toLowerCase()
+  
+  // Check if it's a transfer/transport related offer
+  const isTransfer = lowerName.includes('transfer') || 
+                    lowerName.includes('transport') ||
+                    lowerName.includes('pickup') ||
+                    lowerName.includes('shuttle')
+  
+  if (isTransfer) {
+    return quantity === 1 ? 'person' : 'people'
+  }
+  
+  // For spa, activities, access - use days
+  const isDateBased = lowerName.includes('spa') ||
+                     lowerName.includes('access') ||
+                     lowerName.includes('pass')
+  
+  if (isDateBased) {
+    return quantity === 1 ? 'day' : 'days'
+  }
+  
+  // Default fallback
+  return quantity === 1 ? 'time' : 'times'
+}
+
+/**
  * Converts selected offers to PricingItems
  */
 export const convertOffersToPricingItems = (offers: SelectedOffer[]): PricingItem[] => {
   return offers.map((o) => ({
     id: o.id,
-    name: o.quantity && o.quantity > 1 ? `${o.name} (x${o.quantity})` : o.name,
+    name: o.quantity && o.quantity > 1 ? `${o.name} (${o.quantity} ${getQuantityUnit(o.quantity, o.name)})` : o.name,
     price: o.price,
     type: 'offer' as const,
     concept: 'enhance-your-stay',
