@@ -51,22 +51,38 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   const [showAllOptions, setShowAllOptions] = useState(false)
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
   
-  // Filter options based on mode
-  let filteredOptions = options
-  
-  if (mode === 'consultation') {
-    // In consultation mode, only show the selected option
-    const selectedOption = selectedOptions[config.key]
-    filteredOptions = selectedOption 
-      ? options.filter(option => option.id === selectedOption.id)
-      : []
-  } else {
-    // In interactive mode, filter out disabled exact view options - they should be completely removed from the list
-    filteredOptions = isExactViewSection 
-      ? options.filter(option => !disabledOptions[option.id]?.disabled)
-      : options
+  // Filter options based on mode and type
+  const filterOptions = () => {
+    if (isExactViewSection) {
+      const exactViewOptions = options as ExactViewOption[]
+      let filtered = exactViewOptions
+      
+      if (mode === 'consultation') {
+        const selectedOption = selectedOptions[config.key]
+        filtered = selectedOption 
+          ? exactViewOptions.filter(option => option.id === selectedOption.id)
+          : []
+      } else {
+        filtered = exactViewOptions.filter(option => !disabledOptions[option.id]?.disabled)
+      }
+      
+      return filtered
+    } else {
+      const customizationOptions = options as (CustomizationOption | ViewOption)[]
+      let filtered = customizationOptions
+      
+      if (mode === 'consultation') {
+        const selectedOption = selectedOptions[config.key]
+        filtered = selectedOption 
+          ? customizationOptions.filter(option => option.id === selectedOption.id)
+          : []
+      }
+      
+      return filtered
+    }
   }
   
+  const filteredOptions = filterOptions()
   const INITIAL_ITEMS_COUNT = 3
   const shouldShowMoreButton = mode !== 'consultation' && filteredOptions.length > INITIAL_ITEMS_COUNT
   const displayOptions = (mode === 'consultation' || showAllOptions) ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)

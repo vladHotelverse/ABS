@@ -689,6 +689,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                   closeNotificationLabel: 'Close notification',
                   pricingSummaryLabel: 'Pricing summary',
                   processingLabel: 'Processing',
+                  bidForUpgradeLabel: 'Bid for Upgrade',
                 }}
                 currency="EUR"
                 locale={language === 'en' ? 'en-US' : 'es-ES'}
@@ -774,6 +775,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           closeNotificationLabel: 'Close notification',
           pricingSummaryLabel: 'Pricing summary',
           processingLabel: 'Processing',
+          bidForUpgradeLabel: 'Bid for Upgrade',
         }}
         currency="EUR"
         locale={language === 'en' ? 'en-US' : 'es-ES'}

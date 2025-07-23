@@ -95,7 +95,10 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
     
     // Add room
     if (orderData.selections.room) {
-      items.push(convertRoomToPricingItem(orderData.selections.room))
+      const roomItem = convertRoomToPricingItem(orderData.selections.room)
+      if (roomItem) {
+        items.push(roomItem)
+      }
     }
     
     // Add customizations

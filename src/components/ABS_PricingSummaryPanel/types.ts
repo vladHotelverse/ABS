@@ -65,6 +65,7 @@ export interface PricingLabels {
   closeNotificationLabel: string
   pricingSummaryLabel: string
   processingLabel: string
+  bidForUpgradeLabel: string
 }
 
 // Main props interface
