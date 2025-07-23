@@ -20,5 +20,4 @@ export type {
   BookingStateSectionProps,
   BookingState,
   SelectionStateTexts,
-  SelectionSummary,
 } from './BookingStateSection'

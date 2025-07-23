@@ -17,6 +17,8 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
   texts,
   fallbackImageUrl,
   compatibilityRules,
+  mode = 'interactive',
+  readonly = false,
 }) => {
   const { 
     selectedOptions, 
@@ -46,11 +48,16 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
 
   const currentModalSection = sections.find((section) => section.key === modalSection)
 
+  // Filter sections in consultation mode to only show those with selections
+  const sectionsToShow = mode === 'consultation' 
+    ? sections.filter(section => selectedOptions[section.key])
+    : sections
+
   return (
     <>
       <div id={id} data-testid={id} className={clsx('section rounded-lg mt-6', className)}>
         <div className="rounded-lg">
-          {sections.map((section) => {
+          {sectionsToShow.map((section) => {
             const options = sectionOptions[section.key] || []
             return (
               <CustomizationSection
@@ -65,6 +72,8 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
                 onOpenModal={section.hasModal ? () => handleOpenModal(section.key) : undefined}
                 texts={texts}
                 fallbackImageUrl={fallbackImageUrl}
+                mode={mode}
+                readonly={readonly}
               />
             )
           })}

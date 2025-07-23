@@ -390,7 +390,18 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
   // Handlers for booking state transitions
   const handleConfirm = () => {
-    actions.confirmBooking();
+    if (onConfirmBooking) {
+      // Create booking data from current state
+      const bookingData = {
+        selectedRoom: state.selectedRoom,
+        customizations: Object.values(state.customizations).flat(),
+        selectedOffers: state.specialOffers,
+        activeBids: state.activeBid ? [state.activeBid] : [],
+        totalPrice: subtotal,
+        nights
+      };
+      onConfirmBooking(bookingData);
+    }
   };
 
   const handleRetry = () => {
@@ -473,9 +484,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     errorTitle: t.errorTitle,
     errorMessage: t.errorMessage,
     tryAgainLabel: t.tryAgainLabel,
-    selectionConfirmedTitle: t.bookingConfirmedTitle,
-    confirmationMessage: t.confirmationMessage,
-    backToHomeLabel: t.backToHomeLabel,
   }
 
   // Create room tabs data from room bookings
@@ -488,19 +496,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
   // Return early for non-normal states
   if (bookingStatus !== 'normal') {
-    // Prepare selection summary for confirmation state
-    const selectionSummary = bookingStatus === 'confirmation' ? {
-      selectedRoom: state.selectedRoom?.title || state.selectedRoom?.roomType,
-      customizations: Object.values(state.customizations).flat().map(c => c.name),
-      specialOffers: (state.specialOffers as any[])?.map(o => o.title || o.name) || [],
-      totalPrice: `${t.currencySymbol}${subtotal.toFixed(2)}`,
-      nights: nights,
-      activeBid: state.activeBid ? {
-        roomName: state.activeBid.roomName,
-        bidAmount: state.activeBid.bidAmount,
-      } : undefined,
-    } : undefined
-
     return (
       <BookingStateSection
         state={bookingStatus}
@@ -508,7 +503,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         onRetry={handleRetry}
         onBackToNormal={handleBackToNormal}
         className={className}
-        selectionSummary={selectionSummary}
       />
     )
   }

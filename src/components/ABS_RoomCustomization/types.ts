@@ -101,4 +101,6 @@ export interface RoomCustomizationProps {
   texts: RoomCustomizationTexts
   fallbackImageUrl?: string
   compatibilityRules?: CompatibilityRules
+  mode?: 'interactive' | 'consultation'
+  readonly?: boolean
 }

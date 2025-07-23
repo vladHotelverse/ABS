@@ -57,7 +57,7 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
   labels,
 }) => {
   // Initialize hooks
-  const { formatPrice, calculateTotal, getUnitLabel } = useOfferPricing(currencySymbol)
+  const { formatPrice, calculateTotal, getUnitLabel } = useOfferPricing(currencySymbol, reservationInfo)
   const labelTexts = useOfferLabels(labels)
 
   // Use extracted hooks for state management
@@ -93,7 +93,12 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
 
   return (
     <div id={id} className={clsx('transition-all duration-300 ease-in-out', className)}>
-      <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
+      <div className={clsx(
+        'grid gap-6',
+        offers.length === 1 
+          ? 'grid-cols-1 max-w-md' 
+          : 'grid-cols-[repeat(auto-fit,minmax(300px,1fr))] max-w-6xl'
+      )}>
         {offers.map((offer) => (
           <OfferCard
             key={offer.id}

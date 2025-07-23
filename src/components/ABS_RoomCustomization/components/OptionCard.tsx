@@ -15,6 +15,8 @@ interface OptionCardProps {
   fallbackImageUrl?: string
   showFeatures?: boolean
   onShowFeatures?: () => void
+  mode?: 'interactive' | 'consultation'
+  readonly?: boolean
 }
 
 export const OptionCard: React.FC<OptionCardProps> = ({
@@ -27,6 +29,8 @@ export const OptionCard: React.FC<OptionCardProps> = ({
   fallbackImageUrl,
   showFeatures = false,
   onShowFeatures,
+  mode = 'interactive',
+  readonly = false,
 }) => {
   const handleClick = () => {
     if (isDisabled) return
@@ -41,8 +45,8 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         'hover:shadow-md': !isDisabled,
       }
     )}>
-      {/* Selected indicator */}
-      {isSelected && !isDisabled && (
+      {/* Selected indicator - only show in interactive mode */}
+      {isSelected && !isDisabled && mode !== 'consultation' && (
         <div className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
           <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
           Selected
@@ -89,40 +93,49 @@ export const OptionCard: React.FC<OptionCardProps> = ({
           {option.price.toFixed(2)} {texts.pricePerNightText}
         </p>
 
-        <div className="flex flex-col space-y-2 mt-auto">
-          <UiButton 
-            onClick={handleClick} 
-            variant={isSelected ? 'destructive' : 'secondary'} 
-            size="sm" 
-            className={clsx(
-              "w-full transition-all border",
-              {
-                "hover:bg-black hover:text-white": !isSelected,
-              }
-            )}
-            disabled={isDisabled}
-          >
-            {isSelected 
-              ? texts.removeText 
-              : isDisabled 
-                ? texts.optionDisabledText
-                : `${texts.addForPriceText} ${option.price.toFixed(2)} EUR`}
-          </UiButton>
-
-          {showFeatures && onShowFeatures && (
-            <UiButton
-              onClick={(e) => {
-                e.stopPropagation()
-                if (!isDisabled) onShowFeatures()
-              }}
-              variant="link"
-              size="sm"
-              disabled={isDisabled}
+        {mode !== 'consultation' && (
+          <div className="flex flex-col space-y-2 mt-auto">
+            <UiButton 
+              onClick={handleClick} 
+              variant={isSelected ? 'destructive' : 'secondary'} 
+              size="sm" 
+              className={clsx(
+                "w-full transition-all border",
+                {
+                  "hover:bg-black hover:text-white": !isSelected,
+                }
+              )}
+              disabled={isDisabled || readonly}
             >
-              {texts.featuresText}
+              {isSelected 
+                ? texts.removeText 
+                : isDisabled 
+                  ? texts.optionDisabledText
+                  : `${texts.addForPriceText} ${option.price.toFixed(2)} EUR`}
             </UiButton>
-          )}
-        </div>
+
+            {showFeatures && onShowFeatures && !readonly && (
+              <UiButton
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!isDisabled) onShowFeatures()
+                }}
+                variant="link"
+                size="sm"
+                disabled={isDisabled}
+              >
+                {texts.featuresText}
+              </UiButton>
+            )}
+          </div>
+        )}
+        {mode === 'consultation' && isSelected && (
+          <div className="flex items-center justify-center mt-auto">
+            <div className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
+              {texts.selectedText}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

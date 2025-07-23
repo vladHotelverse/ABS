@@ -14,6 +14,8 @@ interface ViewCardProps {
   onSelect: () => void
   texts: RoomCustomizationTexts
   fallbackImageUrl?: string
+  mode?: 'interactive' | 'consultation'
+  readonly?: boolean
 }
 
 export const ViewCard: React.FC<ViewCardProps> = ({
@@ -24,6 +26,8 @@ export const ViewCard: React.FC<ViewCardProps> = ({
   onSelect,
   texts,
   fallbackImageUrl = 'https://picsum.photos/600/400',
+  mode = 'interactive',
+  readonly = false,
 }) => {
   const [isZoomed, setIsZoomed] = useState(false)
 
@@ -86,26 +90,35 @@ export const ViewCard: React.FC<ViewCardProps> = ({
           </div>
         )}
 
-        <div className="absolute bottom-0 left-10 right-10 py-2 text-center">
-          <UiButton
-            onClick={handleClick}
-            disabled={isDisabled}
-            variant={isSelected ? 'destructive' : 'outline'}
-            size="xs"
-            className={clsx('mb-4 p-3 shadow transition-all duration-300', {
-              'hover:translate-y-[-2px] hover:shadow-md': !isSelected && !isDisabled,
-            })}
-          >
-            {isSelected 
-              ? texts.removeText 
-              : isDisabled 
-                ? texts.optionDisabledText
-                : `${texts.addForPriceText} ${view.price.toFixed(2)} EUR`}
-          </UiButton>
-        </div>
+        {mode !== 'consultation' && (
+          <div className="absolute bottom-0 left-10 right-10 py-2 text-center">
+            <UiButton
+              onClick={handleClick}
+              disabled={isDisabled || readonly}
+              variant={isSelected ? 'destructive' : 'outline'}
+              size="xs"
+              className={clsx('mb-4 p-3 shadow transition-all duration-300', {
+                'hover:translate-y-[-2px] hover:shadow-md': !isSelected && !isDisabled,
+              })}
+            >
+              {isSelected 
+                ? texts.removeText 
+                : isDisabled 
+                  ? texts.optionDisabledText
+                  : `${texts.addForPriceText} ${view.price.toFixed(2)} EUR`}
+            </UiButton>
+          </div>
+        )}
+        {mode === 'consultation' && isSelected && (
+          <div className="absolute bottom-4 left-4 right-4 text-center">
+            <div className="text-xs text-green-600 font-medium bg-green-50/90 backdrop-blur px-3 py-1 rounded-full">
+              {texts.selectedText}
+            </div>
+          </div>
+        )}
 
-        {/* Selected indicator */}
-        {isSelected && !isDisabled && (
+        {/* Selected indicator - only show in interactive mode */}
+        {isSelected && !isDisabled && mode !== 'consultation' && (
           <div className="absolute top-2 left-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
             <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
             Selected

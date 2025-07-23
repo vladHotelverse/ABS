@@ -6,7 +6,7 @@ import type { BidItem } from '../../../hooks/useBidUpgrade'
 export const useBookingState = (initialState: BookingState) => {
   const [state, setState] = useState(initialState)
   const [showMobilePricing, setShowMobilePricing] = useState(false)
-  const [bookingStatus, setBookingStatus] = useState<'normal' | 'loading' | 'error' | 'confirmation'>('normal')
+  const [bookingStatus, setBookingStatus] = useState<'normal' | 'loading' | 'error'>('normal')
   
   const bidUpgradeState = useBidUpgrade({
     onBidSubmit: (bid: BidItem) => {
@@ -97,9 +97,6 @@ export const useBookingState = (initialState: BookingState) => {
     console.log(`Toast: [${type}] ${message}`)
   }
 
-  const confirmBooking = () => {
-    setBookingStatus('confirmation')
-  }
 
   const resetState = () => {
     setBookingStatus('normal')
@@ -124,7 +121,6 @@ export const useBookingState = (initialState: BookingState) => {
       cancelBid,
       showToast,
       setShowMobilePricing,
-      confirmBooking,
       resetState,
     },
   }

@@ -1,4 +1,5 @@
 import { Icon } from '@iconify/react'
+import clsx from 'clsx'
 import type React from 'react'
 import { useState } from 'react'
 import type {
@@ -24,6 +25,8 @@ interface CustomizationSectionProps {
   onOpenModal?: () => void
   texts: RoomCustomizationTexts
   fallbackImageUrl?: string
+  mode?: 'interactive' | 'consultation'
+  readonly?: boolean
 }
 
 const isExactViewOption = (option: CustomizationOption | ViewOption | ExactViewOption): option is ExactViewOption => {
@@ -41,19 +44,32 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   onOpenModal,
   texts,
   fallbackImageUrl,
+  mode = 'interactive',
+  readonly = false,
 }) => {
   const [showInfo, setShowInfo] = useState(false)
   const [showAllOptions, setShowAllOptions] = useState(false)
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
   
-  // Filter out disabled exact view options - they should be completely removed from the list
-  const filteredOptions = isExactViewSection 
-    ? options.filter(option => !disabledOptions[option.id]?.disabled)
-    : options
+  // Filter options based on mode
+  let filteredOptions = options
+  
+  if (mode === 'consultation') {
+    // In consultation mode, only show the selected option
+    const selectedOption = selectedOptions[config.key]
+    filteredOptions = selectedOption 
+      ? options.filter(option => option.id === selectedOption.id)
+      : []
+  } else {
+    // In interactive mode, filter out disabled exact view options - they should be completely removed from the list
+    filteredOptions = isExactViewSection 
+      ? options.filter(option => !disabledOptions[option.id]?.disabled)
+      : options
+  }
   
   const INITIAL_ITEMS_COUNT = 3
-  const shouldShowMoreButton = filteredOptions.length > INITIAL_ITEMS_COUNT
-  const displayOptions = showAllOptions ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)
+  const shouldShowMoreButton = mode !== 'consultation' && filteredOptions.length > INITIAL_ITEMS_COUNT
+  const displayOptions = (mode === 'consultation' || showAllOptions) ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)
 
   const handleInfoToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -66,25 +82,30 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
 
   return (
     <div className="mb-6 bg-white rounded overflow-hidden">
-      <div className="flex justify-between items-center py-3 border-b cursor-pointer" onClick={onToggle}>
+      <div className={clsx(
+        "flex justify-between items-center py-3 border-b",
+        mode !== 'consultation' && "cursor-pointer"
+      )} onClick={mode !== 'consultation' ? onToggle : undefined}>
         <div className="flex items-center">
           <h2 className="text-xl font-semibold">{config.title}</h2>
-          {config.infoText && (
+          {config.infoText && mode !== 'consultation' && (
             <button onClick={handleInfoToggle} className="ml-2 text-neutral-500 hover:text-neutral-700">
               <Icon icon="solar:info-circle-bold" className="h-5 w-5" data-testid="info-icon" />
             </button>
           )}
         </div>
-        <button className="text-neutral-400">
-          {isOpen ? (
-            <Icon icon="solar:alt-arrow-up-bold" className="h-6 w-6" data-testid="minus-icon" />
-          ) : (
-            <Icon icon="solar:alt-arrow-down-bold" className="h-6 w-6" data-testid="plus-icon" />
-          )}
-        </button>
+        {mode !== 'consultation' && (
+          <button className="text-neutral-400">
+            {isOpen ? (
+              <Icon icon="solar:alt-arrow-up-bold" className="h-6 w-6" data-testid="minus-icon" />
+            ) : (
+              <Icon icon="solar:alt-arrow-down-bold" className="h-6 w-6" data-testid="plus-icon" />
+            )}
+          </button>
+        )}
       </div>
 
-      {isOpen && (
+      {(isOpen || mode === 'consultation') && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-300 -webkit-overflow-scrolling-touch pt-4">
           {config.infoText && showInfo && (
             <div className="transition-all duration-300 ease-in-out col-span-full pt-4">
@@ -113,9 +134,11 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                   isSelected={isSelected}
                   isDisabled={isDisabled}
                   disabledReason={disabledReason}
-                  onSelect={() => onSelect(option.id)}
+                  onSelect={readonly ? () => {} : () => onSelect(option.id)}
                   texts={texts}
                   fallbackImageUrl={fallbackImageUrl}
+                  mode={mode}
+                  readonly={readonly}
                 />
               )
             }
@@ -127,11 +150,13 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                   isSelected={isSelected}
                   isDisabled={isDisabled}
                   disabledReason={disabledReason}
-                  onSelect={() => onSelect(option.id)}
+                  onSelect={readonly ? () => {} : () => onSelect(option.id)}
                   texts={texts}
                   fallbackImageUrl={fallbackImageUrl}
                   showFeatures={config.hasFeatures}
-                  onShowFeatures={onOpenModal}
+                  onShowFeatures={readonly ? undefined : onOpenModal}
+                  mode={mode}
+                  readonly={readonly}
                 />
               )
             }

@@ -22,6 +22,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   translations,
   currentRoomType = 'DELUXE SILVER',
   currentRoomAmenities,
+  mode = 'selection',
+  readonly = false,
   // Deprecated individual props - keeping for backward compatibility
   learnMoreText,
   nightText,
@@ -110,8 +112,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     onRoomSelected,
   })
 
-  // Determine if slider should be shown
-  const shouldShowSlider = showPriceSlider || variant === 'with-slider'
+  // Determine if slider should be shown (disabled in consultation mode)
+  const shouldShowSlider = (showPriceSlider || variant === 'with-slider') && mode === 'selection' && !readonly
 
   if (roomOptions.length === 0) {
     return (
@@ -134,7 +136,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
           </div>
         )}
 
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full max-w-md">
           <RoomCard
             room={roomOptions[0]}
             discountBadgeText={resolvedTexts.discountBadgeText}
@@ -145,7 +147,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
             removeText={resolvedTexts.removeText}
             selectedRoom={state.selectedRoom}
-            onSelectRoom={actions.selectRoom}
+            onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
             activeImageIndex={state.activeImageIndices[0] || 0}
             onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(0, newImageIndex)}
             currencySymbol={resolvedTexts.currencySymbol}
@@ -200,7 +202,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
                 removeText={resolvedTexts.removeText}
                 selectedRoom={state.selectedRoom}
-                onSelectRoom={actions.selectRoom}
+                onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
                 activeImageIndex={state.activeImageIndices[index] || 0}
                 onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
                 currencySymbol={resolvedTexts.currencySymbol}
@@ -251,7 +253,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
                     removeText={resolvedTexts.removeText}
                     selectedRoom={state.selectedRoom}
-                    onSelectRoom={actions.selectRoom}
+                    onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
                     activeImageIndex={state.activeImageIndices[index] || 0}
                     onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
                     currencySymbol={resolvedTexts.currencySymbol}
@@ -391,7 +393,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
                     removeText={resolvedTexts.removeText}
                     selectedRoom={state.selectedRoom}
-                    onSelectRoom={actions.selectRoom}
+                    onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
                     activeImageIndex={state.activeImageIndices[index] || 0}
                     onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
                     currencySymbol={resolvedTexts.currencySymbol}

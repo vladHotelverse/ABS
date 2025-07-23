@@ -52,7 +52,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       </div>
 
       {/* Payment information */}
-      <div>
+      <div className="payment-info">
         <div className="flex items-center mb-3">
           <CreditCard size={20} strokeWidth={2} className="h-5 w-5 text-neutral-500 mr-2" />
           <span className="text-sm">{labels.payAtHotelLabel}</span>

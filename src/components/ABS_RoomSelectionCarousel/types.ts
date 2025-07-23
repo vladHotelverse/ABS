@@ -69,6 +69,8 @@ export interface RoomSelectionCarouselProps {
   translations?: RoomSelectionCarouselTranslations
   currentRoomType?: string
   currentRoomAmenities?: string[]
+  mode?: 'selection' | 'consultation'
+  readonly?: boolean
 
   // Deprecated individual text props - keeping for backward compatibility but will be removed
   /** @deprecated Use translations.learnMoreText instead */
