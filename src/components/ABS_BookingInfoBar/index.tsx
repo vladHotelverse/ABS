@@ -42,7 +42,7 @@ const BookingInfoBar: React.FC<BookingInfoProps> = ({
   }
 
   return (
-    <div className={clsx('w-full container mx-auto px-4 pt-8', className)}>
+    <div className={clsx('w-full container mx-auto pt-8', className)}>
       {/* Hotel Image Banner */}
       <HotelBanner hotelImage={hotelImage} showBanner={showBanner} />
 

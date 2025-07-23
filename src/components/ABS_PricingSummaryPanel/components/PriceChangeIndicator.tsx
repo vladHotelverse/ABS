@@ -1,4 +1,3 @@
-import { ArrowUpCircle } from 'lucide-react'
 import type React from 'react'
 import { formatPrice, getCurrencyDecimals } from '../../../lib/currency'
 
@@ -31,9 +30,9 @@ const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({ price, euro
   }
 
   return (
-    <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200 ${className}`}>
-      <ArrowUpCircle className="w-3 h-3 mr-1" />+{formatCurrency(price)}
-    </div>
+    <span className={`text-sm font-medium ${className}`}>
+      +{formatCurrency(price)}
+    </span>
   )
 }
 

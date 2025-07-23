@@ -128,7 +128,7 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
 
         {/* Room Section - combining all room-related items */}
         {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (
-          <section aria-labelledby="room-section-title">
+          <section aria-labelledby="room-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
             <div className="flex justify-between items-center mb-2">
               <h3 id="room-section-title" className="text-base font-semibold">
                 {chooseYourSuperiorRoomItems.length > 0 ? 'Superior Room Selection' : 'Room Selection'}
@@ -180,14 +180,10 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </section>
         )}
 
-        {/* Separator after room section if there are customizations or special offers */}
-        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0 || bidForUpgradeItems.length > 0) && (customizeYourRoomItems.length > 0 || enhanceYourStayItems.length > 0) && (
-          <div className="h-px w-full bg-neutral-200" />
-        )}
 
         {/* Customizations Section */}
         {customizeYourRoomItems.length > 0 && (
-          <section aria-labelledby="customizations-section-title">
+          <section aria-labelledby="customizations-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
             <div className="flex justify-between items-center mb-2">
               <h3 id="customizations-section-title" className="text-base font-semibold">
                 Room Customization
@@ -213,14 +209,10 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </section>
         )}
 
-        {/* Separator after room section if there are customizations or special offers */}
-        {(customizeYourRoomItems.length > 0 && enhanceYourStayItems.length > 0) && (
-          <div className="h-px w-full bg-neutral-200" />
-        )}
 
         {/* Special Offers Section */}
         {enhanceYourStayItems.length > 0 && (
-          <section aria-labelledby="offers-section-title">
+          <section aria-labelledby="offers-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
             <div className="flex justify-between items-center mb-2">
               <h3 id="offers-section-title" className="text-base font-semibold">
                 Stay Enhancement

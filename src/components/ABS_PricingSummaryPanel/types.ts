@@ -7,6 +7,8 @@ export interface PricingItem {
   category?: string
   concept?: 'choose-your-superior-room' | 'customize-your-room' | 'enhance-your-stay' | 'choose-your-room' | 'bid-for-upgrade'
   bidStatus?: 'pending' | 'submitted' | 'accepted' | 'rejected' | 'expired'
+  itemStatus?: 'sent_to_hotel' | 'accepted_by_hotel' | 'rejected_by_hotel'
+  statusDescription?: string
 }
 
 // Available section interface

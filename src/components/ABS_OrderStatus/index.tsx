@@ -100,7 +100,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
     
     // Add customizations
     if (orderData.selections.customizations.length > 0) {
-      const customizationItems: PricingItem[] = orderData.selections.customizations.map(c => ({
+      const customizationItems: PricingItem[] = orderData.selections.customizations.map((c, index) => ({
         id: c.id,
         name: c.name,
         price: c.price || 0,
@@ -108,14 +108,19 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
         concept: 'customize-your-room' as const,
         roomId: orderData.selections.room?.id || 'default',
         nightCount: 1,
-        quantity: 1
+        quantity: 1,
+        // Sample status data for demonstration
+        itemStatus: index === 0 ? 'accepted_by_hotel' : 'sent_to_hotel',
+        statusDescription: index === 0 
+          ? 'Your room customization has been confirmed by the hotel. The selected option will be prepared for your arrival.'
+          : 'Your customization request has been sent to the hotel for review and confirmation.'
       }))
       items.push(...customizationItems)
     }
     
     // Add offers
     if (orderData.selections.offers.length > 0) {
-      const offerItems: PricingItem[] = orderData.selections.offers.map(o => ({
+      const offerItems: PricingItem[] = orderData.selections.offers.map((o, index) => ({
         id: o.id.toString(),
         name: o.title,
         price: o.price || 0,
@@ -123,7 +128,12 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
         concept: 'enhance-your-stay' as const,
         nightCount: 1,
         quantity: (o as any).quantity || 1,
-        personCount: o.type === 'perPerson' ? parseInt(orderData.userInfo.occupancy.match(/\d+/)?.[0] || '1', 10) : undefined
+        personCount: o.type === 'perPerson' ? parseInt(orderData.userInfo.occupancy.match(/\d+/)?.[0] || '1', 10) : undefined,
+        // Sample status data for demonstration
+        itemStatus: index === 0 ? 'rejected_by_hotel' : 'accepted_by_hotel',
+        statusDescription: index === 0 
+          ? 'Unfortunately, this service is not available for your selected dates. The hotel has suggested alternative options that will be presented to you.'
+          : 'Your special offer has been confirmed by the hotel. All arrangements will be made for your stay.'
       }))
       items.push(...offerItems)
     }
@@ -263,7 +273,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
     }
     
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div className="rounded-lg mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">
@@ -343,9 +353,9 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
       <div className="container mx-auto px-4 py-8">
         {renderOrderHeader()}
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Main content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="w-full">
             {/* Room Selection (Read-only) */}
             {orderData.selections.room && (
               <div className="bg-white rounded-lg shadow-sm p-6">
