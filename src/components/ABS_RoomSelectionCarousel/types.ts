@@ -67,6 +67,8 @@ export interface RoomSelectionCarouselProps {
   showPriceSlider?: boolean
   variant?: 'basic' | 'with-slider'
   translations?: RoomSelectionCarouselTranslations
+  currentRoomType?: string
+  currentRoomAmenities?: string[]
 
   // Deprecated individual text props - keeping for backward compatibility but will be removed
   /** @deprecated Use translations.learnMoreText instead */

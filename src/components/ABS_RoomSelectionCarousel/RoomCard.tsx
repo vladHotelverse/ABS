@@ -47,6 +47,8 @@ interface RoomCardProps {
   updateBidText?: string
   cancelBidText?: string
   makeOfferText?: string
+  // Dynamic amenities props
+  dynamicAmenities?: string[]
   // priceSliderElement?: React.ReactNode; // This is now handled internally
 }
 
@@ -83,6 +85,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   updateBidText,
   cancelBidText,
   makeOfferText: _makeOfferText,
+  dynamicAmenities,
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
@@ -296,7 +299,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
         {/* Amenities */}
         <div className="flex flex-nowrap gap-2 mb-2 w-full overflow-x-auto no-scrollbar">
-          {room.amenities.map((amenity) => (
+          {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
             <span
               key={`${room.id}-${amenity}`}
               className="text-xs border border-neutral-200 px-3 py-1 rounded-md text-nowrap"

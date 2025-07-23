@@ -1,8 +1,10 @@
 import clsx from 'clsx'
 import type React from 'react'
+import { useMemo } from 'react'
 import { CarouselNavigation, RoomCard } from './components'
 import { useCarouselState } from './hooks/useCarouselState'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
+import { getDynamicAmenitiesForAllRooms, getCurrentRoomAmenities } from './utils/amenitiesSelector'
 
 const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   className,
@@ -18,6 +20,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   showPriceSlider = true,
   variant = 'basic',
   translations,
+  currentRoomType = 'DELUXE SILVER',
+  currentRoomAmenities,
   // Deprecated individual props - keeping for backward compatibility
   learnMoreText,
   nightText,
@@ -93,6 +97,12 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     viewImage: getNavigationLabel('viewImage', undefined, 'View image {index}'),
   }
 
+  // Generate dynamic amenities for all rooms
+  const dynamicAmenitiesMap = useMemo(() => {
+    const userCurrentAmenities = currentRoomAmenities || getCurrentRoomAmenities(currentRoomType, roomOptions)
+    return getDynamicAmenitiesForAllRooms(roomOptions, currentRoomType, userCurrentAmenities)
+  }, [roomOptions, currentRoomType, currentRoomAmenities])
+
   // Use separated carousel state management (without slider logic)
   const { state, actions } = useCarouselState({
     roomOptions,
@@ -157,6 +167,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             offerMadeText={resolvedTexts.offerMadeText}
             updateBidText={resolvedTexts.updateBidText}
             cancelBidText={resolvedTexts.cancelBidText}
+            dynamicAmenities={dynamicAmenitiesMap.get(roomOptions[0].id)}
           />
         </div>
       </div>
@@ -211,6 +222,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 offerMadeText={resolvedTexts.offerMadeText}
                 updateBidText={resolvedTexts.updateBidText}
                 cancelBidText={resolvedTexts.cancelBidText}
+                dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
               />
             </div>
           ))}
@@ -261,6 +273,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     offerMadeText={resolvedTexts.offerMadeText}
                     updateBidText={resolvedTexts.updateBidText}
                     cancelBidText={resolvedTexts.cancelBidText}
+                    dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
                   />
                 </div>
               ))}
@@ -400,6 +413,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     offerMadeText={resolvedTexts.offerMadeText}
                     updateBidText={resolvedTexts.updateBidText}
                     cancelBidText={resolvedTexts.cancelBidText}
+                    dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
                   />
                 </div>
               )
