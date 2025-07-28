@@ -19,7 +19,7 @@ export interface CreateOrderParams {
 /**
  * Create and save a new order
  */
-export function createOrder(params: CreateOrderParams): string | null {
+export async function createOrder(params: CreateOrderParams): Promise<string | null> {
   try {
     const orderId = generateBookingId()
     const now = new Date().toISOString()
@@ -36,10 +36,11 @@ export function createOrder(params: CreateOrderParams): string | null {
       notes: params.notes
     }
     
-    const success = saveOrder(orderData)
+    const success = await saveOrder(orderData)
     
     if (success) {
-      return orderId
+      // Return the actual ID from the database (might be different from generated one)
+      return orderData.id
     } else {
       console.error('Failed to save order')
       return null
@@ -53,7 +54,7 @@ export function createOrder(params: CreateOrderParams): string | null {
 /**
  * Create sample order data for demo purposes
  */
-export function createSampleOrder(): string | null {
+export async function createSampleOrder(): Promise<string | null> {
   const sampleUserInfo: UserInfo = {
     roomType: 'DELUXE SILVER',
     checkIn: '2025-10-10',
@@ -125,7 +126,7 @@ export function createSampleOrder(): string | null {
   const offerPrice = sampleOffers.reduce((sum, o) => sum + o.price, 0) * 2 // 2 persons
   const totalPrice = roomPrice + customizationPrice + offerPrice
   
-  return createOrder({
+  return await createOrder({
     userInfo: sampleUserInfo,
     selections: sampleSelections,
     totalPrice,

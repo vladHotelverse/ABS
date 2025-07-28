@@ -25,7 +25,7 @@ const ProposalWidget: React.FC<ProposalWidgetProps> = ({
     setIsUpdating(true)
     
     try {
-      const success = updateProposalStatus(orderId, proposal.id, status)
+      const success = await updateProposalStatus(orderId, proposal.id, status)
       
       if (success) {
         setCurrentStatus(status)

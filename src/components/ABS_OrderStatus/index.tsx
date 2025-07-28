@@ -1,11 +1,13 @@
 import type React from 'react'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import clsx from 'clsx'
 import { UiButton } from '../ui/button'
 import type { OrderData } from '../../services/orderStorage'
 import { getOrder } from '../../services/orderStorage'
 import { isValidBookingId, formatBookingIdForDisplay } from '../../utils/bookingIdGenerator'
 import ProposalWidget from './components/ProposalWidget'
+import { subscribeToOrderProposals, subscribeToOrderUpdates, unsubscribeAll, showNotification, requestNotificationPermission } from '../../lib/realtime'
+import type { ProposalNotification } from '../../lib/realtime'
 
 // Import components for reuse in consultation mode
 import { ABS_RoomSelectionCarousel } from '../ABS_RoomSelectionCarousel'
@@ -21,8 +23,14 @@ import {
 } from '../ABS_Landing/utils/dataConversion'
 
 // Import types and data for the components
-import { getSectionsConfig, sectionOptions } from '../ABS_Landing/mockData'
 import type { SelectedCustomizations } from '../ABS_RoomCustomization/types'
+import { useSectionConfigs, useCustomizationOptions } from '@/hooks/useSupabaseContent'
+import { 
+  convertSectionConfig, 
+  convertCustomizationOption, 
+  convertViewOption,
+  groupCustomizationOptions 
+} from '@/utils/supabaseDataConverter'
 
 export interface OrderStatusProps {
   orderId?: string
@@ -42,6 +50,46 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
   const [viewState, setViewState] = useState<ViewState>('loading')
   const [orderData, setOrderData] = useState<OrderData | null>(null)
   const [inputOrderId, setInputOrderId] = useState('')
+  const [, setHasNewProposals] = useState(false)
+
+  // Fetch dynamic data from Supabase
+  const { sections, loading: sectionsLoading } = useSectionConfigs('en')
+  const { options: customizationOptions, loading: optionsLoading } = useCustomizationOptions()
+
+  // Handle new proposal notifications
+  const handleProposalNotification = useCallback((notification: ProposalNotification) => {
+    // New proposal received
+    
+    setHasNewProposals(true)
+    
+    // Show notification to user
+    showNotification(
+      'New Hotel Proposal',
+      `${notification.proposal.title} - ${notification.proposal.description}`,
+      'info'
+    )
+    
+    // Reload order data to get the latest proposals
+    if (orderId) {
+      loadOrderData(orderId)
+    }
+  }, [orderId])
+
+  // Handle order updates
+  const handleOrderUpdate = useCallback((updatedOrder: any) => {
+    // Order updated
+    
+    setOrderData(prevData => {
+      if (!prevData) return prevData
+      
+      return {
+        ...prevData,
+        status: updatedOrder.status,
+        totalPrice: updatedOrder.total_price || prevData.totalPrice,
+        updatedAt: updatedOrder.updated_at || prevData.updatedAt
+      }
+    })
+  }, [])
 
   // Load order data when orderId changes
   useEffect(() => {
@@ -51,6 +99,22 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
       setViewState('loaded')
     }
   }, [orderId])
+
+  // Set up real-time subscriptions when order is loaded
+  useEffect(() => {
+    if (orderId && orderData && viewState === 'loaded') {
+      // Request notification permission
+      requestNotificationPermission()
+      
+      // Subscribe to proposals and order updates
+      subscribeToOrderProposals(orderId, handleProposalNotification)
+      subscribeToOrderUpdates(orderId, handleOrderUpdate)
+      
+      return () => {
+        unsubscribeAll()
+      }
+    }
+  }, [orderId, orderData, viewState, handleProposalNotification, handleOrderUpdate])
 
   const loadOrderData = async (id: string) => {
     setViewState('loading')
@@ -65,7 +129,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
     await new Promise(resolve => setTimeout(resolve, 500))
 
     try {
-      const data = getOrder(id)
+      const data = await getOrder(id)
       if (data) {
         setOrderData(data)
         setViewState('loaded')
@@ -74,7 +138,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
         onOrderNotFound?.()
       }
     } catch (error) {
-      console.error('Error loading order:', error)
+      // Error loading order
       setViewState('not_found')
       onOrderNotFound?.()
     }
@@ -155,6 +219,32 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
       total: Number(total.toFixed(2))
     }
   }, [pricingItems])
+
+  // Process Supabase data for room customization display
+  const processedSectionData = useMemo(() => {
+    if (sectionsLoading || optionsLoading || !sections || !customizationOptions) {
+      return null
+    }
+
+    // Convert sections
+    const sectionsData = sections.map(section => convertSectionConfig(section))
+
+    // Group and convert customization options
+    const groupedOptions = groupCustomizationOptions(customizationOptions)
+    const sectionOptions: Record<string, any[]> = {}
+
+    Object.entries(groupedOptions).forEach(([category, options]) => {
+      if (category === 'view' || category === 'exactView') {
+        const convertedOptions = options.map(opt => convertViewOption(opt, 'en'))
+        sectionOptions[category] = convertedOptions
+      } else {
+        const convertedOptions = options.map(opt => convertCustomizationOption(opt, 'en'))
+        sectionOptions[category] = convertedOptions
+      }
+    })
+
+    return { sectionsData, sectionOptions }
+  }, [sections, customizationOptions, sectionsLoading, optionsLoading])
 
   // Render order ID input form
   const renderOrderIdInput = () => (
@@ -412,26 +502,59 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
             )}
             
             {/* Customizations (Read-only) */}
-            {orderData.selections.customizations.length > 0 && (
+            {orderData.selections.customizations.length > 0 && processedSectionData && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Room Customizations</h2>
                 <div className="order-consultation-mode">
                   <ABS_RoomCustomization
                     title="Room Customizations"
                     subtitle="Selected customizations for your room"
-                    sections={getSectionsConfig('en')}
-                    sectionOptions={sectionOptions}
+                    sections={processedSectionData.sectionsData}
+                    sectionOptions={processedSectionData.sectionOptions}
                     initialSelections={(() => {
                       const converted: SelectedCustomizations = {}
+                      // Processing customizations for display
+                      
+                      // Map English categories to Spanish section keys
+                      const categoryMapping: Record<string, string> = {
+                        'beds': 'camas',
+                        'view': 'vista', 
+                        'exactView': 'vistaExacta',
+                        'distribution': 'distribucion',
+                        'features': 'features',
+                        'orientation': 'orientation',
+                        'location': 'ubicacion'
+                      }
+                      
                       orderData.selections.customizations.forEach((customization) => {
-                        if (customization.category) {
-                          converted[customization.category] = {
+                        // Processing customization
+                        let sectionKey = customization.category
+                        
+                        if (customization.category && categoryMapping[customization.category]) {
+                          sectionKey = categoryMapping[customization.category]
+                        } else if (customization.category) {
+                          sectionKey = customization.category
+                        } else {
+                          // Customization missing category
+                          // Try to infer category from the customization name
+                          if (customization.name.toLowerCase().includes('bed')) {
+                            sectionKey = 'camas'
+                          } else if (customization.name.toLowerCase().includes('view')) {
+                            sectionKey = 'vista'
+                          } else {
+                            sectionKey = 'features'
+                          }
+                        }
+                        
+                        if (sectionKey) {
+                          converted[sectionKey] = {
                             id: customization.id,
                             label: customization.name,
                             price: customization.price,
                           }
                         }
                       })
+                      // Converted customizations
                       return converted
                     })()}
                     onCustomizationChange={() => {}} // Disabled in consultation mode
@@ -581,8 +704,8 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
                       key={proposal.id}
                       orderId={orderData.id}
                       proposal={proposal}
-                      onProposalUpdate={(proposalId, status) => {
-                        console.log('Proposal updated:', proposalId, status)
+                      onProposalUpdate={(_proposalId, _status) => {
+                        // Proposal updated
                         // Reload order data to reflect changes
                         loadOrderData(orderData.id)
                       }}

@@ -132,7 +132,7 @@ export function initializeSampleOrders(): void {
   saveOrder(sampleOrder1)
   saveOrder(sampleOrder2)
   
-  console.log('Sample orders created:', [sampleOrder1.id, sampleOrder2.id])
+  // Sample orders created
 }
 
 /**

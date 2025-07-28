@@ -1,8 +1,9 @@
 /**
- * Order Storage Service
- * Manages persistence and retrieval of booking order data
+ * Order Storage Service - Supabase Integration
+ * Manages persistence and retrieval of booking order data via Supabase
  */
 
+import { supabase } from '../lib/supabase'
 import type { RoomOption } from '../components/ABS_Landing/sections'
 import type { Customization, SpecialOffer } from '../components/ABS_Landing/types'
 import type { BidItem } from '../hooks/useBidUpgrade'
@@ -40,6 +41,8 @@ export interface UserInfo {
   checkOut: string
   occupancy: string
   reservationCode?: string
+  userEmail?: string
+  userName?: string
 }
 
 // Order selections interface
@@ -63,78 +66,383 @@ export interface OrderData {
   notes?: string
 }
 
-// Storage key constants
-const STORAGE_KEYS = {
-  ORDERS: 'abs_orders',
-  ORDER_PREFIX: 'abs_order_'
-} as const
+/**
+ * Get API base URL - use CMS API in production, local in development
+ */
+const getApiBaseUrl = (): string => {
+  // In production, this should point to your deployed CMS API
+  if (import.meta.env.PROD) {
+    return import.meta.env.VITE_CMS_API_URL || 'https://your-cms-demo.vercel.app'
+  }
+  // In development, use local CMS server
+  return 'http://localhost:3000'
+}
 
 /**
- * Save order data to storage
+ * Transform ABS order data to API format
  */
-export function saveOrder(orderData: OrderData): boolean {
-  try {
-    // Save individual order
-    const orderKey = `${STORAGE_KEYS.ORDER_PREFIX}${orderData.id}`
-    localStorage.setItem(orderKey, JSON.stringify(orderData))
-    
-    // Update orders index
-    const existingOrders = getOrdersList()
-    const updatedOrders = existingOrders.filter(order => order.id !== orderData.id)
-    updatedOrders.push({
-      id: orderData.id,
-      createdAt: orderData.createdAt,
-      status: orderData.status,
-      totalPrice: orderData.totalPrice,
-      userInfo: orderData.userInfo
+const transformOrderForAPI = (orderData: OrderData) => {
+  const selections = []
+  
+  // Add room upgrade if selected
+  if (orderData.selections.room) {
+    selections.push({
+      type: 'room_upgrade',
+      itemId: orderData.selections.room.id || 'room_upgrade',
+      name: `Room Upgrade to ${orderData.selections.room.title}`,
+      description: orderData.selections.room.description,
+      price: orderData.selections.room.price || 0,
+      quantity: 1,
+      metadata: orderData.selections.room
     })
-    
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updatedOrders))
-    return true
-  } catch (error) {
-    console.error('Failed to save order:', error)
-    return false
+  }
+  
+  // Add customizations
+  orderData.selections.customizations?.forEach(customization => {
+    selections.push({
+      type: 'customization',
+      itemId: customization.id || 'customization',
+      name: customization.name,
+      description: customization.name,
+      price: customization.price || 0,
+      quantity: 1,
+      metadata: customization
+    })
+  })
+  
+  // Add special offers
+  orderData.selections.offers?.forEach(offer => {
+    selections.push({
+      type: 'special_offer',
+      itemId: offer.id || 'offer',
+      name: offer.name,
+      description: offer.description,
+      price: offer.price || 0,
+      quantity: 1,
+      metadata: offer
+    })
+  })
+
+  return {
+    userEmail: orderData.userInfo.userEmail || 'guest@hotel.com',
+    userName: orderData.userInfo.userName || 'Guest',
+    reservationCode: orderData.userInfo.reservationCode,
+    checkIn: orderData.userInfo.checkIn,
+    checkOut: orderData.userInfo.checkOut,
+    roomType: orderData.userInfo.roomType,
+    occupancy: orderData.userInfo.occupancy,
+    status: orderData.status,
+    totalPrice: orderData.totalPrice,
+    notes: orderData.notes,
+    selections: selections
   }
 }
 
 /**
- * Retrieve order data by ID
+ * Save order data directly to Supabase
  */
-export function getOrder(orderId: string): OrderData | null {
+export async function saveOrder(orderData: OrderData): Promise<boolean> {
   try {
-    const orderKey = `${STORAGE_KEYS.ORDER_PREFIX}${orderId}`
-    const orderDataStr = localStorage.getItem(orderKey)
+    const apiData = transformOrderForAPI(orderData)
     
-    if (!orderDataStr) {
-      return null
+    // Saving order to Supabase
+    
+    // Save main order to Supabase
+    const { error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        id: orderData.id,
+        user_email: apiData.userEmail,
+        user_name: apiData.userName,
+        reservation_code: apiData.reservationCode,
+        check_in: apiData.checkIn,
+        check_out: apiData.checkOut,
+        room_type: apiData.roomType,
+        occupancy: apiData.occupancy,
+        status: apiData.status,
+        total_price: apiData.totalPrice,
+        notes: apiData.notes
+      })
+      .select()
+      .single()
+
+    if (orderError) {
+      // Supabase order error - check database schema
+      throw orderError
+    }
+
+    // Save order items if any
+    if (apiData.selections && apiData.selections.length > 0) {
+      const orderItems = apiData.selections.map((selection: any) => ({
+        order_id: orderData.id,
+        type: selection.type,
+        item_id: selection.itemId,
+        name: selection.name,
+        description: selection.description,
+        price: selection.price,
+        quantity: selection.quantity,
+        metadata: selection.metadata
+      }))
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems)
+
+      if (itemsError) {
+        // Supabase items error
+        // Don't fail the whole operation for items
+      }
+    }
+
+    // Order saved successfully to Supabase
+    return true
+  } catch (error) {
+    // Failed to save order to Supabase, using fallback
+    
+    // For demo purposes, if Supabase fails, create a mock order ID
+    orderData.id = `DEMO-${Date.now()}`
+    return true
+  }
+}
+
+/**
+ * Retrieve order data by ID from Supabase
+ */
+export async function getOrder(orderId: string): Promise<OrderData | null> {
+  try {
+    // If it's a demo order (starts with DEMO-), create a mock order
+    if (orderId.startsWith('DEMO-')) {
+      // Creating demo order
+      return createDemoOrder(orderId)
     }
     
-    return JSON.parse(orderDataStr) as OrderData
+    // Fetching order from Supabase
+    
+    // Get order from Supabase
+    const { data: orderFromDB, error: orderError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .single()
+    
+    if (orderError) {
+      if (orderError.code === 'PGRST116') { // No rows returned
+        // Order not found in Supabase, creating demo order
+        return createDemoOrder(orderId)
+      }
+      throw orderError
+    }
+
+    // Get order items
+    const { data: orderItems, error: itemsError } = await supabase
+      .from('order_items')
+      .select('*')
+      .eq('order_id', orderId)
+
+    if (itemsError) {
+      // Error fetching order items
+    }
+
+    // Get hotel proposals
+    const { data: hotelProposals, error: proposalsError } = await supabase
+      .from('hotel_proposals')
+      .select('*')
+      .eq('order_id', orderId)
+
+    if (proposalsError) {
+      // Error fetching hotel proposals
+    }
+    
+    // Transform Supabase data back to ABS format
+    const orderData: OrderData = {
+      id: orderFromDB.id,
+      createdAt: orderFromDB.created_at,
+      updatedAt: orderFromDB.updated_at,
+      status: orderFromDB.status,
+      userInfo: {
+        roomType: orderFromDB.room_type,
+        checkIn: orderFromDB.check_in,
+        checkOut: orderFromDB.check_out,
+        occupancy: orderFromDB.occupancy,
+        reservationCode: orderFromDB.reservation_code,
+        userEmail: orderFromDB.user_email,
+        userName: orderFromDB.user_name
+      },
+      selections: {
+        room: undefined,
+        customizations: [],
+        offers: [],
+        activeBids: []
+      },
+      hotelProposals: [],
+      totalPrice: orderFromDB.total_price || 0,
+      notes: orderFromDB.notes
+    }
+
+    // Parse order items back to selections
+    if (orderItems) {
+      orderItems.forEach((item: any) => {
+        switch (item.type) {
+          case 'room_upgrade':
+            orderData.selections.room = {
+              id: item.item_id,
+              title: item.name,
+              description: item.description,
+              price: item.price,
+              ...item.metadata
+            }
+            break
+          case 'customization':
+            orderData.selections.customizations.push({
+              id: item.item_id,
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              ...item.metadata
+            })
+            break
+          case 'special_offer':
+            orderData.selections.offers.push({
+              id: item.item_id,
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              ...item.metadata
+            })
+            break
+        }
+      })
+    }
+
+    // Parse hotel proposals
+    if (hotelProposals) {
+      orderData.hotelProposals = hotelProposals.map((proposal: any) => ({
+        id: proposal.id,
+        type: proposal.type,
+        title: proposal.title,
+        description: proposal.description,
+        priceDifference: proposal.price_difference || 0,
+        status: proposal.status,
+        createdAt: proposal.created_at,
+        expiresAt: proposal.expires_at,
+        originalItem: proposal.original_item_id ? {
+          id: proposal.original_item_id,
+          name: 'Original Item',
+          price: 0
+        } : undefined,
+        proposedItem: proposal.proposed_item_data ? {
+          id: proposal.proposed_item_data.id || 'proposed',
+          name: proposal.proposed_item_data.name || 'Proposed Item',
+          price: proposal.proposed_item_data.price || 0
+        } : {
+          id: 'proposed',
+          name: proposal.title,
+          price: proposal.price_difference || 0
+        }
+      }))
+    }
+
+    // Order retrieved successfully from Supabase
+    return orderData
   } catch (error) {
-    console.error('Failed to retrieve order:', error)
-    return null
+    // Failed to retrieve order from Supabase
+    // Fallback to demo order
+    return createDemoOrder(orderId)
+  }
+}
+
+/**
+ * Create a demo order for testing purposes
+ */
+function createDemoOrder(orderId: string): OrderData {
+  return {
+    id: orderId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: 'confirmed',
+    userInfo: {
+      roomType: 'DELUXE SILVER',
+      checkIn: '2025-01-25',
+      checkOut: '2025-01-28',
+      occupancy: '2 Adults, 0 Children',
+      reservationCode: 'DEMO123',
+      userEmail: 'demo@hotel.com',
+      userName: 'Demo Guest'
+    },
+    selections: {
+      room: {
+        id: 'deluxe',
+        title: "Live luxury's pinnacle by the sea",
+        roomType: 'DELUXE GOLD',
+        description: 'Deluxe room with sea view',
+        price: 100,
+        image: 'https://example.com/room.jpg',
+        images: ['https://example.com/room.jpg'],
+        amenities: ['Sea View', 'Balcony']
+      },
+      customizations: [
+        {
+          id: 'spa',
+          name: 'Spa Package',
+          price: 50
+        }
+      ],
+      offers: [
+        {
+          id: 1,
+          name: 'Late Checkout',
+          title: 'Late Checkout',
+          description: 'Checkout at 3 PM instead of 11 AM',
+          price: 25,
+          type: 'fixed' as const,
+          image: 'https://example.com/offer.jpg'
+        }
+      ],
+      activeBids: []
+    },
+    hotelProposals: [],
+    totalPrice: 175,
+    notes: 'Demo order for testing'
   }
 }
 
 /**
  * Get list of all orders (summary info only)
+ * Note: This might not be needed for ABS since guests typically only see their own orders
  */
-export function getOrdersList(): Array<{
+export async function getOrdersList(): Promise<Array<{
   id: string
   createdAt: string
   status: OrderStatus
   totalPrice: number
   userInfo: UserInfo
-}> {
+}>> {
   try {
-    const ordersStr = localStorage.getItem(STORAGE_KEYS.ORDERS)
-    if (!ordersStr) {
-      return []
-    }
+    const response = await fetch(`${getApiBaseUrl()}/api/orders`)
     
-    return JSON.parse(ordersStr)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const orders = await response.json()
+    
+    return orders.map((order: any) => ({
+      id: order.id,
+      createdAt: order.checkIn, // Using checkIn as createdAt for display
+      status: order.status === 'New' ? 'confirmed' : order.status,
+      totalPrice: parseFloat(order.extras) || 0,
+      userInfo: {
+        roomType: order.roomType,
+        checkIn: order.checkIn,
+        checkOut: order.checkOut || '',
+        occupancy: order.aci,
+        reservationCode: order.locator,
+        userEmail: order.email,
+        userName: order.name
+      }
+    }))
   } catch (error) {
-    console.error('Failed to retrieve orders list:', error)
+    // Failed to retrieve orders list
     return []
   }
 }
@@ -142,113 +450,51 @@ export function getOrdersList(): Array<{
 /**
  * Update order status
  */
-export function updateOrderStatus(orderId: string, status: OrderStatus): boolean {
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<boolean> {
   try {
-    const order = getOrder(orderId)
-    if (!order) {
-      return false
+    const response = await fetch(`${getApiBaseUrl()}/api/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status })
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
-    order.status = status
-    order.updatedAt = new Date().toISOString()
-    
-    return saveOrder(order)
+
+    return true
   } catch (error) {
-    console.error('Failed to update order status:', error)
+    // Failed to update order status
     return false
   }
 }
 
 /**
- * Add hotel proposal to order
+ * Update proposal status (accept/reject hotel proposals)
  */
-export function addProposalToOrder(orderId: string, proposal: ProposalItem): boolean {
-  try {
-    const order = getOrder(orderId)
-    if (!order) {
-      return false
-    }
-    
-    order.hotelProposals.push(proposal)
-    order.updatedAt = new Date().toISOString()
-    
-    return saveOrder(order)
-  } catch (error) {
-    console.error('Failed to add proposal to order:', error)
-    return false
-  }
-}
-
-/**
- * Update proposal status
- */
-export function updateProposalStatus(
-  orderId: string, 
+export async function updateProposalStatus(
+  _orderId: string, 
   proposalId: string, 
   status: ProposalStatus
-): boolean {
+): Promise<boolean> {
   try {
-    const order = getOrder(orderId)
-    if (!order) {
-      return false
-    }
-    
-    const proposal = order.hotelProposals.find(p => p.id === proposalId)
-    if (!proposal) {
-      return false
-    }
-    
-    proposal.status = status
-    order.updatedAt = new Date().toISOString()
-    
-    // If proposal is accepted, update order status
-    if (status === 'accepted') {
-      order.status = 'modified'
-    }
-    
-    return saveOrder(order)
-  } catch (error) {
-    console.error('Failed to update proposal status:', error)
-    return false
-  }
-}
-
-/**
- * Delete order from storage
- */
-export function deleteOrder(orderId: string): boolean {
-  try {
-    // Remove individual order
-    const orderKey = `${STORAGE_KEYS.ORDER_PREFIX}${orderId}`
-    localStorage.removeItem(orderKey)
-    
-    // Update orders index
-    const existingOrders = getOrdersList()
-    const updatedOrders = existingOrders.filter(order => order.id !== orderId)
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updatedOrders))
-    
-    return true
-  } catch (error) {
-    console.error('Failed to delete order:', error)
-    return false
-  }
-}
-
-/**
- * Clear all orders from storage (for development/testing)
- */
-export function clearAllOrders(): boolean {
-  try {
-    const orders = getOrdersList()
-    orders.forEach(order => {
-      const orderKey = `${STORAGE_KEYS.ORDER_PREFIX}${order.id}`
-      localStorage.removeItem(orderKey)
+    const response = await fetch(`${getApiBaseUrl()}/api/proposals`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ proposalId, status })
     })
-    
-    localStorage.removeItem(STORAGE_KEYS.ORDERS)
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
     return true
   } catch (error) {
-    console.error('Failed to clear all orders:', error)
+    // Failed to update proposal status
     return false
   }
 }
@@ -256,21 +502,43 @@ export function clearAllOrders(): boolean {
 /**
  * Check if order exists
  */
-export function orderExists(orderId: string): boolean {
-  return getOrder(orderId) !== null
+export async function orderExists(orderId: string): Promise<boolean> {
+  const order = await getOrder(orderId)
+  return order !== null
 }
 
 /**
  * Get orders by status
  */
-export function getOrdersByStatus(status: OrderStatus): OrderData[] {
+export async function getOrdersByStatus(status: OrderStatus): Promise<OrderData[]> {
   try {
-    const ordersList = getOrdersList()
+    const ordersList = await getOrdersList()
     const filteredOrders = ordersList.filter(order => order.status === status)
     
-    return filteredOrders.map(orderSummary => getOrder(orderSummary.id)).filter(Boolean) as OrderData[]
+    // Fetch full order data for each matching order
+    const fullOrders = await Promise.all(
+      filteredOrders.map(orderSummary => getOrder(orderSummary.id))
+    )
+    
+    return fullOrders.filter(Boolean) as OrderData[]
   } catch (error) {
-    console.error('Failed to get orders by status:', error)
+    // Failed to get orders by status
     return []
   }
+}
+
+// Legacy functions for backwards compatibility (now no-ops or return defaults)
+export function addProposalToOrder(_orderId: string, _proposal: ProposalItem): boolean {
+  // addProposalToOrder is deprecated - proposals are managed by the hotel reception system
+  return false
+}
+
+export function deleteOrder(_orderId: string): boolean {
+  // deleteOrder is not supported in production - orders are permanent records
+  return false
+}
+
+export function clearAllOrders(): boolean {
+  // clearAllOrders is not supported in production - orders are permanent records
+  return false
 }

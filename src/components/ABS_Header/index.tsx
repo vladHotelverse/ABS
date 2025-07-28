@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({
     const textPaths = fullText.querySelectorAll('.text-path')
 
     // Track timeouts for cleanup
-    const timeouts: number[] = []
+    const timeouts: ReturnType<typeof setTimeout>[] = []
 
     // Set initial state - hide fullText completely (including its H)
     fullText.style.opacity = '0'
