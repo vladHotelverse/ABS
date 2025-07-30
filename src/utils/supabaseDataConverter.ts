@@ -1,8 +1,8 @@
 import type { RoomType, CustomizationOption, SpecialOffer, SectionConfig, CompatibilityRule, TranslationMap } from '@/types/supabase'
 import type { RoomOption, SpecialOffer as ComponentSpecialOffer } from '@/components/ABS_Landing/sections'
-import type { SectionConfig as ComponentSectionConfig, CustomizationOption as ComponentCustomizationOption, ViewOption, ExactViewOption, CompatibilityRules } from '@/components/ABS_RoomCustomization/types'
+import type { SectionConfig as ComponentSectionConfig, CustomizationOption as ComponentCustomizationOption, ViewOption, ExactViewOption, SpecialOfferOption, CompatibilityRules } from '@/components/ABS_RoomCustomization/types'
 import type { Translations } from '@/components/ABS_Landing/ABS_Landing'
-import { Bed, Hotel, Waves, Eye, Compass, Home, ArrowUp } from 'lucide-react'
+import { Bed, Hotel, Waves, Eye, Compass, Home, ArrowUp, Star } from 'lucide-react'
 
 // Convert RoomType to RoomOption
 export function convertRoomType(room: RoomType, language: string = 'en'): RoomOption {
@@ -51,6 +51,46 @@ export function convertViewOption(option: CustomizationOption, language: string 
   return baseOption as ViewOption
 }
 
+// Convert special offer options (for upgrade packages)
+export function convertSpecialOfferOption(option: CustomizationOption, language: string = 'en', currentRoomAmenities: string[] = []): SpecialOfferOption {
+  // Parse additional amenities from description or use a predefined list
+  // In a real implementation, this would come from a separate field in the database
+  const additionalAmenities = getAdditionalAmenitiesForOffer(option.option_code, language)
+  
+  return {
+    id: option.option_code,
+    claim: option.name[language] || option.name.en,
+    price: option.price,
+    additionalAmenities,
+    targetRoomId: `room_${option.option_code}`,
+    currentRoomAmenities,
+  }
+}
+
+// Helper function to get additional amenities for special offers
+function getAdditionalAmenitiesForOffer(offerCode: string, language: string = 'en'): string[] {
+  const amenitiesMap: Record<string, Record<string, string[]>> = {
+    'deluxe_experience': {
+      'es': ['Vista al mar', 'Jacuzzi', 'Desayuno incluido', 'Acceso al spa'],
+      'en': ['Sea View', 'Jacuzzi', 'Breakfast Included', 'Spa Access']
+    },
+    'premium_business': {
+      'es': ['Escritorio de trabajo', 'Cafetera Nespresso', 'Zona de trabajo', 'Servicio de conserjería'],
+      'en': ['Work Desk', 'Nespresso Machine', 'Work Area', 'Concierge Service']
+    },
+    'romantic_getaway': {
+      'es': ['Terraza privada', 'Mini bar', 'Servicio de habitación 24h', 'Amenidades de lujo'],
+      'en': ['Private Terrace', 'Minibar', '24h Room Service', 'Luxury Amenities']
+    },
+    'wellness_spa': {
+      'es': ['Acceso al spa', 'Acceso al gimnasio', 'Piscina privada', 'Servicio de conserjería'],
+      'en': ['Spa Access', 'Gym Access', 'Private Pool', 'Concierge Service']
+    },
+  }
+  
+  return amenitiesMap[offerCode]?.[language] || amenitiesMap[offerCode]?.['en'] || []
+}
+
 // Convert SpecialOffer to component format
 export function convertSpecialOffer(offer: SpecialOffer, language: string = 'en'): ComponentSpecialOffer {
   // Create a simple hash of the offer_code for the numeric ID
@@ -87,6 +127,7 @@ export function convertSectionConfig(section: SectionConfig): ComponentSectionCo
     'Compass': Compass,
     'Home': Home,
     'ArrowUp': ArrowUp,
+    'Star': Star,
   }
 
   return {
@@ -94,6 +135,7 @@ export function convertSectionConfig(section: SectionConfig): ComponentSectionCo
     title: section.title,
     icon: iconMap[section.icon || 'Hotel'] || Hotel,
     infoText: section.info_text,
+    isSpecialOffer: section.section_code === 'specialOffers',
   }
 }
 

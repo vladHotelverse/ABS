@@ -15,12 +15,14 @@ import {
   convertRoomType,
   convertCustomizationOption,
   convertViewOption,
+  convertSpecialOfferOption,
   convertSpecialOffer,
   convertSectionConfig,
   convertCompatibilityRules,
   convertTranslations,
   groupCustomizationOptions,
 } from '@/utils/supabaseDataConverter'
+import { getSectionsConfig, mockSectionOptions, roomOptions as mockRoomOptions, specialOffers as mockSpecialOffers, translations as mockTranslations } from '@/components/ABS_Landing/mockData'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
@@ -64,49 +66,74 @@ function Home() {
 
   // Process the data when it's loaded
   useEffect(() => {
-    if (!loading && !error && translations && roomTypes.length > 0) {
-      // Convert room types
-      const roomOptions = roomTypes.map(room => convertRoomType(room, currentLang))
-
-      // Convert sections
-      const sectionsData = sections.map(section => convertSectionConfig(section))
-
-      // Group and convert customization options
-      const groupedOptions = groupCustomizationOptions(customizationOptions)
-      const sectionOptions: Record<string, any[]> = {}
-
-      // Processing customization options
-
-      Object.entries(groupedOptions).forEach(([category, options]) => {
-        if (category === 'view' || category === 'exactView') {
-          const convertedOptions = options.map(opt => convertViewOption(opt, currentLang))
-          // Converted customization options
-          sectionOptions[category] = convertedOptions
-        } else {
-          const convertedOptions = options.map(opt => convertCustomizationOption(opt, currentLang))
-          // Converted customization options
-          sectionOptions[category] = convertedOptions
+    if (!loading) {
+      // Use mock data if Supabase data is not available or has errors
+      const useMockData = error || !translations || roomTypes.length === 0
+      
+      if (useMockData) {
+        // Use mock data
+        const mockSections = getSectionsConfig(currentLang)
+        const mockTranslationsWithSpecialOffer = {
+          ...mockTranslations[currentLang],
+          specialOfferText: currentLang === 'es' ? 'Oferta especial' : 'Special Offer',
+          additionalBenefitsText: currentLang === 'es' ? 'Beneficios adicionales:' : 'Additional benefits:',
+          upgradeForText: currentLang === 'es' ? 'Mejora por' : 'Upgrade for',
         }
-      })
+        
+        
+        setProcessedData({
+          roomOptions: mockRoomOptions,
+          sections: mockSections,
+          sectionOptions: mockSectionOptions,
+          specialOffers: mockSpecialOffers,
+          translations: mockTranslationsWithSpecialOffer,
+          compatibilityRules: { mutuallyExclusive: [], conflicts: [] },
+        })
+      } else {
+        // Use Supabase data
+        const roomOptions = roomTypes.map(room => convertRoomType(room, currentLang))
+        const sectionsData = sections.map(section => convertSectionConfig(section))
+        
+        // Group and convert customization options
+        const groupedOptions = groupCustomizationOptions(customizationOptions)
+        const sectionOptions: Record<string, any[]> = {}
 
-      // Convert special offers
-      // Processing special offers
-      const offersData = specialOffers.map(offer => convertSpecialOffer(offer, currentLang))
+        Object.entries(groupedOptions).forEach(([category, options]) => {
+          if (category === 'view' || category === 'exactView') {
+            const convertedOptions = options.map(opt => convertViewOption(opt, currentLang))
+            sectionOptions[category] = convertedOptions
+          } else if (category === 'specialOffers') {
+            const convertedOptions = options.map(opt => convertSpecialOfferOption(opt, currentLang))
+            sectionOptions[category] = convertedOptions
+          } else {
+            const convertedOptions = options.map(opt => convertCustomizationOption(opt, currentLang))
+            sectionOptions[category] = convertedOptions
+          }
+        })
 
-      // Convert compatibility rules
-      const rulesData = convertCompatibilityRules(compatibilityRules)
+        // Convert special offers
+        const offersData = specialOffers.map(offer => convertSpecialOffer(offer, currentLang))
 
-      // Convert translations
-      const translationsData = convertTranslations(translations)
+        // Convert compatibility rules
+        const rulesData = convertCompatibilityRules(compatibilityRules)
 
-      setProcessedData({
-        roomOptions,
-        sections: sectionsData,
-        sectionOptions,
-        specialOffers: offersData,
-        translations: translationsData,
-        compatibilityRules: rulesData,
-      })
+        // Convert translations
+        const translationsData = {
+          ...convertTranslations(translations),
+          specialOfferText: currentLang === 'es' ? 'Oferta especial' : 'Special Offer',
+          additionalBenefitsText: currentLang === 'es' ? 'Beneficios adicionales:' : 'Additional benefits:',
+          upgradeForText: currentLang === 'es' ? 'Mejora por' : 'Upgrade for',
+        }
+
+        setProcessedData({
+          roomOptions,
+          sections: sectionsData,
+          sectionOptions,
+          specialOffers: offersData,
+          translations: translationsData,
+          compatibilityRules: rulesData,
+        })
+      }
     }
   }, [loading, error, translations, roomTypes, customizationOptions, specialOffers, sections, compatibilityRules, currentLang])
 

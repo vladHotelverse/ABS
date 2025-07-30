@@ -12,14 +12,13 @@ const AMENITY_PRIORITIES = {
   // Premium Features
   'Hydromassage Bathtub': 9,
   'Living Room': 9,
-  'Coffee Machine': 8,
   'King Size Bed': 8,
   'Sofa Bed - Double': 7,
   
   // Views and Location
   'Pool View': 8,
   'Landmark View': 7,
-  'Morning Sun': 6,
+  'Morning Sun': 9,
   'Afternoon Sun': 5,
   'Piazza View': 5,
   'Lateral Streets View': 4,
@@ -28,7 +27,7 @@ const AMENITY_PRIORITIES = {
   'Shared Pool': 9,
   'Terrace': 8,
   'Balcony': 7,
-  'Close to Pool': 6,
+  'Close to Pool': 9,
   
   // Technology and Comfort
   'Bluetooth sound system': 6,
@@ -36,8 +35,8 @@ const AMENITY_PRIORITIES = {
   'Premium Wi-Fi': 4,
   
   // Service and Convenience
-  '24 Hours Room Service': 7,
-  'Pillow Menu': 5,
+  '24 Hours Room Service': 1,
+  'Pillow Menu': 1,
   'Minibar': 4,
   'Safe': 3,
   

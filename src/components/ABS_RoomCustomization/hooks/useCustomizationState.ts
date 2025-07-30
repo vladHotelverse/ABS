@@ -4,6 +4,7 @@ import type {
   SelectedCustomizations, 
   ViewOption, 
   ExactViewOption,
+  SpecialOfferOption,
   CompatibilityRules,
   ConflictResolution
 } from '../types'
@@ -11,7 +12,7 @@ import { CompatibilityEngine, defaultCompatibilityRules } from '../compatibility
 
 interface UseCustomizationStateProps {
   initialSelections?: SelectedCustomizations
-  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[]>
+  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[] | SpecialOfferOption[]>
   onCustomizationChange?: (category: string, optionId: string, optionLabel: string, optionPrice: number) => void
   compatibilityRules?: CompatibilityRules
 }
@@ -93,7 +94,10 @@ export const useCustomizationState = ({
   )
 
   const selectOption = useCallback((category: string, optionId: string, optionDetails: any) => {
-    const optionLabel = 'label' in optionDetails ? optionDetails.label : optionDetails.name
+    const optionLabel = 'label' in optionDetails ? optionDetails.label : 
+                       'name' in optionDetails ? optionDetails.name : 
+                       'claim' in optionDetails ? optionDetails.claim : 
+                       optionId
     setSelectedOptions((prev) => ({
       ...prev,
       [category]: {

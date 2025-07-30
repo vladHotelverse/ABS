@@ -49,6 +49,8 @@ interface RoomCardProps {
   makeOfferText?: string
   // Dynamic amenities props
   dynamicAmenities?: string[]
+  // Total price text
+  totalPriceText?: string
   // priceSliderElement?: React.ReactNode; // This is now handled internally
 }
 
@@ -86,6 +88,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   cancelBidText,
   makeOfferText: _makeOfferText,
   dynamicAmenities,
+  totalPriceText = 'Total',
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
@@ -166,6 +169,16 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [onSelectRoom, room, selectedRoom]
   )
 
+  // Calculate total price for 5 nights stay
+  const nights = 5
+  const totalPrice = useMemo(() => {
+    return room.price * nights
+  }, [room.price])
+
+  const totalOldPrice = useMemo(() => {
+    return room.oldPrice ? room.oldPrice * nights : undefined
+  }, [room.oldPrice])
+
   return (
     <div
       className={clsx(
@@ -212,6 +225,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
       {/* Room Image Carousel */}
       <div className="relative h-64 bg-neutral-100 group">
         <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full" />
+        
+        {/* Amenities overlay - top left */}
+        <div className="absolute top-3 left-3 z-10 flex flex-nowrap gap-1 max-w-[85%]">
+          {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
+            <span
+              key={`${room.id}-${amenity}`}
+              className="text-xs bg-white/90 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-md text-gray-800 shadow-sm"
+            >
+              {amenity}
+            </span>
+          ))}
+        </div>
 
         {/* Image Navigation Arrows - only show if multiple images */}
         {room.images.length > 1 && (
@@ -297,39 +322,41 @@ const RoomCard: React.FC<RoomCardProps> = ({
           </TooltipProvider>
         </div>
 
-        {/* Amenities */}
-        <div className="flex flex-nowrap gap-2 mb-2 w-full overflow-x-auto no-scrollbar">
-          {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
-            <span
-              key={`${room.id}-${amenity}`}
-              className="text-xs border border-neutral-200 px-3 py-1 rounded-md text-nowrap"
-            >
-              {amenity}
-            </span>
-          ))}
-        </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-4 mt-2">
+        <div className="flex items-start justify-between gap-4 mt-2">
           <div className='flex flex-col'>
             {/* Price Display */}
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold">{`${currencySymbol}${room.price}`}</span>
-          {room.oldPrice && (
-            <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${room.oldPrice}`}</span>
-          )}
-          <span className="text-sm text-neutral-500">{nightText}</span>
-        </div>
-        <span className="text-sm font-bold mt-1">{instantConfirmationText}</span>
-
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-bold">{`${currencySymbol}${room.price}`}</span>
+              {room.oldPrice && (
+                <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${room.oldPrice}`}</span>
+              )}
+              <span className="text-base text-neutral-500">{nightText}</span>
+            </div>
+            
+            {/* Total Price Display */}
+            {nights > 1 && (
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-base font-semibold text-neutral-700">{`${currencySymbol}${totalPrice}`}</span>
+                {totalOldPrice && (
+                  <span className="text-neutral-400 line-through text-sm">{`${currencySymbol}${totalOldPrice}`}</span>
+                )}
+                <span className="text-sm text-neutral-500">{totalPriceText}</span>
+              </div>
+            )}
           </div>
-          <UiButton
-            variant={selectedRoom?.id === room.id ? 'destructive' : 'black'}
-            className="w-fit uppercase tracking-wide"
-            onClick={handleSelectRoom}
-          >
-            <span>{selectedRoom?.id === room.id ? removeText : selectText}</span>
-          </UiButton>
+          <div className="flex flex-col items-end">
+            <UiButton
+              variant={selectedRoom?.id === room.id ? 'destructive' : 'black'}
+              className="w-fit uppercase tracking-wide"
+              onClick={handleSelectRoom}
+            >
+              <span>{selectedRoom?.id === room.id ? removeText : selectText}</span>
+            </UiButton>
+            {/* Instant Confirmation - positioned below the button */}
+            <span className="text-xs text-green-600 font-medium mt-2">{instantConfirmationText}</span>
+          </div>
         </div>
 
         {/* Additional Info */}
@@ -345,7 +372,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         )}
       >
         <div className={clsx(
-          "border-t border-gray-200 p-4 bg-gray-50 raunded-b-lg",
+          "border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg",
           sliderVisible ? 'opacity-100' : 'opacity-0'
         )}>
           <PriceSlider

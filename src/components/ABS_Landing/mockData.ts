@@ -1,4 +1,4 @@
-import { Bed, Hotel, Waves, Package, Users, Compass, Eye } from 'lucide-react'
+import { Bed, Hotel, Waves, Package, Users, Compass, Eye, Star } from 'lucide-react'
 
 // Mock data for ABS_Landing stories
 export const roomOptions = [
@@ -776,6 +776,17 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       hasFeatures: false,
       infoText: texts.orientationInfoText,
     },
+    {
+      key: 'specialOffers',
+      title: lang === 'es' ? 'Ofertas Especiales' : 'Special Offers',
+      icon: Star,
+      hasModal: false,
+      hasFeatures: false,
+      infoText: lang === 'es' ? 
+        'Transforma tu estancia con nuestros paquetes de upgrade exclusivos. Cada oferta incluye servicios premium y beneficios especiales.' :
+        'Transform your stay with our exclusive upgrade packages. Each offer includes premium amenities and special benefits.',
+      isSpecialOffer: true,
+    },
     // {
     //   key: 'bestChoice',
     //   title: texts.bestChoiceTitle || 'Best Choice for',
@@ -888,7 +899,119 @@ export const mockAvailableOffers = [
 ]
 
 // Section options for RoomCustomization
-// sectionOptions removed - now using dynamic Supabase data
+export const mockSectionOptions = {
+  camas: [
+    {
+      id: 'twin',
+      label: '2 x Twin Beds',
+      description: 'Two separate single beds',
+      price: 0,
+      icon: 'bed-twin',
+    },
+    {
+      id: 'king',
+      label: 'King Size Bed',
+      description: 'One extra-large king-sized bed',
+      price: 5,
+      icon: 'bed-king',
+    },
+  ],
+  distribucion: [
+    {
+      id: 'standard',
+      label: 'Standard Layout',
+      description: 'Regular room layout',
+      price: 0,
+      icon: 'home',
+    },
+    {
+      id: 'duplex',
+      label: 'Duplex Suite',
+      description: 'Two-level suite with separate living area',
+      price: 30,
+      icon: 'stairs',
+    },
+  ],
+  features: [
+    {
+      id: 'adapted-room',
+      label: 'Adapted Room',
+      description: 'Accessible room designed for guests with disabilities',
+      price: 0,
+      icon: 'accessibility',
+    },
+  ],
+  orientation: [
+    {
+      id: 'afternoon-sun',
+      label: 'Afternoon Sun',
+      description: 'West-facing room with warm afternoon sunlight',
+      price: 2,
+      icon: 'sun',
+    },
+    {
+      id: 'all-day-sun',
+      label: 'All-day Sun',
+      description: 'South-facing room with sunlight throughout the day',
+      price: 6,
+      icon: 'sun',
+    },
+  ],
+  specialOffers: [
+    {
+      id: 'deluxe_experience',
+      claim: 'Paquete Experiencia Deluxe',
+      price: 45.00,
+      additionalAmenities: [
+        'Vista al mar',
+        'Jacuzzi',
+        'Desayuno incluido',
+        'Acceso al spa'
+      ],
+      targetRoomId: 'room_deluxe',
+      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+    },
+    {
+      id: 'premium_business',
+      claim: 'Paquete Premium Business',
+      price: 55.00,
+      additionalAmenities: [
+        'Escritorio de trabajo',
+        'Cafetera Nespresso',
+        'Zona de trabajo',
+        'Servicio de conserjería'
+      ],
+      targetRoomId: 'room_business',
+      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+    },
+    {
+      id: 'romantic_getaway',
+      claim: 'Paquete Escapada Romántica',
+      price: 75.00,
+      additionalAmenities: [
+        'Terraza privada',
+        'Mini bar',
+        'Servicio de habitación 24h',
+        'Amenidades de lujo'
+      ],
+      targetRoomId: 'room_romantic',
+      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+    },
+    {
+      id: 'wellness_spa',
+      claim: 'Paquete Wellness & Spa',
+      price: 65.00,
+      additionalAmenities: [
+        'Acceso al spa',
+        'Acceso al gimnasio',
+        'Piscina privada',
+        'Servicio de conserjería'
+      ],
+      targetRoomId: 'room_wellness',
+      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+    }
+  ]
+}
 
 // Export compatibility rules for easy import
 export { defaultCompatibilityRules } from '../ABS_RoomCustomization/compatibilityRules'

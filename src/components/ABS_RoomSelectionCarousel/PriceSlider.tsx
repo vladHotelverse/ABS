@@ -18,6 +18,7 @@ export interface PriceSliderProps {
   updateBidText?: string
   cancelBidText?: string
   roomName?: string
+  nights?: number
   onPriceChange: (price: number) => void
   onMakeOffer: () => void
   onCancelBid?: () => void
@@ -39,6 +40,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   updateBidText = 'Update bid',
   cancelBidText = 'Cancel',
   roomName,
+  nights: _nights = 1,
   onPriceChange,
   onMakeOffer,
   onCancelBid,
@@ -54,11 +56,12 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
         // Submitted bid view
         <div className="space-y-3">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-start justify-between mb-2">
               <span className="text-sm font-medium text-blue-800">{bidSubmittedText}</span>
-              <span className="text-lg font-bold text-blue-900">
-                {`${submittedPrice} ${currencyText}/${nightText}`}
-              </span>
+              <div className="text-right">
+                <div className="text-xl font-bold text-blue-900">{`${submittedPrice} ${currencyText} ${nightText}`}</div>
+                <div className="text-xs text-blue-600 mt-1">Total: {(submittedPrice || 0) * 5} {currencyText}</div>
+              </div>
             </div>
             <p className="text-xs text-blue-600">{availabilityText}</p>
           </div>
@@ -86,9 +89,12 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
       ) : (
         // Normal slider view
         <>
-          <div className="text-sm font-medium mb-2 flex justify-between items-center">
+          <div className="text-sm font-medium mb-2 flex justify-between items-start">
             <span>{dynamicProposeText}</span>
-            <span className="text-black font-bold">{`${proposedPrice} ${currencyText}/${nightText}`}</span>
+            <div className="text-right">
+              <div className="text-xl font-bold text-black">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
+              <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div>
+            </div>
           </div>
           <div className="relative w-full py-2">
             <Slider

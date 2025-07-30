@@ -6,6 +6,15 @@ export interface CustomizationOption {
   price: number
 }
 
+export interface SpecialOfferOption {
+  id: string
+  claim: string
+  price: number
+  additionalAmenities: string[]
+  targetRoomId: string
+  currentRoomAmenities?: string[]
+}
+
 export interface ViewOption {
   id: string
   label: string
@@ -66,6 +75,7 @@ export interface SectionConfig {
   infoText?: string
   hasModal?: boolean
   hasFeatures?: boolean
+  isSpecialOffer?: boolean
 }
 
 export interface RoomCustomizationTexts {
@@ -87,6 +97,10 @@ export interface RoomCustomizationTexts {
   switchToNewText: string
   conflictDialogTitle: string
   conflictDialogDescription: string
+  // Special offer texts
+  specialOfferText?: string
+  additionalBenefitsText?: string
+  upgradeForText?: string
 }
 
 export interface RoomCustomizationProps {
@@ -95,7 +109,7 @@ export interface RoomCustomizationProps {
   title: string
   subtitle: string
   sections: SectionConfig[]
-  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[]>
+  sectionOptions: Record<string, CustomizationOption[] | ViewOption[] | ExactViewOption[] | SpecialOfferOption[]>
   initialSelections?: SelectedCustomizations
   onCustomizationChange?: (category: string, optionId: string, optionLabel: string, optionPrice: number) => void
   texts: RoomCustomizationTexts

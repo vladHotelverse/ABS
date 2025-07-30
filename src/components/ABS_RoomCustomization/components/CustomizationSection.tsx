@@ -10,13 +10,15 @@ import type {
   ViewOption,
   ExactViewOption,
   DisabledOptions,
+  SpecialOfferOption,
 } from '../types'
 import { OptionCard } from './OptionCard'
 import { ViewCard } from './ViewCard'
+import { SpecialOfferCard } from './SpecialOfferCard'
 
 interface CustomizationSectionProps {
   config: SectionConfig
-  options: CustomizationOption[] | ViewOption[] | ExactViewOption[]
+  options: CustomizationOption[] | ViewOption[] | ExactViewOption[] | SpecialOfferOption[]
   selectedOptions: SelectedCustomizations
   disabledOptions: DisabledOptions
   isOpen: boolean
@@ -29,8 +31,12 @@ interface CustomizationSectionProps {
   readonly?: boolean
 }
 
-const isExactViewOption = (option: CustomizationOption | ViewOption | ExactViewOption): option is ExactViewOption => {
-  return 'imageUrl' in option && typeof option.imageUrl === 'string'
+const isExactViewOption = (option: CustomizationOption | ViewOption | ExactViewOption | SpecialOfferOption): option is ExactViewOption => {
+  return 'imageUrl' in option && typeof option.imageUrl === 'string' && 'name' in option
+}
+
+const isSpecialOfferOption = (option: CustomizationOption | ViewOption | ExactViewOption | SpecialOfferOption): option is SpecialOfferOption => {
+  return 'claim' in option && 'additionalAmenities' in option
 }
 
 export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
@@ -50,10 +56,25 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   const [showInfo, setShowInfo] = useState(false)
   const [showAllOptions, setShowAllOptions] = useState(false)
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
+  const isSpecialOfferSection = options.length > 0 && isSpecialOfferOption(options[0])
   
   // Filter options based on mode and type
   const filterOptions = () => {
-    if (isExactViewSection) {
+    if (isSpecialOfferSection) {
+      const specialOfferOptions = options as SpecialOfferOption[]
+      let filtered = specialOfferOptions
+      
+      if (mode === 'consultation') {
+        const selectedOption = selectedOptions[config.key]
+        filtered = selectedOption 
+          ? specialOfferOptions.filter(option => option.id === selectedOption.id)
+          : []
+      } else {
+        filtered = specialOfferOptions.filter(option => !disabledOptions[option.id]?.disabled)
+      }
+      
+      return filtered
+    } else if (isExactViewSection) {
       const exactViewOptions = options as ExactViewOption[]
       let filtered = exactViewOptions
       
@@ -142,6 +163,21 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
             const isDisabled = disabledOptions[option.id]?.disabled || false
             const disabledReason = disabledOptions[option.id]?.reason
 
+            if (isSpecialOfferSection && isSpecialOfferOption(option)) {
+              return (
+                <SpecialOfferCard
+                  key={option.id}
+                  offer={option}
+                  isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  disabledReason={disabledReason}
+                  onSelect={readonly ? () => {} : () => onSelect(option.id)}
+                  texts={texts}
+                  mode={mode}
+                  readonly={readonly}
+                />
+              )
+            }
             if (isExactViewSection && isExactViewOption(option)) {
               return (
                 <ViewCard
@@ -158,7 +194,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                 />
               )
             }
-            if (!isExactViewSection) {
+            if (!isExactViewSection && !isSpecialOfferSection) {
               return (
                 <OptionCard
                   key={option.id}
