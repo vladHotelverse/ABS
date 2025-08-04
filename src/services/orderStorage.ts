@@ -112,10 +112,13 @@ const transformOrderForAPI = (orderData: OrderData) => {
   
   // Add special offers
   orderData.selections.offers?.forEach(offer => {
+    // Use room title if available (for special offers from room customization)
+    const displayName = (offer as any).roomTitle || offer.name
+    
     selections.push({
       type: 'special_offer',
       itemId: offer.id || 'offer',
-      name: offer.name,
+      name: displayName,
       description: offer.description,
       price: offer.price || 0,
       quantity: 1,

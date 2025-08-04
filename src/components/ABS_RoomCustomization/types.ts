@@ -13,6 +13,11 @@ export interface SpecialOfferOption {
   additionalAmenities: string[]
   targetRoomId: string
   currentRoomAmenities?: string[]
+  // New properties to reference room data from carousel
+  roomTitle?: string
+  roomType?: string
+  roomAmenities?: string[]
+  roomPrice?: number
 }
 
 export interface ViewOption {

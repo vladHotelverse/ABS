@@ -227,7 +227,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full" />
         
         {/* Amenities overlay - top left */}
-        <div className="absolute top-3 left-3 z-10 flex flex-nowrap gap-1 max-w-[85%]">
+        <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1 max-w-[85%]">
           {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
             <span
               key={`${room.id}-${amenity}`}
@@ -336,7 +336,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             </div>
             
             {/* Total Price Display */}
-            {nights > 1 && (
+            {/* {nights > 1 && (
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-base font-semibold text-neutral-700">{`${currencySymbol}${totalPrice}`}</span>
                 {totalOldPrice && (
@@ -344,7 +344,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 )}
                 <span className="text-sm text-neutral-500">{totalPriceText}</span>
               </div>
-            )}
+            )} */}
           </div>
           <div className="flex flex-col items-end">
             <UiButton

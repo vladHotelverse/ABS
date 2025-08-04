@@ -60,7 +60,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               <span className="text-sm font-medium text-blue-800">{bidSubmittedText}</span>
               <div className="text-right">
                 <div className="text-xl font-bold text-blue-900">{`${submittedPrice} ${currencyText} ${nightText}`}</div>
-                <div className="text-xs text-blue-600 mt-1">Total: {(submittedPrice || 0) * 5} {currencyText}</div>
+                {/* <div className="text-xs text-blue-600 mt-1">Total: {(submittedPrice || 0) * 5} {currencyText}</div> */}
               </div>
             </div>
             <p className="text-xs text-blue-600">{availabilityText}</p>
@@ -93,7 +93,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             <span>{dynamicProposeText}</span>
             <div className="text-right">
               <div className="text-xl font-bold text-black">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
-              <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div>
+              {/* <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div> */}
             </div>
           </div>
           <div className="relative w-full py-2">

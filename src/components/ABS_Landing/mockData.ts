@@ -959,56 +959,80 @@ export const mockSectionOptions = {
   ],
   specialOffers: [
     {
-      id: 'deluxe_experience',
-      claim: 'Paquete Experiencia Deluxe',
-      price: 45.00,
-      additionalAmenities: [
-        'Vista al mar',
-        'Jacuzzi',
-        'Desayuno incluido',
-        'Acceso al spa'
+      id: 'deluxe_gold_offer',
+      claim: 'Deluxe Gold Experience',
+      price: 22.00,
+      additionalAmenities: ['Vista al mar', 'Jacuzzi', 'Desayuno incluido', 'Acceso al spa'],
+      targetRoomId: 'deluxe',
+      // Reference room data from carousel
+      roomTitle: "Live luxury's pinnacle by the sea",
+      roomType: 'DELUXE GOLD',
+      roomAmenities: [
+        '24 Hours Room Service',
+        '30 to 35 m2 / 325 to 375 sqft',
+        'AC',
+        'Balcony',
+        'Bathrobe and slippers',
+        'Bluetooth sound system'
       ],
-      targetRoomId: 'room_deluxe',
-      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+      roomPrice: 22
     },
     {
-      id: 'premium_business',
-      claim: 'Paquete Premium Business',
-      price: 55.00,
-      additionalAmenities: [
-        'Escritorio de trabajo',
-        'Cafetera Nespresso',
-        'Zona de trabajo',
-        'Servicio de conserjería'
+      id: 'swim_up_offer',
+      claim: 'Swim-Up Paradise',
+      price: 31.00,
+      additionalAmenities: ['Acceso directo a piscina', 'Terraza privada', 'Zona de descanso exclusiva'],
+      targetRoomId: 'deluxe-swim-up',
+      // Reference room data from carousel
+      roomTitle: "Dive in from your private terrace",
+      roomType: 'DELUXE SWIM-UP',
+      roomAmenities: [
+        '24 Hours Room Service',
+        '30 to 35 m2 / 325 to 375 sqft',
+        'AC',
+        'Afternoon Sun',
+        'Bathrobe and slippers',
+        'Bluetooth sound system'
       ],
-      targetRoomId: 'room_business',
-      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+      roomPrice: 31
     },
     {
-      id: 'romantic_getaway',
-      claim: 'Paquete Escapada Romántica',
-      price: 75.00,
-      additionalAmenities: [
-        'Terraza privada',
-        'Mini bar',
-        'Servicio de habitación 24h',
-        'Amenidades de lujo'
+      id: 'rock_suite_offer',
+      claim: 'Rock Suite Premium',
+      price: 89.00,
+      additionalAmenities: ['Espacio de 60-70m2', 'Sala de estar', 'Bañera hidromasaje', 'Vista premium'],
+      targetRoomId: 'rocksuite',
+      // Reference room data from carousel
+      roomTitle: "Supreme luxury with divine views",
+      roomType: 'ROCK SUITE',
+      roomAmenities: [
+        '60 to 70 m2 / 645 to 755 sqft',
+        'AC',
+        'Balcony',
+        'Bluetooth sound system',
+        'Coffee Machine',
+        'Hydromassage Bathtub'
       ],
-      targetRoomId: 'room_romantic',
-      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+      roomPrice: 89
     },
     {
-      id: 'wellness_spa',
-      claim: 'Paquete Wellness & Spa',
-      price: 65.00,
-      additionalAmenities: [
-        'Acceso al spa',
-        'Acceso al gimnasio',
-        'Piscina privada',
-        'Servicio de conserjería'
+      id: 'eighties_suite_offer',
+      claim: '80s Nostalgia Experience',
+      price: 120.00,
+      additionalAmenities: ['Decoración años 80', 'Kit de bienvenida', 'Música vintage', 'Experiencia única'],
+      targetRoomId: '80s-suite',
+      // Reference room data from carousel
+      roomTitle: "80s nostalgia unleashed",
+      roomType: '80S SUITE',
+      roomAmenities: [
+        '60 to 70 m2 / 645 to 755 sqft',
+        'AC',
+        'Balcony',
+        'Coffee Machine',
+        'Hydromassage Bathtub',
+        'King Size Bed'
       ],
-      targetRoomId: 'room_wellness',
-      currentRoomAmenities: ['WiFi de alta velocidad', 'Aire acondicionado', 'TV inteligente']
+      roomPrice: 120
     }
   ]
 }

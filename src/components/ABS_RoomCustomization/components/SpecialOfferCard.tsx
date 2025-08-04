@@ -1,8 +1,10 @@
 import { Icon } from '@iconify/react'
 import clsx from 'clsx'
 import type React from 'react'
+import { useMemo } from 'react'
 import type { SpecialOfferOption, RoomCustomizationTexts } from '../types'
 import { AmenityIcon } from '../utils/amenityIcons'
+import { selectBestAmenities, getCurrentRoomAmenities } from '../../ABS_RoomSelectionCarousel/utils/amenitiesSelector'
 
 interface SpecialOfferCardProps {
   offer: SpecialOfferOption
@@ -25,6 +27,34 @@ export const SpecialOfferCard: React.FC<SpecialOfferCardProps> = ({
   mode = 'interactive',
   readonly = false,
 }) => {
+  // Calculate the best 3 amenities using the same logic as room carousel
+  const dynamicAmenities = useMemo(() => {
+    if (!offer.roomAmenities || !offer.roomType) {
+      return (offer.roomAmenities || offer.additionalAmenities).slice(0, 3)
+    }
+
+    // Create a room-like object for the amenity selector
+    const roomForSelection = {
+      id: offer.targetRoomId || offer.id,
+      roomType: offer.roomType,
+      amenities: offer.roomAmenities,
+      title: offer.roomTitle,
+      price: offer.roomPrice || offer.price,
+      description: '',
+      images: []
+    }
+
+    // Get current room amenities (assuming DELUXE SILVER as base)
+    const currentRoomAmenities = getCurrentRoomAmenities('DELUXE SILVER', [roomForSelection])
+    
+    // Select the best 3 amenities using the same logic as room carousel
+    return selectBestAmenities(
+      roomForSelection,
+      'DELUXE SILVER',
+      currentRoomAmenities
+    )
+  }, [offer])
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -56,16 +86,20 @@ export const SpecialOfferCard: React.FC<SpecialOfferCardProps> = ({
       </div>
 
       <div className="p-4 pt-6">
-        {/* Package Name */}
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">{offer.claim}</h3>
+        {/* Room Title Only */}
+        <div className="mb-3">
+          {offer.roomTitle && (
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{offer.roomTitle}</h3>
+          )}
+        </div>
 
-        {/* Additional Benefits */}
+        {/* Room Amenities - Top 3 Most Relevant */}
         <div className="space-y-2 mb-4">
           <p className="text-sm text-gray-600 font-medium">
-            {texts.additionalBenefitsText || 'Beneficios adicionales:'}
+            {texts.additionalBenefitsText || 'Amenidades incluidas:'}
           </p>
           <div className="grid grid-cols-1 gap-2">
-            {offer.additionalAmenities.map((amenity, index) => (
+            {dynamicAmenities.map((amenity, index) => (
               <div key={`${offer.id}-amenity-${index}`} className="flex items-center gap-2">
                 <AmenityIcon amenity={amenity} className="w-5 h-5 text-gray-700 flex-shrink-0" />
                 <span className="text-sm text-gray-700">{amenity}</span>
@@ -79,7 +113,7 @@ export const SpecialOfferCard: React.FC<SpecialOfferCardProps> = ({
           <div>
             <p className="text-xs text-gray-500">{texts.upgradeForText || 'Mejora por'}</p>
             <p className="text-lg font-bold text-gray-900">
-              +{offer.price.toFixed(2)}€ <span className="text-sm font-normal text-gray-600">{texts.pricePerNightText}</span>
+              +{(offer.roomPrice || offer.price).toFixed(2)}€ <span className="text-sm font-normal text-gray-600">{texts.pricePerNightText}</span>
             </p>
           </div>
 

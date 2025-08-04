@@ -12,10 +12,11 @@ import type { ProposalNotification } from '../../lib/realtime'
 // Import components for reuse in consultation mode
 import { ABS_RoomSelectionCarousel } from '../ABS_RoomSelectionCarousel'
 import BookingInfoBar from '../ABS_BookingInfoBar'
-import { ABS_SpecialOffers } from '../ABS_SpecialOffers'
 import { ABS_RoomCustomization } from '../ABS_RoomCustomization'
 import PricingSummaryPanel from '../ABS_PricingSummaryPanel'
 import type { PricingItem } from '../ABS_PricingSummaryPanel'
+import { Icon } from '@iconify/react'
+import { AmenityIcon } from '../ABS_RoomCustomization/utils/amenityIcons'
 
 // Import data conversion utilities
 import {
@@ -588,105 +589,85 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
             {orderData.selections.offers.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Special Offers</h2>
-                <div className="order-consultation-mode [&_button]:hidden [&_.booking-button]:hidden [&_[data-testid*=book]]:hidden [&_[data-testid*=quantity]]:hidden [&_.quantity-controls]:hidden">
-                  <ABS_SpecialOffers
-                    offers={orderData.selections.offers.map(offer => {
-                      // For stored orders, we need to calculate the base price from the total
-                      const storedQuantity = (offer as any).quantity || 1
-                      const personCount = parseInt(orderData.userInfo.occupancy.match(/\d+/)?.[0] || '1', 10)
-                      
-                      // Calculate base price based on offer type
-                      let basePrice = offer.price || 0
-                      const isAllInclusive = offer.title.toLowerCase().includes('all inclusive')
-                      
-                      if (isAllInclusive && offer.type === 'perPerson') {
-                        // For All Inclusive, the stored price is the total for entire stay
-                        // We need to calculate the per-person per-night price
-                        const checkIn = new Date(orderData.userInfo.checkIn)
-                        const checkOut = new Date(orderData.userInfo.checkOut)
-                        const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)))
-                        basePrice = basePrice / (personCount * nights)
-                      } else if (offer.type === 'perPerson' && storedQuantity > 0) {
-                        // The stored price is the total, so divide by quantity and persons to get base price
-                        basePrice = basePrice / (storedQuantity * personCount)
-                      } else if (offer.type === 'perNight' && storedQuantity > 0) {
-                        // For per night offers, divide by quantity
-                        basePrice = basePrice / storedQuantity
+                <div className="space-y-4">
+                  {orderData.selections.offers.map(offer => {
+                    // Use room title if available (for room-based special offers)
+                    let displayTitle = offer.title || offer.name
+                    
+                    // Map old package names to room titles for existing orders
+                    const titleMapping: Record<string, string> = {
+                      'Deluxe Experience Package': "Live luxury's pinnacle by the sea",
+                      'Premium Business Package': "Dive in from your private terrace", 
+                      'Romantic Getaway Package': "Supreme luxury with divine views",
+                      'Wellness & Spa Package': "Glam rock with infinite views"
+                    }
+                    
+                    if (titleMapping[displayTitle]) {
+                      displayTitle = titleMapping[displayTitle]
+                    }
+
+                    // Get room amenities based on the room type
+                    const getRoomAmenities = (title: string): string[] => {
+                      switch (title) {
+                        case "Live luxury's pinnacle by the sea":
+                          return ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'AC']
+                        case "Dive in from your private terrace":
+                          return ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'Afternoon Sun']
+                        case "Supreme luxury with divine views":
+                          return ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Hydromassage Bathtub']
+                        case "Glam rock with infinite views":
+                          return ['60 to 70 m2 / 645 to 755 sqft', 'Coffee Machine', 'Hydromassage Bathtub']
+                        default:
+                          return ['Premium amenities included']
                       }
-                      // For perStay offers, the price is already the base price per stay
-                      
-                      return {
-                        ...offer,
-                        id: Number(offer.id),
-                        title: offer.title,
-                        description: offer.description || '',
-                        image: offer.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d',
-                        price: basePrice,
-                        type: (offer.type as 'perStay' | 'perPerson' | 'perNight') || 'perStay',
-                      }
-                    })}
-                    initialSelections={Object.fromEntries(
-                      orderData.selections.offers.map(offer => {
-                        const checkIn = new Date(orderData.userInfo.checkIn)
-                        const checkOut = new Date(orderData.userInfo.checkOut)
-                        const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)))
-                        const isAllInclusive = offer.title.toLowerCase().includes('all inclusive')
+                    }
+
+                    const roomAmenities = getRoomAmenities(displayTitle)
+
+                    return (
+                      <div key={offer.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                        {/* Special Offer Badge */}
+                        <div className="bg-gray-800 text-white px-3 py-1 flex items-center gap-1.5">
+                          <Icon icon="solar:star-bold" className="w-4 h-4" />
+                          <span className="text-xs font-medium">Special Offer</span>
+                        </div>
                         
-                        return [
-                          Number(offer.id),
-                          {
-                            quantity: (offer as any).quantity || 1,
-                            selectedDate: (offer as any).selectedDate,
-                            selectedDates: (offer as any).selectedDates || [],
-                            persons: parseInt(orderData.userInfo.occupancy.match(/\d+/)?.[0] || '1', 10),
-                            nights: isAllInclusive ? nights : 1,
-                          }
-                        ]
-                      })
-                    )}
-                    onBookOffer={() => {}} // Disabled in consultation mode
-                    currencySymbol="€"
-                    reservationInfo={{
-                      checkInDate: new Date(orderData.userInfo.checkIn),
-                      checkOutDate: new Date(orderData.userInfo.checkOut),
-                      personCount: parseInt(orderData.userInfo.occupancy.match(/\d+/)?.[0] || '1', 10)
-                    }}
-                    labels={{
-                      perStay: 'per stay',
-                      perPerson: 'per person', 
-                      perNight: 'per night',
-                      total: 'Total',
-                      bookNow: 'Added',
-                      numberOfPersons: 'Number of persons',
-                      numberOfNights: 'Number of nights',
-                      addedLabel: 'Added',
-                      popularLabel: 'Popular',
-                      personsTooltip: 'Select number of persons',
-                      personsSingularUnit: 'person',
-                      personsPluralUnit: 'persons',
-                      nightsTooltip: 'Select number of nights',
-                      nightsSingularUnit: 'night',
-                      nightsPluralUnit: 'nights',
-                      personSingular: 'person',
-                      personPlural: 'persons',
-                      nightSingular: 'night',
-                      nightPlural: 'nights',
-                      removeOfferLabel: 'Remove',
-                      decreaseQuantityLabel: 'Decrease',
-                      increaseQuantityLabel: 'Increase',
-                      selectDateLabel: 'Select date',
-                      selectDateTooltip: 'Choose your preferred date',
-                      dateRequiredLabel: 'Date required',
-                      selectDatesLabel: 'Select dates',
-                      selectDatesTooltip: 'Choose dates',
-                      availableDatesLabel: 'Available dates',
-                      noAvailableDatesLabel: 'No available dates',
-                      clearDatesLabel: 'Clear',
-                      confirmDatesLabel: 'Confirm',
-                      dateSelectedLabel: 'selected',
-                      multipleDatesRequiredLabel: 'Multiple dates required',
-                    }}
-                  />
+                        <div className="p-4">
+                          {/* Room Title */}
+                          <div className="mb-3">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">{displayTitle}</h3>
+                          </div>
+
+                          {/* Room Amenities - Top 3 Most Relevant */}
+                          <div className="space-y-2 mb-4">
+                            <p className="text-sm text-gray-600 font-medium">Amenidades incluidas:</p>
+                            <div className="grid grid-cols-1 gap-2">
+                              {roomAmenities.slice(0, 3).map((amenity, index) => (
+                                <div key={`${offer.id}-amenity-${index}`} className="flex items-center gap-2">
+                                  <AmenityIcon amenity={amenity} className="w-5 h-5 text-gray-700 flex-shrink-0" />
+                                  <span className="text-sm text-gray-700">{amenity}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Price and Status */}
+                          <div className="flex items-center justify-between border-t pt-3">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                ✓ Selected
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-gray-900">
+                                +{offer.price.toFixed(2)}€ <span className="text-sm font-normal text-gray-600">per night</span>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

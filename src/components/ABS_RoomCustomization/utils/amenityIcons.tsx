@@ -12,8 +12,8 @@ export const amenityIcons: AmenityIconMapping = {
   'City View': 'solar:buildings-bold',
   'Vista al jardín': 'solar:leaf-bold',
   'Garden View': 'solar:leaf-bold',
-  'Balcón': 'solar:window-frame-bold',
-  'Balcony': 'solar:window-frame-bold',
+  'Balcón': 'mdi:balcony',
+  'Balcony': 'mdi:balcony',
   'Terraza': 'solar:sun-bold',
   'Terrace': 'solar:sun-bold',
   'Terraza privada': 'solar:sun-bold',
@@ -21,8 +21,9 @@ export const amenityIcons: AmenityIconMapping = {
   
   // Bathroom
   'Jacuzzi': 'solar:bath-bold',
-  'Bañera': 'solar:bath-bold',
-  'Bathtub': 'solar:bath-bold',
+  'Bañera': 'material-symbols:bathtub-outline',
+  'Bathtub': 'material-symbols:bathtub-outline',
+  'Hydromassage Bathtub': 'material-symbols:bathtub-outline',
   'Ducha de lluvia': 'solar:water-drop-bold',
   'Rain Shower': 'solar:water-drop-bold',
   'Amenidades de lujo': 'solar:star-bold',
@@ -88,6 +89,15 @@ export const amenityIcons: AmenityIconMapping = {
   'Armario amplio': 'solar:closet-bold',
   'Large Closet': 'solar:closet-bold',
   
+  // Sun and Orientation
+  'Afternoon Sun': 'wi:day-sunny',
+  'Morning Sun': 'wi:sunrise',
+  'All-day Sun': 'solar:sun-bold',
+  
+  // Room Size
+  '30 to 35 m2 / 325 to 375 sqft': 'material-symbols:square-foot',
+  '60 to 70 m2 / 645 to 755 sqft': 'material-symbols:square-foot',
+  
   // Default
   'default': 'solar:check-circle-bold',
 }
@@ -96,13 +106,15 @@ export const amenityIcons: AmenityIconMapping = {
 const fallbackPatterns = [
   { pattern: /wifi|internet|conexi[oó]n/i, icon: 'solar:wifi-router-bold' },
   { pattern: /tv|television|smart/i, icon: 'solar:tv-bold' },
+  { pattern: /hydromassage|bathtub|bañera/i, icon: 'material-symbols:bathtub-outline' },
   { pattern: /ba[ñn]o|bath|shower|ducha/i, icon: 'solar:bath-bold' },
   { pattern: /bed|cama|king|queen/i, icon: 'solar:bed-bold' },
   { pattern: /kitchen|cocina|cook/i, icon: 'solar:chef-hat-bold' },
   { pattern: /coffee|caf[eé]|nespresso/i, icon: 'solar:cup-hot-bold' },
   { pattern: /air|aire|conditioning|climate/i, icon: 'solar:snowflake-bold' },
   { pattern: /view|vista|window/i, icon: 'solar:eye-bold' },
-  { pattern: /balc[oó]n|balcony|terrace|terraza/i, icon: 'solar:window-frame-bold' },
+  { pattern: /balc[oó]n|balcony/i, icon: 'mdi:balcony' },
+  { pattern: /terrace|terraza/i, icon: 'material-symbols:deck-outline' },
   { pattern: /pool|piscina|swimming/i, icon: 'solar:swimming-bold' },
   { pattern: /gym|gimnasio|fitness/i, icon: 'solar:dumbbell-bold' },
   { pattern: /spa|wellness|relax/i, icon: 'solar:leaf-bold' },
@@ -120,6 +132,10 @@ const fallbackPatterns = [
   { pattern: /heating|calefacci[oó]n|heat/i, icon: 'solar:fire-bold' },
   { pattern: /pillow|almohada|cushion/i, icon: 'solar:moon-sleep-bold' },
   { pattern: /concierge|conserjer[ií]a/i, icon: 'solar:user-check-bold' },
+  { pattern: /m2|sqft|square.*feet|square.*foot/i, icon: 'material-symbols:square-foot' },
+  { pattern: /afternoon.*sun/i, icon: 'wi:day-sunny' },
+  { pattern: /morning.*sun/i, icon: 'wi:sunrise' },
+  { pattern: /all.*day.*sun|sun.*all.*day/i, icon: 'solar:sun-bold' },
 ]
 
 export function getAmenityIcon(amenity: string): string {

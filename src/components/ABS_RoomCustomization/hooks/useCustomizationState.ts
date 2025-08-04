@@ -94,7 +94,9 @@ export const useCustomizationState = ({
   )
 
   const selectOption = useCallback((category: string, optionId: string, optionDetails: any) => {
-    const optionLabel = 'label' in optionDetails ? optionDetails.label : 
+    // For special offers, prefer roomTitle over claim
+    const optionLabel = category === 'specialOffers' && 'roomTitle' in optionDetails ? optionDetails.roomTitle :
+                       'label' in optionDetails ? optionDetails.label : 
                        'name' in optionDetails ? optionDetails.name : 
                        'claim' in optionDetails ? optionDetails.claim : 
                        optionId

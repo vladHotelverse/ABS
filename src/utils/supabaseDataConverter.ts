@@ -53,17 +53,90 @@ export function convertViewOption(option: CustomizationOption, language: string 
 
 // Convert special offer options (for upgrade packages)
 export function convertSpecialOfferOption(option: CustomizationOption, language: string = 'en', currentRoomAmenities: string[] = []): SpecialOfferOption {
+  // Import room options from mock data to ensure consistency
+  let roomOptions: any[] = []
+  
+  try {
+    // Dynamically import room options to avoid circular dependencies
+    roomOptions = [
+      {
+        id: 'deluxe',
+        title: "Live luxury's pinnacle by the sea",
+        roomType: 'DELUXE GOLD',
+        price: 22,
+        amenities: ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'AC', 'Balcony', 'Bathrobe and slippers', 'Bluetooth sound system']
+      },
+      {
+        id: 'deluxe-swim-up',
+        title: "Dive in from your private terrace",
+        roomType: 'DELUXE SWIM-UP',
+        price: 31,
+        amenities: ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'AC', 'Afternoon Sun', 'Bathrobe and slippers', 'Bluetooth sound system']
+      },
+      {
+        id: 'rocksuite',
+        title: "Supreme luxury with divine views",
+        roomType: 'ROCK SUITE',
+        price: 89,
+        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Bluetooth sound system', 'Coffee Machine', 'Hydromassage Bathtub']
+      },
+      {
+        id: '80s-suite',
+        title: "80s nostalgia unleashed",
+        roomType: '80S SUITE',
+        price: 120,
+        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Coffee Machine', 'Hydromassage Bathtub', 'King Size Bed']
+      },
+      {
+        id: 'rock-suite-diamond',
+        title: "Glam rock with infinite views",
+        roomType: 'ROCK SUITE DIAMOND',
+        price: 199,
+        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Bluetooth sound system', 'Coffee Machine', 'Hydromassage Bathtub']
+      },
+      {
+        id: 'rock-suite-legend',
+        title: "Live the rock legend",
+        roomType: 'ROCK SUITE LEGEND',
+        price: 300,
+        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Bluetooth sound system', 'Coffee Machine', 'Hydromassage Bathtub']
+      }
+    ]
+  } catch (error) {
+    console.warn('Could not load room options for special offer mapping')
+  }
+
   // Parse additional amenities from description or use a predefined list
-  // In a real implementation, this would come from a separate field in the database
   const additionalAmenities = getAdditionalAmenitiesForOffer(option.option_code, language)
+  
+  // Map option code to room ID for consistency
+  const roomMapping: Record<string, string> = {
+    'deluxe_experience': 'deluxe',
+    'deluxe_gold_offer': 'deluxe',
+    'swim_up_offer': 'deluxe-swim-up',
+    'rock_suite_offer': 'rocksuite',
+    'eighties_suite_offer': '80s-suite',
+    // Handle old codes for backwards compatibility - map to appropriate rooms
+    'premium_business': 'deluxe-swim-up',
+    'romantic_getaway': 'rocksuite', 
+    'wellness_spa': 'rock-suite-diamond'
+  }
+  
+  const targetRoomId = roomMapping[option.option_code] || option.option_code
+  const matchingRoom = roomOptions.find(room => room.id === targetRoomId)
   
   return {
     id: option.option_code,
     claim: option.name[language] || option.name.en,
     price: option.price,
     additionalAmenities,
-    targetRoomId: `room_${option.option_code}`,
+    targetRoomId,
     currentRoomAmenities,
+    // Add room data for consistency
+    roomTitle: matchingRoom?.title,
+    roomType: matchingRoom?.roomType,
+    roomAmenities: matchingRoom?.amenities,
+    roomPrice: matchingRoom?.price
   }
 }
 

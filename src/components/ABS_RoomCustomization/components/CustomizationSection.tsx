@@ -36,7 +36,9 @@ const isExactViewOption = (option: CustomizationOption | ViewOption | ExactViewO
 }
 
 const isSpecialOfferOption = (option: CustomizationOption | ViewOption | ExactViewOption | SpecialOfferOption): option is SpecialOfferOption => {
-  return 'claim' in option && 'additionalAmenities' in option
+  const result = 'claim' in option && 'additionalAmenities' in option
+  console.log('[DEBUG] isSpecialOfferOption check:', { option, hasClaim: 'claim' in option, hasAmenities: 'additionalAmenities' in option, result })
+  return result
 }
 
 export const CustomizationSection: React.FC<CustomizationSectionProps> = ({

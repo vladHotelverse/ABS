@@ -25,6 +25,7 @@ export interface Customization {
   price: number
   category?: string
   quantity?: number
+  roomTitle?: string // For special offers with room-based data
 }
 
 // Special offer types matching ABS_SpecialOffers

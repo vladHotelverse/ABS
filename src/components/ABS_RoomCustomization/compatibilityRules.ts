@@ -22,6 +22,10 @@ export const defaultCompatibilityRules: CompatibilityRules = {
     {
       options: ['twin', 'king', 'sofa'],
       reason: 'Only one bed configuration can be selected'
+    },
+    {
+      options: ['deluxe_gold_offer', 'swim_up_offer', 'rock_suite_offer', 'eighties_suite_offer'],
+      reason: 'Only one special offer can be selected'
     }
   ],
   conflicts: [
@@ -69,6 +73,21 @@ export const defaultCompatibilityRules: CompatibilityRules = {
       option: 'best-views',
       disables: ['ground-floor', 'city-view'],
       reason: 'Best views are typically from upper floors with premium vistas'
+    },
+    {
+      option: 'swim_up_offer',
+      disables: ['upper-floor', 'sea-frontal-view'],
+      reason: 'Swim-up rooms are typically ground level and pool-facing'
+    },
+    {
+      option: 'rock_suite_offer',
+      disables: ['ground-floor', 'twin'],
+      reason: 'Rock suites are premium upper-floor accommodations with king beds'
+    },
+    {
+      option: 'eighties_suite_offer',
+      disables: ['ground-floor', 'twin'],
+      reason: '80s suites are premium upper-floor accommodations with king beds'
     }
   ]
 }
