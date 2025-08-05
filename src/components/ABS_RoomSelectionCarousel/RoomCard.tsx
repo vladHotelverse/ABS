@@ -88,7 +88,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
   cancelBidText,
   makeOfferText: _makeOfferText,
   dynamicAmenities,
-  totalPriceText = 'Total',
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
@@ -169,15 +168,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [onSelectRoom, room, selectedRoom]
   )
 
-  // Calculate total price for 5 nights stay
-  const nights = 5
-  const totalPrice = useMemo(() => {
-    return room.price * nights
-  }, [room.price])
-
-  const totalOldPrice = useMemo(() => {
-    return room.oldPrice ? room.oldPrice * nights : undefined
-  }, [room.oldPrice])
 
   return (
     <div
