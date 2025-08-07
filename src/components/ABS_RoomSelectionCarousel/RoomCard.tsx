@@ -61,7 +61,6 @@ interface RoomCardProps {
   onImageDragMove?: (currentX: number) => void
   onImageDragEnd?: () => void
   roomIndex?: number
-  // priceSliderElement?: React.ReactNode; // This is now handled internally
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -102,7 +101,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   onImageDragStart,
   onImageDragMove,
   onImageDragEnd,
-  roomIndex = 0,
+  roomIndex: _roomIndex = 0,
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
@@ -164,14 +163,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [room.images.length, activeImageIndex, onImageChange]
   )
 
-  // const _handleLearnMore = useCallback(() => {
-  //   if (onLearnMore) {
-  //     onLearnMore(room)
-  //   } else {
-  //     // Default behavior - could open a modal, navigate to room details, etc.
-  //     console.log('Learn more about room:', room.title || room.roomType)
-  //   }
-  // }, [onLearnMore, room])
 
   const handleSelectRoom = useCallback(
     (e: React.MouseEvent) => {

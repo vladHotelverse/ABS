@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react'
+import type React from 'react'
 
 interface UseDragHandlersProps {
   onDragStart: (startX: number) => void
@@ -29,10 +30,13 @@ export const useDragHandlers = ({
   const endOptionsRef = useRef<{ roomCount?: number; imageCount?: number; roomIndex?: number }>()
 
   const getClientX = (e: React.MouseEvent | React.TouchEvent): number => {
-    if ('touches' in e) {
-      return e.touches[0]?.clientX || 0
+    if ('touches' in e && e.touches.length > 0) {
+      return e.touches[0].clientX
     }
-    return e.clientX
+    if ('clientX' in e) {
+      return e.clientX
+    }
+    return 0
   }
 
   const handleStart = useCallback(
