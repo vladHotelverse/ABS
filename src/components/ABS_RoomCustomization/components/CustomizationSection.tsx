@@ -165,21 +165,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
             const isDisabled = disabledOptions[option.id]?.disabled || false
             const disabledReason = disabledOptions[option.id]?.reason
 
-            if (isSpecialOfferSection && isSpecialOfferOption(option)) {
-              return (
-                <SpecialOfferCard
-                  key={option.id}
-                  offer={option}
-                  isSelected={isSelected}
-                  isDisabled={isDisabled}
-                  disabledReason={disabledReason}
-                  onSelect={readonly ? () => {} : () => onSelect(option.id)}
-                  texts={texts}
-                  mode={mode}
-                  readonly={readonly}
-                />
-              )
-            }
+            
             if (isExactViewSection && isExactViewOption(option)) {
               return (
                 <ViewCard
@@ -191,6 +177,21 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
                   onSelect={readonly ? () => {} : () => onSelect(option.id)}
                   texts={texts}
                   fallbackImageUrl={fallbackImageUrl}
+                  mode={mode}
+                  readonly={readonly}
+                />
+              )
+            }
+            if (isSpecialOfferSection && isSpecialOfferOption(option)) {
+              return (
+                <SpecialOfferCard
+                  key={option.id}
+                  offer={option}
+                  isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  disabledReason={disabledReason}
+                  onSelect={readonly ? () => {} : () => onSelect(option.id)}
+                  texts={texts}
                   mode={mode}
                   readonly={readonly}
                 />

@@ -64,42 +64,42 @@ export function convertSpecialOfferOption(option: CustomizationOption, language:
         title: "Live luxury's pinnacle by the sea",
         roomType: 'DELUXE GOLD',
         price: 22,
-        amenities: ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'AC', 'Balcony', 'Bathrobe and slippers', 'Bluetooth sound system']
+        amenities: ['30 to 35 m2 / 325 to 375 sqft', 'Balcony', 'Landmark View']
       },
       {
         id: 'deluxe-swim-up',
         title: "Dive in from your private terrace",
         roomType: 'DELUXE SWIM-UP',
         price: 31,
-        amenities: ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'AC', 'Afternoon Sun', 'Bathrobe and slippers', 'Bluetooth sound system']
+        amenities: ['Shared Pool', 'Terrace', 'Bluetooth sound system']
       },
       {
         id: 'rocksuite',
         title: "Supreme luxury with divine views",
         roomType: 'ROCK SUITE',
         price: 89,
-        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Bluetooth sound system', 'Coffee Machine', 'Hydromassage Bathtub']
+        amenities: ['Pool View', 'Balcony', 'Hydromassage Bathtub']
       },
       {
         id: '80s-suite',
         title: "80s nostalgia unleashed",
         roomType: '80S SUITE',
         price: 120,
-        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Coffee Machine', 'Hydromassage Bathtub', 'King Size Bed']
+        amenities: ['Living Room', 'Morning Sun', 'King Size Bed']
       },
       {
         id: 'rock-suite-diamond',
         title: "Glam rock with infinite views",
         roomType: 'ROCK SUITE DIAMOND',
         price: 199,
-        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Bluetooth sound system', 'Coffee Machine', 'Hydromassage Bathtub']
+        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'Close to Pool', 'Hydromassage Bathtub']
       },
       {
         id: 'rock-suite-legend',
         title: "Live the rock legend",
         roomType: 'ROCK SUITE LEGEND',
         price: 300,
-        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Balcony', 'Bluetooth sound system', 'Coffee Machine', 'Hydromassage Bathtub']
+        amenities: ['60 to 70 m2 / 645 to 755 sqft', 'Balcony', 'Hydromassage Bathtub']
       }
     ]
   } catch (error) {
