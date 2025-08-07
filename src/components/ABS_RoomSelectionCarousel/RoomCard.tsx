@@ -60,7 +60,6 @@ interface RoomCardProps {
   onImageDragStart?: (startX: number) => void
   onImageDragMove?: (currentX: number) => void
   onImageDragEnd?: () => void
-  roomIndex?: number
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -101,7 +100,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
   onImageDragStart,
   onImageDragMove,
   onImageDragEnd,
-  roomIndex: _roomIndex = 0,
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated

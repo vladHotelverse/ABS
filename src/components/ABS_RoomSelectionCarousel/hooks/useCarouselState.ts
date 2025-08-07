@@ -136,12 +136,12 @@ const carouselReducer = (state: CarouselState, action: CarouselAction): Carousel
       const velocity = Math.abs(deltaX) / Math.max(duration, 1)
       
       // Determine if we should trigger navigation
-      const threshold = 50 // minimum distance to trigger navigation
-      const velocityThreshold = 0.5 // minimum velocity for quick swipes
+      const DRAG_DISTANCE_THRESHOLD = 50 // minimum distance in pixels to trigger navigation
+      const DRAG_VELOCITY_THRESHOLD = 0.5 // minimum velocity (px/ms) for quick swipes
       
-      const shouldNavigate = Math.abs(deltaX) > threshold || velocity > velocityThreshold
+      const shouldNavigate = Math.abs(deltaX) > DRAG_DISTANCE_THRESHOLD || velocity > DRAG_VELOCITY_THRESHOLD
       
-      let newState = {
+      const newState = {
         ...state,
         dragState: {
           isDragging: false,

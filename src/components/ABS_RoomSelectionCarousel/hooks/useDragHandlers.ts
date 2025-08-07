@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import type React from 'react'
 
 interface UseDragHandlersProps {
@@ -31,7 +31,7 @@ export const useDragHandlers = ({
 
   const getClientX = (e: React.MouseEvent | React.TouchEvent): number => {
     if ('touches' in e && e.touches.length > 0) {
-      return e.touches[0].clientX
+      return e.touches[0]?.clientX || 0
     }
     if ('clientX' in e) {
       return e.clientX
