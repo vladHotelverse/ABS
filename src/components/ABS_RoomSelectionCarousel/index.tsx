@@ -121,12 +121,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     disabled: roomOptions.length <= 1,
   })
 
-  // Create image drag handlers for each room
-  const createImageDragHandlers = (roomIndex: number, imageCount: number) => ({
-    onImageDragStart: (startX: number) => actions.startDrag(startX),
-    onImageDragMove: (currentX: number) => actions.updateDrag(currentX),
-    onImageDragEnd: () => actions.endDrag({ imageCount, roomIndex }),
-  })
 
   // Determine if slider should be shown (disabled in consultation mode)
   const shouldShowSlider = (showPriceSlider || variant === 'with-slider') && mode === 'selection' && !readonly
@@ -187,11 +181,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             cancelBidText={resolvedTexts.cancelBidText}
             dynamicAmenities={dynamicAmenitiesMap.get(roomOptions[0].id)}
             roomIndex={0}
-            imageDragState={{
-              isDragging: state.dragState.isDragging,
-              deltaX: state.dragState.deltaX,
-            }}
-            {...createImageDragHandlers(0, roomOptions[0].images.length)}
           />
         </div>
       </div>
@@ -248,11 +237,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 cancelBidText={resolvedTexts.cancelBidText}
                 dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
                 roomIndex={index}
-                imageDragState={{
-                  isDragging: state.dragState.isDragging,
-                  deltaX: state.dragState.deltaX,
-                }}
-                {...createImageDragHandlers(index, room.images.length)}
               />
             </div>
           ))}
@@ -313,11 +297,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     cancelBidText={resolvedTexts.cancelBidText}
                     dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
                     roomIndex={index}
-                    imageDragState={{
-                      isDragging: state.dragState.isDragging,
-                      deltaX: state.dragState.deltaX,
-                    }}
-                    {...createImageDragHandlers(index, room.images.length)}
                   />
                 </div>
               ))}
@@ -467,11 +446,6 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     cancelBidText={resolvedTexts.cancelBidText}
                     dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
                     roomIndex={index}
-                    imageDragState={{
-                      isDragging: state.dragState.isDragging,
-                      deltaX: state.dragState.deltaX,
-                    }}
-                    {...createImageDragHandlers(index, room.images.length)}
                   />
                 </div>
               )
