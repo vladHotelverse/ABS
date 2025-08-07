@@ -4,6 +4,7 @@ import type React from 'react'
 import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 import { PriceSlider } from './components'
 import { useSlider } from './hooks'
+import { useDragHandlers } from './hooks/useDragHandlers'
 import { UiButton } from '../ui/button'
 import { UiTooltip, UiTooltipContent, UiTooltipTrigger, TooltipProvider } from '../ui/tooltip'
 import type { RoomOption } from './types'
@@ -51,6 +52,15 @@ interface RoomCardProps {
   dynamicAmenities?: string[]
   // Total price text
   totalPriceText?: string
+  // Drag state props for image navigation
+  imageDragState?: {
+    isDragging: boolean
+    deltaX: number
+  }
+  onImageDragStart?: (startX: number) => void
+  onImageDragMove?: (currentX: number) => void
+  onImageDragEnd?: () => void
+  roomIndex?: number
   // priceSliderElement?: React.ReactNode; // This is now handled internally
 }
 
@@ -88,6 +98,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
   cancelBidText,
   makeOfferText: _makeOfferText,
   dynamicAmenities,
+  imageDragState,
+  onImageDragStart,
+  onImageDragMove,
+  onImageDragEnd,
+  roomIndex = 0,
 }) => {
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
@@ -168,6 +183,17 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [onSelectRoom, room, selectedRoom]
   )
 
+  // Drag handlers for image navigation
+  const imageDragHandlers = useDragHandlers({
+    onDragStart: onImageDragStart || (() => {}),
+    onDragMove: onImageDragMove || (() => {}),
+    onDragEnd: () => {
+      if (onImageDragEnd) {
+        onImageDragEnd()
+      }
+    },
+    disabled: room.images.length <= 1,
+  })
 
   return (
     <div
@@ -213,7 +239,15 @@ const RoomCard: React.FC<RoomCardProps> = ({
       )}
 
       {/* Room Image Carousel */}
-      <div className="relative h-64 bg-neutral-100 group">
+      <div 
+        className="relative h-64 bg-neutral-100 group"
+        {...imageDragHandlers}
+        style={{
+          ...imageDragHandlers.style,
+          transform: imageDragState?.isDragging ? `translateX(${imageDragState.deltaX * 0.5}px)` : undefined,
+          transition: imageDragState?.isDragging ? 'none' : 'transform 0.3s ease-out',
+        }}
+      >
         <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full" />
         
         {/* Amenities overlay - top left */}
