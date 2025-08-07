@@ -1,14 +1,25 @@
 import { useReducer, useEffect, useMemo, useCallback } from 'react'
 import type { RoomOption } from '../types'
 
+
+// Drag state interface
+interface DragState {
+  isDragging: boolean
+  startX: number
+  currentX: number
+  deltaX: number
+  startTime: number
+}
+
 // State interface - removed slider-specific state
 export interface CarouselState {
   activeIndex: number
   activeImageIndices: Record<number, number>
   selectedRoom: RoomOption | null
+  dragState: DragState
 }
 
-// Action types - removed slider-specific actions
+// Action types - removed slider-specific actions, added drag actions
 export type CarouselAction =
   | { type: 'SET_ACTIVE_INDEX'; payload: number }
   | { type: 'SET_ACTIVE_IMAGE_INDEX'; payload: { roomIndex: number; imageIndex: number } }
@@ -23,6 +34,9 @@ export type CarouselAction =
   | { type: 'PREV_IMAGE'; roomIndex: number; imageCount: number }
   | { type: 'RESET_STATE'; payload: CarouselState }
   | { type: 'RESET_VIEW'; payload: { activeIndex: number; activeImageIndices: Record<number, number> } }
+  | { type: 'START_DRAG'; payload: { startX: number } }
+  | { type: 'UPDATE_DRAG'; payload: { currentX: number } }
+  | { type: 'END_DRAG'; roomCount?: number; imageCount?: number; roomIndex?: number }
 
 // Reducer function - removed slider-specific cases
 const carouselReducer = (state: CarouselState, action: CarouselAction): CarouselState => {
@@ -92,6 +106,84 @@ const carouselReducer = (state: CarouselState, action: CarouselAction): Carousel
         activeImageIndices: action.payload.activeImageIndices,
       }
 
+    case 'START_DRAG':
+      return {
+        ...state,
+        dragState: {
+          ...state.dragState,
+          isDragging: true,
+          startX: action.payload.startX,
+          currentX: action.payload.startX,
+          deltaX: 0,
+          startTime: Date.now(),
+        },
+      }
+
+    case 'UPDATE_DRAG':
+      return {
+        ...state,
+        dragState: {
+          ...state.dragState,
+          currentX: action.payload.currentX,
+          deltaX: action.payload.currentX - state.dragState.startX,
+        },
+      }
+
+    case 'END_DRAG': {
+      const { dragState } = state
+      const deltaX = dragState.deltaX
+      const duration = Date.now() - dragState.startTime
+      const velocity = Math.abs(deltaX) / Math.max(duration, 1)
+      
+      // Determine if we should trigger navigation
+      const DRAG_DISTANCE_THRESHOLD = 50 // minimum distance in pixels to trigger navigation
+      const DRAG_VELOCITY_THRESHOLD = 0.5 // minimum velocity (px/ms) for quick swipes
+      
+      const shouldNavigate = Math.abs(deltaX) > DRAG_DISTANCE_THRESHOLD || velocity > DRAG_VELOCITY_THRESHOLD
+      
+      const newState = {
+        ...state,
+        dragState: {
+          isDragging: false,
+          startX: 0,
+          currentX: 0,
+          deltaX: 0,
+          startTime: 0,
+        },
+      }
+
+      if (shouldNavigate) {
+        if (action.roomCount !== undefined) {
+          // Room carousel navigation
+          if (deltaX < 0) {
+            // Swipe left - next slide
+            newState.activeIndex = (state.activeIndex + 1) % action.roomCount
+          } else {
+            // Swipe right - previous slide
+            newState.activeIndex = state.activeIndex > 0 ? state.activeIndex - 1 : action.roomCount - 1
+          }
+        } else if (action.imageCount !== undefined && action.roomIndex !== undefined) {
+          // Image navigation within room
+          const currentImageIndex = state.activeImageIndices[action.roomIndex] || 0
+          if (deltaX < 0) {
+            // Swipe left - next image
+            newState.activeImageIndices = {
+              ...state.activeImageIndices,
+              [action.roomIndex]: (currentImageIndex + 1) % action.imageCount,
+            }
+          } else {
+            // Swipe right - previous image
+            newState.activeImageIndices = {
+              ...state.activeImageIndices,
+              [action.roomIndex]: currentImageIndex > 0 ? currentImageIndex - 1 : action.imageCount - 1,
+            }
+          }
+        }
+      }
+
+      return newState
+    }
+
     default:
       return state
   }
@@ -104,7 +196,7 @@ export interface UseCarouselStateProps {
   onRoomSelected?: (room: RoomOption | null) => void
 }
 
-// Hook return type - removed slider-specific properties
+// Hook return type - removed slider-specific properties, added drag handlers
 export interface UseCarouselStateReturn {
   state: CarouselState
   actions: {
@@ -115,6 +207,9 @@ export interface UseCarouselStateReturn {
     prevSlide: () => void
     nextImage: (roomIndex: number, imageCount: number) => void
     prevImage: (roomIndex: number, imageCount: number) => void
+    startDrag: (startX: number) => void
+    updateDrag: (currentX: number) => void
+    endDrag: (options?: { roomCount?: number; imageCount?: number; roomIndex?: number }) => void
   }
 }
 
@@ -145,6 +240,13 @@ export const useCarouselState = ({
       activeIndex: initialActiveIndex,
       activeImageIndices: initialImageIndices,
       selectedRoom: initialSelectedRoom,
+      dragState: {
+        isDragging: false,
+        startX: 0,
+        currentX: 0,
+        deltaX: 0,
+        startTime: 0,
+      },
     }
   }, [roomOptions.length, initialSelectedRoom])
 
@@ -197,7 +299,19 @@ export const useCarouselState = ({
     dispatch({ type: 'PREV_IMAGE', roomIndex, imageCount })
   }, [])
 
-  // Group actions into object - removed slider-specific actions
+  const startDrag = useCallback((startX: number) => {
+    dispatch({ type: 'START_DRAG', payload: { startX } })
+  }, [])
+
+  const updateDrag = useCallback((currentX: number) => {
+    dispatch({ type: 'UPDATE_DRAG', payload: { currentX } })
+  }, [])
+
+  const endDrag = useCallback((options?: { roomCount?: number; imageCount?: number; roomIndex?: number }) => {
+    dispatch({ type: 'END_DRAG', ...options })
+  }, [])
+
+  // Group actions into object - removed slider-specific actions, added drag handlers
   const actions = useMemo(
     () => ({
       setActiveIndex,
@@ -207,8 +321,11 @@ export const useCarouselState = ({
       prevSlide,
       nextImage,
       prevImage,
+      startDrag,
+      updateDrag,
+      endDrag,
     }),
-    [setActiveIndex, setActiveImageIndex, selectRoom, nextSlide, prevSlide, nextImage, prevImage]
+    [setActiveIndex, setActiveImageIndex, selectRoom, nextSlide, prevSlide, nextImage, prevImage, startDrag, updateDrag, endDrag]
   )
 
   // This effect now ONLY resets the view when the list of rooms changes.
@@ -219,14 +336,14 @@ export const useCarouselState = ({
       newImageIndices[index] = 0
     })
     dispatch({ type: 'RESET_VIEW', payload: { activeIndex: newActiveIndex, activeImageIndices: newImageIndices } })
-  }, [roomOptions, dispatch])
+  }, [roomOptions])
 
   // This new effect ONLY syncs the selected room from the parent without changing the view.
   useEffect(() => {
     if (state.selectedRoom?.id !== initialSelectedRoom?.id) {
       dispatch({ type: 'SET_SELECTED_ROOM', payload: initialSelectedRoom })
     }
-  }, [initialSelectedRoom, state.selectedRoom, dispatch])
+  }, [initialSelectedRoom, state.selectedRoom])
 
   return {
     state,

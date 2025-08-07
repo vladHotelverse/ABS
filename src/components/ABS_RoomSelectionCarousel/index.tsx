@@ -3,6 +3,7 @@ import type React from 'react'
 import { useMemo } from 'react'
 import { CarouselNavigation, RoomCard } from './components'
 import { useCarouselState } from './hooks/useCarouselState'
+import { useDragHandlers } from './hooks/useDragHandlers'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
 import { getDynamicAmenitiesForAllRooms, getCurrentRoomAmenities } from './utils/amenitiesSelector'
 
@@ -112,6 +113,15 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     onRoomSelected,
   })
 
+  // Drag handlers for room carousel navigation
+  const roomCarouselDragHandlers = useDragHandlers({
+    onDragStart: actions.startDrag,
+    onDragMove: actions.updateDrag,
+    onDragEnd: (options) => actions.endDrag({ roomCount: roomOptions.length, ...options }),
+    disabled: roomOptions.length <= 1,
+  })
+
+
   // Determine if slider should be shown (disabled in consultation mode)
   const shouldShowSlider = (showPriceSlider || variant === 'with-slider') && mode === 'selection' && !readonly
 
@@ -170,6 +180,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             updateBidText={resolvedTexts.updateBidText}
             cancelBidText={resolvedTexts.cancelBidText}
             dynamicAmenities={dynamicAmenitiesMap.get(roomOptions[0].id)}
+            roomIndex={0}
           />
         </div>
       </div>
@@ -225,6 +236,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 updateBidText={resolvedTexts.updateBidText}
                 cancelBidText={resolvedTexts.cancelBidText}
                 dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
+                roomIndex={index}
               />
             </div>
           ))}
@@ -233,7 +245,15 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         {/* Mobile/Tablet: Carousel layout */}
         <div className="lg:hidden">
           <div className="relative w-full overflow-visible h-full">
-            <div className="w-full relative perspective-[1000px] min-h-[550px] overflow-visible">
+            <div 
+              className="w-full relative perspective-[1000px] min-h-[550px] overflow-visible"
+              {...roomCarouselDragHandlers}
+              style={{
+                ...roomCarouselDragHandlers.style,
+                transform: state.dragState.isDragging ? `translateX(${state.dragState.deltaX * 0.5}px)` : undefined,
+                transition: state.dragState.isDragging ? 'none' : 'transform 0.3s ease-out',
+              }}
+            >
               {roomOptions.map((room, index) => (
                 <div
                   key={room.id}
@@ -276,6 +296,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     updateBidText={resolvedTexts.updateBidText}
                     cancelBidText={resolvedTexts.cancelBidText}
                     dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
+                    roomIndex={index}
                   />
                 </div>
               ))}
@@ -361,7 +382,15 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         {/* Slider Container with Visible Cards */}
         <div className="relative w-full overflow-visible h-full">
           {/* Main Carousel Area */}
-          <div className="w-full relative perspective-[1000px] h-[750px] overflow-hidden">
+          <div 
+            className="w-full relative perspective-[1000px] h-[750px] overflow-hidden"
+            {...roomCarouselDragHandlers}
+            style={{
+              ...roomCarouselDragHandlers.style,
+              transform: state.dragState.isDragging ? `translateX(${state.dragState.deltaX * 0.3}px)` : undefined,
+              transition: state.dragState.isDragging ? 'none' : 'transform 0.3s ease-out',
+            }}
+          >
             {roomOptions.map((room, index) => {
               // Calculate if this card should be visible (previous, current, or next)
               const prevIndex = (state.activeIndex - 1 + roomOptions.length) % roomOptions.length
@@ -416,6 +445,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     updateBidText={resolvedTexts.updateBidText}
                     cancelBidText={resolvedTexts.cancelBidText}
                     dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
+                    roomIndex={index}
                   />
                 </div>
               )

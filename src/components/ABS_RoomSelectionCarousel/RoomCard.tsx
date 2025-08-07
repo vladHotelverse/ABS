@@ -51,7 +51,7 @@ interface RoomCardProps {
   dynamicAmenities?: string[]
   // Total price text
   totalPriceText?: string
-  // priceSliderElement?: React.ReactNode; // This is now handled internally
+  roomIndex?: number
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -149,14 +149,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [room.images.length, activeImageIndex, onImageChange]
   )
 
-  // const _handleLearnMore = useCallback(() => {
-  //   if (onLearnMore) {
-  //     onLearnMore(room)
-  //   } else {
-  //     // Default behavior - could open a modal, navigate to room details, etc.
-  //     console.log('Learn more about room:', room.title || room.roomType)
-  //   }
-  // }, [onLearnMore, room])
 
   const handleSelectRoom = useCallback(
     (e: React.MouseEvent) => {
@@ -168,6 +160,151 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [onSelectRoom, room, selectedRoom]
   )
 
+  // Image drag handlers using separate local state
+  const [localImageDragState, setLocalImageDragState] = useState({
+    isDragging: false,
+    startX: 0,
+    currentX: 0,
+    deltaX: 0,
+    startTime: 0,
+  })
+
+  // Create separate drag handlers specifically for image navigation
+  const imageDragHandlers = useMemo(() => ({
+    onMouseDown: (e: React.MouseEvent) => {
+      if (room.images.length <= 1) return
+      e.preventDefault()
+      e.stopPropagation() // Prevent main carousel from responding
+      
+      const startX = e.clientX
+      const startTime = Date.now()
+      setLocalImageDragState({
+        isDragging: true,
+        startX,
+        currentX: startX,
+        deltaX: 0,
+        startTime,
+      })
+
+      const handleMouseMove = (moveE: MouseEvent) => {
+        const currentX = moveE.clientX
+        const deltaX = currentX - startX
+        setLocalImageDragState(prev => ({
+          ...prev,
+          currentX,
+          deltaX,
+        }))
+      }
+
+      const handleMouseUp = () => {
+        setLocalImageDragState(currentState => {
+          const duration = Date.now() - startTime
+          const velocity = Math.abs(currentState.deltaX) / Math.max(duration, 1)
+          
+          // Navigation thresholds
+          const DRAG_DISTANCE_THRESHOLD = 50
+          const DRAG_VELOCITY_THRESHOLD = 0.5
+          
+          const shouldNavigate = Math.abs(currentState.deltaX) > DRAG_DISTANCE_THRESHOLD || velocity > DRAG_VELOCITY_THRESHOLD
+          
+          if (shouldNavigate && Math.abs(currentState.deltaX) > 10) {
+            if (currentState.deltaX < 0) {
+              // Swipe left - next image
+              handleImageNavigation('next')
+            } else {
+              // Swipe right - previous image  
+              handleImageNavigation('prev')
+            }
+          }
+          
+          return {
+            isDragging: false,
+            startX: 0,
+            currentX: 0,
+            deltaX: 0,
+            startTime: 0,
+          }
+        })
+        
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    },
+    onTouchStart: (e: React.TouchEvent) => {
+      if (room.images.length <= 1) return
+      e.stopPropagation() // Prevent main carousel from responding
+      
+      const touch = e.touches[0]
+      if (!touch) return
+      
+      const startX = touch.clientX
+      const startTime = Date.now()
+      setLocalImageDragState({
+        isDragging: true,
+        startX,
+        currentX: startX,
+        deltaX: 0,
+        startTime,
+      })
+    },
+    onTouchMove: (e: React.TouchEvent) => {
+      if (!localImageDragState.isDragging || room.images.length <= 1) return
+      e.stopPropagation() // Prevent main carousel from responding
+      
+      const touch = e.touches[0]
+      if (!touch) return
+      
+      const currentX = touch.clientX
+      const deltaX = currentX - localImageDragState.startX
+      setLocalImageDragState(prev => ({
+        ...prev,
+        currentX,
+        deltaX,
+      }))
+    },
+    onTouchEnd: (e: React.TouchEvent) => {
+      e.stopPropagation() // Prevent main carousel from responding
+      
+      setLocalImageDragState(currentState => {
+        if (!currentState.isDragging) return currentState
+        
+        const duration = Date.now() - currentState.startTime
+        const velocity = Math.abs(currentState.deltaX) / Math.max(duration, 1)
+        
+        // Navigation thresholds
+        const DRAG_DISTANCE_THRESHOLD = 50
+        const DRAG_VELOCITY_THRESHOLD = 0.5
+        
+        const shouldNavigate = Math.abs(currentState.deltaX) > DRAG_DISTANCE_THRESHOLD || velocity > DRAG_VELOCITY_THRESHOLD
+        
+        if (shouldNavigate && Math.abs(currentState.deltaX) > 10) {
+          if (currentState.deltaX < 0) {
+            // Swipe left - next image
+            handleImageNavigation('next')
+          } else {
+            // Swipe right - previous image
+            handleImageNavigation('prev')
+          }
+        }
+        
+        return {
+          isDragging: false,
+          startX: 0,
+          currentX: 0,
+          deltaX: 0,
+          startTime: 0,
+        }
+      })
+    },
+    style: {
+      touchAction: room.images.length <= 1 ? 'auto' : 'none',
+      userSelect: room.images.length <= 1 ? 'auto' : 'none',
+      cursor: room.images.length <= 1 ? 'default' : 'grab',
+    } as React.CSSProperties,
+  }), [room.images.length, localImageDragState, handleImageNavigation])
 
   return (
     <div
@@ -213,7 +350,15 @@ const RoomCard: React.FC<RoomCardProps> = ({
       )}
 
       {/* Room Image Carousel */}
-      <div className="relative h-64 bg-neutral-100 group">
+      <div 
+        className="relative h-64 bg-neutral-100 group"
+        {...imageDragHandlers}
+        style={{
+          ...imageDragHandlers.style,
+          transform: localImageDragState.isDragging ? `translateX(${localImageDragState.deltaX * 0.5}px)` : undefined,
+          transition: localImageDragState.isDragging ? 'none' : 'transform 0.3s ease-out',
+        }}
+      >
         <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full" />
         
         {/* Amenities overlay - top left */}
