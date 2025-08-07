@@ -60,6 +60,7 @@ interface RoomCardProps {
   onImageDragStart?: (startX: number) => void
   onImageDragMove?: (currentX: number) => void
   onImageDragEnd?: () => void
+  roomIndex?: number
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
