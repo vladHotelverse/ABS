@@ -22,6 +22,7 @@ import type { OfferData } from '../ABS_SpecialOffers/types'
 // Import new section components
 import { RoomSelectionSection, RoomSelectionMapSection, CustomizationSection, SpecialOffersSection, BookingStateSection } from './sections'
 import type { RoomOption, SpecialOffer } from './sections'
+import { ABS_RoomSelection } from '../ABS_RoomSelection'
 
 // Import hooks and utilities
 import { useBookingState, useMultiBookingState } from './hooks'
@@ -614,6 +615,16 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             compatibilityRules={compatibilityRules}
           />
 
+          {/* ABS Room Selection Section */}
+          {roomSelectionMap && (
+            <ABS_RoomSelection
+              title={roomSelectionMap.title}
+              description={roomSelectionMap.description}
+              url={roomSelectionMap.url}
+              iframe={roomSelectionMap.iframe}
+            />
+          )}
+
           {/* Special Offers Section */}
           <SpecialOffersSection
             specialOffers={specialOffers}
@@ -708,12 +719,12 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         </aside>
       </main>
                     {/* Room Selection Map Section */}
-                    {roomSelectionMap && (
+                    {/* {roomSelectionMap && (
             <RoomSelectionMapSection
               roomSelectionConfig={roomSelectionMap}
               isVisible={true}
             />
-          )}
+          )} */}
       {/* Mobile Pricing Widget */}
       <MobilePricingWidget
         total={total}

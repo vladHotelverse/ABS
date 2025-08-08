@@ -30,7 +30,7 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
   // Dynamic height based on screen size: 800px for desktop, 400px for mobile
   const getResponsiveHeight = () => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth >= 768 ? '1000px' : '400px'
+      return window.innerWidth >= 768 ? '700px' : '400px'
     }
     return '400px' // Fallback for SSR
   }
@@ -53,13 +53,15 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
 
   return (
     <section className={`w-full ${className}`}>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-h-[700px] relative bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ">
+        <div className='absolute left-6'>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             {title}
           </h2>
           <p className="text-gray-600 text-sm md:text-base mb-0">
             {description}
           </p>
+        </div>
           <iframe
             src={url}
             width={dynamicIframe.width}
@@ -67,7 +69,7 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
             frameBorder={dynamicIframe.frameBorder}
             allowFullScreen={true}
             title={dynamicIframe.title}
-            className="w-full rounded-lg"
+            className="w-full rounded-lg mt-10"
             style={{ minHeight: height, borderRadius: '10px' }}
           />
       </div>
