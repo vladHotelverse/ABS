@@ -20,7 +20,7 @@ import type {
 import type { OfferData } from '../ABS_SpecialOffers/types'
 
 // Import new section components
-import { RoomSelectionSection, RoomSelectionMapSection, CustomizationSection, SpecialOffersSection, BookingStateSection } from './sections'
+import { RoomSelectionSection, CustomizationSection, SpecialOffersSection, BookingStateSection } from './sections'
 import type { RoomOption, SpecialOffer } from './sections'
 import { ABS_RoomSelection } from '../ABS_RoomSelection'
 
