@@ -1,3 +1,5 @@
+import type { SegmentDiscount } from '../ABS_RoomSelectionCarousel/types'
+
 // Unified pricing item interface to reduce conversion complexity
 export interface PricingItem {
   id: string | number
@@ -9,6 +11,7 @@ export interface PricingItem {
   bidStatus?: 'pending' | 'submitted' | 'accepted' | 'rejected' | 'expired'
   itemStatus?: 'sent_to_hotel' | 'accepted_by_hotel' | 'rejected_by_hotel'
   statusDescription?: string
+  segmentDiscount?: SegmentDiscount
 }
 
 // Available section interface

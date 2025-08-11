@@ -1,3 +1,5 @@
+import type { SegmentDiscount } from '../ABS_RoomSelectionCarousel/types'
+
 export interface OfferType {
   id: number
   title: string
@@ -8,6 +10,7 @@ export interface OfferType {
   requiresDateSelection?: boolean
   allowsMultipleDates?: boolean // For multiple date selection
   featured?: boolean
+  segmentDiscount?: SegmentDiscount
 }
 
 export interface OfferSelection {

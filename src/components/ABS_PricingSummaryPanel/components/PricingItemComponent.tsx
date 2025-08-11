@@ -3,6 +3,7 @@ import type React from 'react'
 import { useState } from 'react'
 import { cn } from '../../../lib/utils'
 import { UiButton } from '../../ui/button'
+import { SegmentBadge } from '../../ui/segment-badge'
 import PriceChangeIndicator from './PriceChangeIndicator'
 import type { PricingItem } from '../types'
 
@@ -70,12 +71,16 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
     <div className="transition-all duration-300 ease-in-out border-b border-gray-100 pb-3 mb-3 last:border-b-0 last:mb-0 last:pb-0">
       <div className={cn(
         "flex justify-between items-center py-2 rounded")}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className={cn(
             "text-sm max-w-[200px]",
             isBid && "font-medium text-blue-900"
           )}>{item.name}</span>
           {getBidStatusIcon()}
+          {/* Segment Badge for pricing item */}
+          {item.segmentDiscount && (
+            <SegmentBadge segmentDiscount={item.segmentDiscount} />
+          )}
         </div>
         <div className="flex items-center space-x-2">
           <PriceChangeIndicator 

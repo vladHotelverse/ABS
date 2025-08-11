@@ -10,10 +10,17 @@ export const useOfferPricing = (currencySymbol: string, reservationInfo?: Reserv
   )
 
   const calculateTotal = useCallback((offer: OfferType, selection: OfferSelection): number => {
-    if (selection.quantity === 0) return 0
-
-    // Check if this is an All Inclusive package
+    // Check if this is an All Inclusive package, Online Check-in, or Late Checkout
     const isAllInclusive = offer.title.toLowerCase().includes('all inclusive')
+    const isOnlineCheckin = offer.title.toLowerCase().includes('online check-in')
+    const isLateCheckout = offer.title.toLowerCase().includes('late checkout')
+    
+    if (selection.quantity === 0 && !isAllInclusive && !isOnlineCheckin && !isLateCheckout) return 0
+    
+    // For Online Check-in and Late Checkout, it's a flat fee per stay
+    if ((isOnlineCheckin || isLateCheckout) && offer.type === 'perStay') {
+      return offer.price
+    }
     
     // For All Inclusive packages, use the full reservation person count and night count
     if (isAllInclusive && offer.type === 'perPerson') {

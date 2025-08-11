@@ -1,3 +1,14 @@
+export type SegmentType = 'business' | 'leisure' | 'luxury' | 'budget' | 'family' | 'loyalty' | 'group' | 'extended-stay'
+
+export interface SegmentDiscount {
+  segmentType: SegmentType
+  discountAmount: number
+  discountType: 'percentage' | 'fixed'
+  label: string
+  priority: number // Higher number = higher priority for display
+  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gold'
+}
+
 export interface RoomOption {
   id: string
   title?: string
@@ -7,6 +18,7 @@ export interface RoomOption {
   price: number
   oldPrice?: number
   images: string[]
+  segmentDiscount?: SegmentDiscount
 }
 
 export interface RoomSelectionCarouselTranslations {
@@ -32,6 +44,18 @@ export interface RoomSelectionCarouselTranslations {
 
   // Discount badge
   discountBadgeText: string // Template: '-{percentage}%'
+  
+  // Segment badges
+  segmentLabels?: {
+    business: string
+    leisure: string  
+    luxury: string
+    budget: string
+    family: string
+    loyalty: string
+    group: string
+    'extended-stay': string
+  }
 
   // Empty state
   noRoomsAvailableText: string

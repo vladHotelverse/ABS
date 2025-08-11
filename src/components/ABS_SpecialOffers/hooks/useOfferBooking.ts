@@ -30,6 +30,16 @@ export const useOfferBooking = ({
     return offer.title.toLowerCase().includes('all inclusive')
   }
 
+  // Helper function to check if offer is Online Check-in
+  const isOnlineCheckin = (offer: OfferType): boolean => {
+    return offer.title.toLowerCase().includes('online check-in')
+  }
+
+  // Helper function to check if offer is Late Checkout
+  const isLateCheckout = (offer: OfferType): boolean => {
+    return offer.title.toLowerCase().includes('late checkout')
+  }
+
   // Helper function to calculate nights between dates
   const calculateNights = (checkIn?: Date, checkOut?: Date): number => {
     if (!checkIn || !checkOut) return 1
@@ -38,8 +48,8 @@ export const useOfferBooking = ({
     return Math.max(1, diffDays)
   }
   const validateBooking = useCallback((offer: OfferType, selection: OfferSelection): string | null => {
-    // For non-date-based offers, quantity must be greater than 0
-    if (!offer.requiresDateSelection && offer.type !== 'perNight' && selection.quantity === 0) {
+    // For non-date-based offers, quantity must be greater than 0 (except for All Inclusive, Online Check-in, and Late Checkout)
+    if (!offer.requiresDateSelection && offer.type !== 'perNight' && selection.quantity === 0 && !isAllInclusive(offer) && !isOnlineCheckin(offer) && !isLateCheckout(offer)) {
       return 'Quantity must be greater than 0'
     }
 
@@ -67,6 +77,9 @@ export const useOfferBooking = ({
       if (offer.requiresDateSelection && selection.selectedDates && selection.selectedDates.length > 0) {
         finalQuantity = selection.selectedDates.length
       } else if (offer.requiresDateSelection && selection.selectedDate) {
+        finalQuantity = 1
+      } else if (isOnlineCheckin(offer) || isLateCheckout(offer)) {
+        // Online check-in and Late checkout are always quantity 1 when booked
         finalQuantity = 1
       }
 
@@ -161,12 +174,14 @@ export const useOfferBooking = ({
 
       // Reset selection to default
       const isAllInclusiveOffer = isAllInclusive(offer)
+      const isOnlineCheckinOffer = isOnlineCheckin(offer)
+      const isLateCheckoutOffer = isLateCheckout(offer)
       const nights = calculateNights(reservationInfo?.checkInDate, reservationInfo?.checkOutDate)
       
       setSelections((prev) => ({
         ...prev,
         [id]: {
-          quantity: isAllInclusiveOffer ? 1 : 0, // All inclusive resets to 1, others to 0
+          quantity: (isAllInclusiveOffer || isOnlineCheckinOffer || isLateCheckoutOffer) ? 1 : 0, // Special offers reset to 1, others to 0
           persons: offer.type === 'perPerson' ? reservationInfo?.personCount || 1 : 1,
           nights: isAllInclusiveOffer ? nights : 1, // All inclusive uses full stay duration
           selectedDate: undefined,

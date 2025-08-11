@@ -1,6 +1,7 @@
 import { Star } from 'lucide-react'
 import type React from 'react'
 import { Badge } from '../../ui/badge'
+import { SegmentBadge } from '../../ui/segment-badge'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../ui/card'
 import type { OfferLabels, OfferSelection, OfferType, ReservationInfo } from '../types'
 import OfferBookingButton from './OfferBookingButton'
@@ -41,8 +42,10 @@ const OfferCard: React.FC<OfferCardProps> = ({
 }) => {
   const total = calculateTotal(offer, selection)
   
-  // Check if this is an All Inclusive package
+  // Check if this is an All Inclusive package, Online Check-in, or Late Checkout
   const isAllInclusive = offer.title.toLowerCase().includes('all inclusive')
+  const isOnlineCheckin = offer.title.toLowerCase().includes('online check-in')
+  const isLateCheckout = offer.title.toLowerCase().includes('late checkout')
 
   // Create appropriate handlers based on offer requirements
   const dateChangeHandler = offer.requiresDateSelection && !offer.allowsMultipleDates ? onUpdateSelectedDate : undefined
@@ -70,6 +73,12 @@ const OfferCard: React.FC<OfferCardProps> = ({
             {labels.popularLabel}
           </Badge>
         )}
+        {/* Segment Badge - positioned below other badges */}
+        {offer.segmentDiscount && (
+          <div className="absolute bottom-2 right-2">
+            <SegmentBadge segmentDiscount={offer.segmentDiscount} />
+          </div>
+        )}
       </div>
 
       <CardHeader className="pb-3">
@@ -91,7 +100,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
           onDecreaseQuantity={() => onUpdateQuantity(-1)}
           isBooked={isBooked}
           labels={labels}
-          showQuantityControls={!offer.requiresDateSelection && offer.type !== 'perNight' && !isAllInclusive}
+          showQuantityControls={!offer.requiresDateSelection && offer.type !== 'perNight' && !isAllInclusive && !isOnlineCheckin && !isLateCheckout}
           selectedDate={selection.selectedDate}
           selectedDates={selection.selectedDates}
           onDateChange={dateChangeHandler}
@@ -147,7 +156,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
               !selection.selectedDate &&
               (!selection.selectedDates || selection.selectedDates.length === 0)) ||
               (offer.type === 'perNight' && (!selection.startDate || !selection.endDate)) ||
-              (!offer.requiresDateSelection && offer.type !== 'perNight' && !isAllInclusive && selection.quantity === 0))
+              (!offer.requiresDateSelection && offer.type !== 'perNight' && !isAllInclusive && !isOnlineCheckin && !isLateCheckout && selection.quantity === 0))
           }
           isBooked={isBooked}
           bookText={labels.bookNow}

@@ -6,6 +6,7 @@ import { PriceSlider } from './components'
 import { useSlider } from './hooks'
 import { UiButton } from '../ui/button'
 import { UiTooltip, UiTooltipContent, UiTooltipTrigger, TooltipProvider } from '../ui/tooltip'
+import { SegmentBadge } from '../ui/segment-badge'
 import type { RoomOption } from './types'
 
 interface RoomCardProps {
@@ -462,12 +463,16 @@ const RoomCard: React.FC<RoomCardProps> = ({
         <div className="flex items-start justify-between gap-4 mt-2">
           <div className='flex flex-col'>
             {/* Price Display */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-3xl font-bold">{`${currencySymbol}${room.price}`}</span>
               {room.oldPrice && (
                 <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${room.oldPrice}`}</span>
               )}
               <span className="text-base text-neutral-500">{nightText}</span>
+              {/* Segment Badge */}
+              {room.segmentDiscount && (
+                <SegmentBadge segmentDiscount={room.segmentDiscount} />
+              )}
             </div>
             
             {/* Total Price Display */}
