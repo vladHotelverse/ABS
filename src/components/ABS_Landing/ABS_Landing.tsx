@@ -509,7 +509,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }
 
   return (
-    <div className={clsx('min-h-screen bg-neutral-50/30 flex flex-col', className)}>
+    <div className={clsx('min-h-screen max-w-[calc(100vw-24px)] bg-neutral-50/30 flex flex-col', className)}>
       <Header
         onCartClick={onCartClick}
         itemsInCart={itemCount}

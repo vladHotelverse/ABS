@@ -139,3 +139,12 @@ export interface RoomSelectionCarouselProps {
     status: 'pending' | 'submitted' | 'accepted' | 'rejected'
   }
 }
+
+// Re-export the new grouped interfaces from RoomCard
+export type {
+  RoomCardTranslations,
+  RoomCardHandlers,
+  RoomCardConfig,
+  RoomCardState,
+  RoomCardProps,
+} from './RoomCard'

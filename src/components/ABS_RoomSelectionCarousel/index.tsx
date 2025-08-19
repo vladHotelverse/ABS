@@ -5,6 +5,7 @@ import { CarouselNavigation, RoomCard } from './components'
 import { useCarouselState } from './hooks/useCarouselState'
 import { useDragHandlers } from './hooks/useDragHandlers'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
+import type { RoomCardTranslations, RoomCardHandlers, RoomCardConfig, RoomCardState, RoomOption } from './types'
 import { getDynamicAmenitiesForAllRooms, getCurrentRoomAmenities } from './utils/amenitiesSelector'
 
 const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
@@ -125,6 +126,62 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   // Determine if slider should be shown (disabled in consultation mode)
   const shouldShowSlider = (showPriceSlider || variant === 'with-slider') && mode === 'selection' && !readonly
 
+  // Helper function to create grouped props for RoomCard
+  const createRoomCardProps = (room: RoomOption, roomIndex: number) => {
+    const translations: RoomCardTranslations = {
+      discountBadgeText: resolvedTexts.discountBadgeText,
+      nightText: resolvedTexts.nightText,
+      learnMoreText: resolvedTexts.learnMoreText,
+      priceInfoText: resolvedTexts.priceInfoText,
+      selectedText: resolvedTexts.selectedText,
+      selectText: resolvedTexts.upgradeNowText || resolvedTexts.selectText,
+      removeText: resolvedTexts.removeText,
+      instantConfirmationText: 'Instant Confirmation',
+      bidSubmittedText: resolvedTexts.bidSubmittedText,
+      previousImageLabel: resolvedTexts.previousImage,
+      nextImageLabel: resolvedTexts.nextImage,
+      viewImageLabel: resolvedTexts.viewImage,
+      proposePriceText: resolvedTexts.proposePriceText,
+      availabilityText: resolvedTexts.availabilityText,
+      currencyText: resolvedTexts.currencyText,
+      offerMadeText: resolvedTexts.offerMadeText,
+      updateBidText: resolvedTexts.updateBidText,
+      cancelBidText: resolvedTexts.cancelBidText,
+      makeOfferText: resolvedTexts.makeOfferText,
+    }
+
+    const handlers: RoomCardHandlers = {
+      onSelectRoom: readonly || mode === 'consultation' ? () => {} : actions.selectRoom,
+      onImageChange: (newImageIndex: number) => actions.setActiveImageIndex(roomIndex, newImageIndex),
+      onLearnMore,
+      onMakeOffer,
+      onCancelBid,
+    }
+
+    const config: RoomCardConfig = {
+      currencySymbol: resolvedTexts.currencySymbol,
+      isActive: state.activeIndex === roomIndex,
+      showPriceSlider: shouldShowSlider,
+      minPrice,
+      dynamicAmenities: dynamicAmenitiesMap.get(room.id),
+      roomIndex,
+    }
+
+    const cardState: RoomCardState = {
+      selectedRoom: state.selectedRoom,
+      activeImageIndex: state.activeImageIndices[roomIndex] || 0,
+      activeBid,
+    }
+
+    return {
+      room,
+      translations,
+      handlers,
+      config,
+      state: cardState,
+    }
+  }
+
   if (roomOptions.length === 0) {
     return (
       <div className={clsx('text-center py-8', className)}>
@@ -147,41 +204,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         )}
 
         <div className="w-full max-w-md">
-          <RoomCard
-            room={roomOptions[0]}
-            discountBadgeText={resolvedTexts.discountBadgeText}
-            nightText={resolvedTexts.nightText}
-            learnMoreText={resolvedTexts.learnMoreText}
-            priceInfoText={resolvedTexts.priceInfoText}
-            selectedText={resolvedTexts.selectedText}
-            selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
-            removeText={resolvedTexts.removeText}
-            selectedRoom={state.selectedRoom}
-            onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
-            activeImageIndex={state.activeImageIndices[0] || 0}
-            onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(0, newImageIndex)}
-            currencySymbol={resolvedTexts.currencySymbol}
-            onLearnMore={onLearnMore}
-            activeBid={activeBid}
-            bidSubmittedText={resolvedTexts.bidSubmittedText}
-            previousImageLabel={resolvedTexts.previousImage}
-            nextImageLabel={resolvedTexts.nextImage}
-            viewImageLabel={resolvedTexts.viewImage}
-            isActive={state.activeIndex === 0}
-            showPriceSlider={shouldShowSlider}
-            minPrice={minPrice}
-            onMakeOffer={onMakeOffer}
-            onCancelBid={onCancelBid}
-            proposePriceText={resolvedTexts.proposePriceText}
-            makeOfferText={resolvedTexts.makeOfferText}
-            availabilityText={resolvedTexts.availabilityText}
-            currencyText={resolvedTexts.currencyText}
-            offerMadeText={resolvedTexts.offerMadeText}
-            updateBidText={resolvedTexts.updateBidText}
-            cancelBidText={resolvedTexts.cancelBidText}
-            dynamicAmenities={dynamicAmenitiesMap.get(roomOptions[0].id)}
-            roomIndex={0}
-          />
+          <RoomCard {...createRoomCardProps(roomOptions[0], 0)} />
         </div>
       </div>
     )
@@ -203,41 +226,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
         <div className="hidden lg:grid lg:grid-cols-2 gap-6">
           {roomOptions.map((room, index) => (
             <div key={room.id}>
-              <RoomCard
-                room={room}
-                discountBadgeText={resolvedTexts.discountBadgeText}
-                nightText={resolvedTexts.nightText}
-                learnMoreText={resolvedTexts.learnMoreText}
-                priceInfoText={resolvedTexts.priceInfoText}
-                selectedText={resolvedTexts.selectedText}
-                selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
-                removeText={resolvedTexts.removeText}
-                selectedRoom={state.selectedRoom}
-                onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
-                activeImageIndex={state.activeImageIndices[index] || 0}
-                onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
-                currencySymbol={resolvedTexts.currencySymbol}
-                onLearnMore={onLearnMore}
-                activeBid={activeBid}
-                bidSubmittedText={resolvedTexts.bidSubmittedText}
-                previousImageLabel={resolvedTexts.previousImage}
-                nextImageLabel={resolvedTexts.nextImage}
-                viewImageLabel={resolvedTexts.viewImage}
-                isActive={state.activeIndex === index}
-                showPriceSlider={shouldShowSlider}
-                minPrice={minPrice}
-                onMakeOffer={onMakeOffer}
-                onCancelBid={onCancelBid}
-                proposePriceText={resolvedTexts.proposePriceText}
-                makeOfferText={resolvedTexts.makeOfferText}
-                availabilityText={resolvedTexts.availabilityText}
-                currencyText={resolvedTexts.currencyText}
-                offerMadeText={resolvedTexts.offerMadeText}
-                updateBidText={resolvedTexts.updateBidText}
-                cancelBidText={resolvedTexts.cancelBidText}
-                dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
-                roomIndex={index}
-              />
+              <RoomCard {...createRoomCardProps(room, index)} />
             </div>
           ))}
         </div>
@@ -263,41 +252,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     'left-[100%] z-5 opacity-70': state.activeIndex !== index && index === 1,
                   })}
                 >
-                  <RoomCard
-                    room={room}
-                    discountBadgeText={resolvedTexts.discountBadgeText}
-                    nightText={resolvedTexts.nightText}
-                    learnMoreText={resolvedTexts.learnMoreText}
-                    priceInfoText={resolvedTexts.priceInfoText}
-                    selectedText={resolvedTexts.selectedText}
-                    selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
-                    removeText={resolvedTexts.removeText}
-                    selectedRoom={state.selectedRoom}
-                    onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
-                    activeImageIndex={state.activeImageIndices[index] || 0}
-                    onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
-                    currencySymbol={resolvedTexts.currencySymbol}
-                    onLearnMore={onLearnMore}
-                    activeBid={activeBid}
-                    bidSubmittedText={resolvedTexts.bidSubmittedText}
-                    previousImageLabel={resolvedTexts.previousImage}
-                    nextImageLabel={resolvedTexts.nextImage}
-                    viewImageLabel={resolvedTexts.viewImage}
-                    isActive={state.activeIndex === index}
-                    showPriceSlider={shouldShowSlider}
-                    minPrice={minPrice}
-                    onMakeOffer={onMakeOffer}
-                    onCancelBid={onCancelBid}
-                    proposePriceText={resolvedTexts.proposePriceText}
-                    makeOfferText={resolvedTexts.makeOfferText}
-                    availabilityText={resolvedTexts.availabilityText}
-                    currencyText={resolvedTexts.currencyText}
-                    offerMadeText={resolvedTexts.offerMadeText}
-                    updateBidText={resolvedTexts.updateBidText}
-                    cancelBidText={resolvedTexts.cancelBidText}
-                    dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
-                    roomIndex={index}
-                  />
+                  <RoomCard {...createRoomCardProps(room, index)} />
                 </div>
               ))}
             </div>
@@ -412,41 +367,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     'left-[100%] z-5 opacity-70 sm:w-1/2 sm:left-[80%]': index === nextIndex,
                   })}
                 >
-                  <RoomCard
-                    room={room}
-                    discountBadgeText={resolvedTexts.discountBadgeText}
-                    nightText={resolvedTexts.nightText}
-                    learnMoreText={resolvedTexts.learnMoreText}
-                    priceInfoText={resolvedTexts.priceInfoText}
-                    selectedText={resolvedTexts.selectedText}
-                    selectText={resolvedTexts.upgradeNowText || resolvedTexts.selectText}
-                    removeText={resolvedTexts.removeText}
-                    selectedRoom={state.selectedRoom}
-                    onSelectRoom={readonly || mode === 'consultation' ? () => {} : actions.selectRoom}
-                    activeImageIndex={state.activeImageIndices[index] || 0}
-                    onImageChange={(newImageIndex: number) => actions.setActiveImageIndex(index, newImageIndex)}
-                    currencySymbol={resolvedTexts.currencySymbol}
-                    onLearnMore={onLearnMore}
-                    activeBid={activeBid}
-                    bidSubmittedText={resolvedTexts.bidSubmittedText}
-                    previousImageLabel={resolvedTexts.previousImage}
-                    nextImageLabel={resolvedTexts.nextImage}
-                    viewImageLabel={resolvedTexts.viewImage}
-                    isActive={state.activeIndex === index}
-                    showPriceSlider={shouldShowSlider}
-                    minPrice={minPrice}
-                    onMakeOffer={onMakeOffer}
-                    onCancelBid={onCancelBid}
-                    proposePriceText={resolvedTexts.proposePriceText}
-                    makeOfferText={resolvedTexts.makeOfferText}
-                    availabilityText={resolvedTexts.availabilityText}
-                    currencyText={resolvedTexts.currencyText}
-                    offerMadeText={resolvedTexts.offerMadeText}
-                    updateBidText={resolvedTexts.updateBidText}
-                    cancelBidText={resolvedTexts.cancelBidText}
-                    dynamicAmenities={dynamicAmenitiesMap.get(room.id)}
-                    roomIndex={index}
-                  />
+                  <RoomCard {...createRoomCardProps(room, index)} />
                 </div>
               )
             })}

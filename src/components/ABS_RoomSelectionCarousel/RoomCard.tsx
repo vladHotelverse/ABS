@@ -9,8 +9,7 @@ import { UiTooltip, UiTooltipContent, UiTooltipTrigger, TooltipProvider } from '
 import { SegmentBadge } from '../ui/segment-badge'
 import type { RoomOption } from './types'
 
-interface RoomCardProps {
-  room: RoomOption
+export interface RoomCardTranslations {
   discountBadgeText: string
   nightText: string
   learnMoreText: string
@@ -18,29 +17,11 @@ interface RoomCardProps {
   selectedText: string
   selectText: string
   removeText: string
-  selectedRoom: RoomOption | null
-  onSelectRoom: (room: RoomOption | null) => void
-  activeImageIndex: number
-  onImageChange: (newImageIndex: number) => void
-  currencySymbol?: string
-  onLearnMore?: (room: RoomOption) => void
   instantConfirmationText?: string
-  activeBid?: {
-    roomId: string | number
-    bidAmount: number
-    status: 'pending' | 'submitted' | 'accepted' | 'rejected'
-  }
   bidSubmittedText?: string
-  // Translation props for image navigation
   previousImageLabel?: string
   nextImageLabel?: string
   viewImageLabel?: string // Template: 'View image {index}'
-  // Price slider props
-  isActive?: boolean
-  showPriceSlider?: boolean
-  minPrice?: number
-  onMakeOffer?: (price: number, room: RoomOption) => void
-  onCancelBid?: (roomId: string) => void
   proposePriceText?: string
   availabilityText?: string
   currencyText?: string
@@ -48,48 +29,92 @@ interface RoomCardProps {
   updateBidText?: string
   cancelBidText?: string
   makeOfferText?: string
-  // Dynamic amenities props
-  dynamicAmenities?: string[]
-  // Total price text
   totalPriceText?: string
+}
+
+export interface RoomCardHandlers {
+  onSelectRoom: (room: RoomOption | null) => void
+  onImageChange: (newImageIndex: number) => void
+  onLearnMore?: (room: RoomOption) => void
+  onMakeOffer?: (price: number, room: RoomOption) => void
+  onCancelBid?: (roomId: string) => void
+}
+
+export interface RoomCardConfig {
+  currencySymbol?: string
+  isActive?: boolean
+  showPriceSlider?: boolean
+  minPrice?: number
+  dynamicAmenities?: string[]
   roomIndex?: number
+}
+
+export interface RoomCardState {
+  selectedRoom: RoomOption | null
+  activeImageIndex: number
+  activeBid?: {
+    roomId: string | number
+    bidAmount: number
+    status: 'pending' | 'submitted' | 'accepted' | 'rejected'
+  }
+}
+
+export interface RoomCardProps {
+  room: RoomOption
+  translations: RoomCardTranslations
+  handlers: RoomCardHandlers
+  config?: RoomCardConfig
+  state: RoomCardState
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
   room,
-  discountBadgeText,
-  nightText,
-  learnMoreText: _learnMoreText,
-  priceInfoText,
-  selectedText,
-  selectText,
-  removeText,
-  selectedRoom,
-  onSelectRoom,
-  activeImageIndex,
-  onImageChange,
-  currencySymbol = '€',
-  onLearnMore: _onLearnMore,
-  instantConfirmationText = 'Instant Confirmation',
-  activeBid,
-  bidSubmittedText = 'Bid Submitted',
-  previousImageLabel = 'Previous image',
-  nextImageLabel = 'Next image',
-  viewImageLabel = 'View image {index}',
-  isActive = false,
-  showPriceSlider = false,
-  minPrice = 10,
-  onMakeOffer,
-  onCancelBid,
-  proposePriceText,
-  availabilityText,
-  currencyText,
-  offerMadeText,
-  updateBidText,
-  cancelBidText,
-  makeOfferText: _makeOfferText,
-  dynamicAmenities,
+  translations,
+  handlers,
+  config = {},
+  state,
 }) => {
+  // Destructure grouped props with defaults
+  const {
+    discountBadgeText,
+    nightText,
+    priceInfoText,
+    selectedText,
+    selectText,
+    removeText,
+    instantConfirmationText = 'Instant Confirmation',
+    bidSubmittedText = 'Bid Submitted',
+    previousImageLabel = 'Previous image',
+    nextImageLabel = 'Next image',
+    viewImageLabel = 'View image {index}',
+    proposePriceText,
+    availabilityText,
+    currencyText,
+    offerMadeText,
+    updateBidText,
+    cancelBidText,
+  } = translations
+
+  const {
+    onSelectRoom,
+    onImageChange,
+    onMakeOffer,
+    onCancelBid,
+  } = handlers
+
+  const {
+    currencySymbol = '€',
+    isActive = false,
+    showPriceSlider = false,
+    minPrice = 10,
+    dynamicAmenities,
+  } = config
+
+  const {
+    selectedRoom,
+    activeImageIndex,
+    activeBid,
+  } = state
   const isBidActive = activeBid?.roomId === room.id
   // State for checking if description is truncated
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false)
@@ -311,7 +336,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
     <div
       className={clsx(
         'relative rounded-lg overflow-visible md:shadow-sm max-w-lg transition-all duration-300',
-        isActive && showPriceSlider ? 'bg-gray-50 ring-2 ring-gray-200' : 'bg-white',
+        isActive && showPriceSlider ? 'bg-gray-50 md:ring-2 ring-gray-200' : 'bg-white',
         {
           'border-2 border-green-300 bg-green-50/30': selectedRoom?.id === room.id,
           'border-2 border-blue-300 bg-blue-50/30': isBidActive && selectedRoom?.id !== room.id,
@@ -360,7 +385,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           transition: localImageDragState.isDragging ? 'none' : 'transform 0.3s ease-out',
         }}
       >
-        <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full" />
+        <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full rounded-t-lg" />
         
         {/* Amenities overlay - top left */}
         <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1 max-w-[85%]">

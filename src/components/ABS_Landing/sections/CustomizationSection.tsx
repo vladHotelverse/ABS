@@ -43,7 +43,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   }
 
   return (
-    <section className={`bg-white p-4 md:p-6 rounded-lg shadow border border-neutral-300 ${className}`}>
+    <section className={`bg-white md:p-6 rounded-lg md:hadow md:border md:border-neutral-300 ${className}`}>
       <h2 className="text-3xl font-bold mb-4">{texts.customizeTitle}</h2>
       <p className="mb-6">{texts.customizeSubtitle}</p>
       <RoomCustomization

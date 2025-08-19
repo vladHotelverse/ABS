@@ -37,7 +37,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
   return (
     <div
       className={clsx(
-        'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-100 shadow-lg',
+        'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-100 shadow-lg max-w-[calc(100vw-24px)]',
         'lg:hidden', // Only show on mobile/tablet
         'transition-transform duration-300 ease-in-out',
         'safe-area-inset-bottom', // Handle device safe areas

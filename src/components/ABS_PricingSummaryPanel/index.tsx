@@ -97,7 +97,7 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   return (
     <section
       className={clsx(
-        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm w-[400px] sticky top-28',
+        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm md:w-[400px] max-w-[calc(100vw-24px)] sticky top-28 ',
         className
       )}
       aria-label={labels.pricingSummaryLabel}
