@@ -95,13 +95,13 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   return (
     <section
       className={clsx(
-        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm md:w-[400px] sticky top-28 ',
+        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm w-full md:w-[400px] sticky top-28 ',
         className
       )}
       aria-label={labels.pricingSummaryLabel}
     >
       {/* Room image at the top */}
-      <div className="w-full h-40 bg-neutral-200 overflow-hidden">
+      <div className="w-full md:h-40 bg-neutral-200 overflow-hidden">
         <img src={roomImage} alt={labels.roomImageAltText} className="w-full h-full object-cover" />
       </div>
 

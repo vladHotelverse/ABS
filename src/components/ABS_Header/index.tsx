@@ -151,20 +151,10 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Cart and Price */}
-          <div className="flex items-center space-x-4">
             <div className="text-right min-w-0 flex-shrink-0">
               <p className="text-xs text-neutral-300 whitespace-nowrap">{totalLabel}</p>
               <p className="text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis">{formattedPrice}</p>
             </div>
-            <UiButton
-              onClick={onCartClick}
-              className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"
-              aria-label={`Shopping cart with ${itemsInCart} items. Total: ${formattedPrice}`}
-              disabled={isLoading}
-            >
-              <ShoppingCart className="h-6 w-6" />
-            </UiButton>
-          </div>
         </div>
       </div>
     </header>
