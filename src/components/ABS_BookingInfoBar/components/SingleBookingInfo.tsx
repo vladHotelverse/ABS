@@ -28,11 +28,11 @@ const SingleBookingInfo: React.FC<SingleBookingInfoProps> = ({ title, items = []
         </div>
       </div>
 
-      {/* Mobile/Tablet/Desktop version - 2x2 grid for smaller screens */}
+      {/* Mobile/Tablet/Desktop version - responsive grid for smaller screens */}
       <div className="block xl:hidden">
-        <div className="p-4 overflow-hidden">
-          <h4 className="mb-4 font-medium text-md">{title}</h4>
-          <div className="grid grid-cols-2 gap-4 min-w-0">
+        <div className="p-3 sm:p-4 overflow-hidden">
+          <h4 className="mb-3 sm:mb-4 font-medium text-sm sm:text-md">{title}</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 min-w-0">
             {items?.map((item, index) => (
               <BookingInfoItem
                 key={`mobile-${item.icon}-${item.label}-${index}`}

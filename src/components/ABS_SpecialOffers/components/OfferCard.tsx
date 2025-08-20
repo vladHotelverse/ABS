@@ -56,10 +56,10 @@ const OfferCard: React.FC<OfferCardProps> = ({
     <Card
       data-testid="offer-card"
       className={`overflow-hidden border transition-all h-full flex flex-col ${
-        isBooked ? 'border-green-300 bg-green-50/30' : 'border-neutral-100 hover:border-neutral-100'
+        isBooked ? 'border-green-300 bg-green-50/30' : 'border-neutral-100 hover:border-neutral-200'
       }`}
     >
-      <div className="h-40 overflow-hidden relative">
+      <div className="h-32 sm:h-40 overflow-hidden relative">
         <OfferImage image={offer.image} title={offer.title} />
         {isBooked && (
           <Badge className="absolute top-2 left-2 bg-green-600 text-white text-xs flex items-center gap-1">
@@ -81,15 +81,15 @@ const OfferCard: React.FC<OfferCardProps> = ({
         )}
       </div>
 
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
+      <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6">
+        <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
           {offer.title}
-          {isBooked && <Star className="h-5 w-5 text-green-600" />}
+          {isBooked && <Star className="h-4 sm:h-5 w-4 sm:w-5 text-green-600" />}
         </CardTitle>
-        <p className="text-sm leading-relaxed">{offer.description}</p>
+        <p className="text-xs sm:text-sm leading-relaxed line-clamp-2">{offer.description}</p>
       </CardHeader>
 
-      <CardContent className="space-y-4 px-4 flex-grow">
+      <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-6 flex-grow">
         {/* Price Display */}
         <OfferPriceDisplay
           price={formatPrice(offer.price)}
@@ -133,7 +133,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
         )}
       </CardContent>
 
-      <CardFooter className="px-4 pb-4 space-y-2">
+      <CardFooter className="px-3 sm:px-6 pb-3 sm:pb-4 space-y-2">
         {/* Show validation messages only when user attempted to book */}
         {!isBooked && showValidation && (
           <>
@@ -161,6 +161,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
           isBooked={isBooked}
           bookText={labels.bookNow}
           removeText={labels.removeOfferLabel}
+          offerTitle={offer.title}
         />
       </CardFooter>
     </Card>
