@@ -10,6 +10,8 @@ describe('useRoomCalculations', () => {
     roomNumber: `${id}01`,
     guestName: `Guest ${id}`,
     roomImage: 'mock-image.jpg',
+    nights: 1,
+    payAtHotel: false,
     items: items.map((item, index) => ({
       id: `${id}-item-${index}`,
       name: item.name,
