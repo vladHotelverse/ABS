@@ -5,9 +5,7 @@ import EmptyState from './components/EmptyState'
 import PriceBreakdown from './components/PriceBreakdown'
 import ToastContainer from './components/ToastContainer'
 import PricingItemComponent from './components/PricingItemComponent'
-// import RoomSection from './components/RoomSection'
-// import CustomizationsSection from './components/CustomizationsSection'
-// import OffersSection from './components/OffersSection'
+import ItemsSection from './components/ItemsSection'
 import LoadingOverlay from './components/LoadingOverlay'
 import type { PricingItem, PricingSummaryPanelProps } from './types'
 import { PANEL_CONFIG, DEFAULT_ROOM_IMAGE } from './constants'
@@ -97,7 +95,7 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   return (
     <section
       className={clsx(
-        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm md:w-[400px] max-w-[calc(100vw-24px)] sticky top-28 ',
+        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm md:w-[400px] sticky top-28 ',
         className
       )}
       aria-label={labels.pricingSummaryLabel}
@@ -182,61 +180,23 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
 
 
         {/* Customizations Section */}
-        {customizeYourRoomItems.length > 0 && (
-          <section aria-labelledby="customizations-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="customizations-section-title" className="text-base font-semibold">
-                Room Customization
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {customizeYourRoomItems.map((item) => (
-                <PricingItemComponent
-                  key={item.id}
-                  item={item}
-                  euroSuffix={labels.euroSuffix}
-                  removeLabel={`Remove ${item.name}`}
-                  onRemove={() => {
-                    try {
-                      handleRemoveItem(item)
-                    } catch (error) {
-                      console.error('Error in remove item callback:', error)
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <ItemsSection
+          title="Room Customization"
+          items={customizeYourRoomItems}
+          euroSuffix={labels.euroSuffix}
+          removeLabel="Remove"
+          onRemoveItem={handleRemoveItem}
+        />
 
 
         {/* Special Offers Section */}
-        {enhanceYourStayItems.length > 0 && (
-          <section aria-labelledby="offers-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="offers-section-title" className="text-base font-semibold">
-                Stay Enhancement
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {enhanceYourStayItems.map((item) => (
-                <PricingItemComponent
-                  key={item.id}
-                  item={item}
-                  euroSuffix={labels.euroSuffix}
-                  removeLabel={`Remove ${item.name}`}
-                  onRemove={() => {
-                    try {
-                      handleRemoveItem(item)
-                    } catch (error) {
-                      console.error('Error in remove item callback:', error)
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <ItemsSection
+          title="Stay Enhancement"
+          items={enhanceYourStayItems}
+          euroSuffix={labels.euroSuffix}
+          removeLabel="Remove"
+          onRemoveItem={handleRemoveItem}
+        />
 
         {/* Price Breakdown - Only show when not empty */}
         {!isEmpty && (

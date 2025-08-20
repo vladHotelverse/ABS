@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import type React from 'react'
 import { useMemo } from 'react'
-import { CarouselNavigation, RoomCard } from './components'
+import { SingleRoomLayout, TwoRoomLayout, MultiRoomLayout } from './components'
 import { useCarouselState } from './hooks/useCarouselState'
 import { useDragHandlers } from './hooks/useDragHandlers'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
@@ -194,247 +194,61 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   if (roomOptions.length === 1) {
     // Single room: No carousel, just display the room card
     return (
-      <div className={clsx(className)}>
-        {/* Title and Subtitle */}
-        {(title || subtitle) && (
-          <div className="mb-6 text-center">
-            {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
-            {subtitle && <p className="text-neutral-600">{subtitle}</p>}
-          </div>
-        )}
-
-        <div className="w-full max-w-md">
-          <RoomCard {...createRoomCardProps(roomOptions[0], 0)} />
-        </div>
-      </div>
+      <SingleRoomLayout
+        className={className}
+        title={title}
+        subtitle={subtitle}
+        roomCardProps={createRoomCardProps(roomOptions[0], 0)}
+      />
     )
   }
 
   if (roomOptions.length === 2) {
     // Two rooms: Show side by side on large screens, carousel on mobile
+    const roomCardPropsArray = roomOptions.map((room, index) => createRoomCardProps(room, index))
+    
     return (
-      <div className={clsx(className)}>
-        {/* Title and Subtitle */}
-        {(title || subtitle) && (
-          <div className="mb-6 text-center">
-            {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
-            {subtitle && <p className="text-neutral-600">{subtitle}</p>}
-          </div>
-        )}
-
-        {/* Desktop: Side by side layout */}
-        <div className="hidden lg:grid lg:grid-cols-2 gap-6">
-          {roomOptions.map((room, index) => (
-            <div key={room.id}>
-              <RoomCard {...createRoomCardProps(room, index)} />
-            </div>
-          ))}
-        </div>
-
-        {/* Mobile/Tablet: Carousel layout */}
-        <div className="lg:hidden">
-          <div className="relative w-full overflow-visible h-full">
-            <div 
-              className="w-full relative perspective-[1000px] min-h-[550px] overflow-visible"
-              {...roomCarouselDragHandlers}
-              style={{
-                ...roomCarouselDragHandlers.style,
-                transform: state.dragState.isDragging ? `translateX(${state.dragState.deltaX * 0.5}px)` : undefined,
-                transition: state.dragState.isDragging ? 'none' : 'transform 0.3s ease-out',
-              }}
-            >
-              {roomOptions.map((room, index) => (
-                <div
-                  key={room.id}
-                  className={clsx('w-full absolute transition-all duration-500 ease-in-out', {
-                    'left-0 z-10': state.activeIndex === index,
-                    'left-[-100%] z-5 opacity-70': state.activeIndex !== index && index === 0,
-                    'left-[100%] z-5 opacity-70': state.activeIndex !== index && index === 1,
-                  })}
-                >
-                  <RoomCard {...createRoomCardProps(room, index)} />
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile Navigation */}
-            <div className="flex justify-center items-center gap-4 mt-4">
-              <button
-                onClick={actions.prevSlide}
-                className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors duration-200"
-                aria-label={resolvedTexts.previousRoomMobile}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4"
-                >
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-              </button>
-
-              <div className="flex gap-2">
-                {roomOptions.map((room, index) => (
-                  <button
-                    key={`room-dot-${room.id}`}
-                    onClick={() => actions.setActiveIndex(index)}
-                    className={clsx('h-2 w-2 rounded-full transition-all duration-200', {
-                      'bg-black': state.activeIndex === index,
-                      'bg-neutral-300': state.activeIndex !== index,
-                    })}
-                    aria-label={resolvedTexts.goToRoom.replace('{index}', (index + 1).toString())}
-                  />
-                ))}
-              </div>
-
-              <button
-                onClick={actions.nextSlide}
-                className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors duration-200"
-                aria-label={resolvedTexts.nextRoomMobile}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4"
-                >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </div>
+      <TwoRoomLayout
+        className={className}
+        title={title}
+        subtitle={subtitle}
+        roomCardPropsArray={roomCardPropsArray}
+        state={state}
+        dragHandlers={roomCarouselDragHandlers}
+        onPrevSlide={actions.prevSlide}
+        onNextSlide={actions.nextSlide}
+        onSetActiveIndex={actions.setActiveIndex}
+        navigationLabels={{
+          previousRoomMobile: resolvedTexts.previousRoomMobile,
+          nextRoomMobile: resolvedTexts.nextRoomMobile,
+          goToRoom: resolvedTexts.goToRoom,
+        }}
+      />
     )
   }
 
   // Three or more rooms: Full carousel behavior
+  const roomCardPropsArray = roomOptions.map((room, index) => createRoomCardProps(room, index))
+  
   return (
-    <div className={clsx(className)}>
-      {/* Title and Subtitle */}
-      {(title || subtitle) && (
-        <div className="mb-6 text-center">
-          {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
-          {subtitle && <p className="text-neutral-600">{subtitle}</p>}
-        </div>
-      )}
-
-      <div className="lg:col-span-2">
-        {/* Slider Container with Visible Cards */}
-        <div className="relative w-full overflow-visible h-full">
-          {/* Main Carousel Area */}
-          <div 
-            className="w-full relative perspective-[1000px] h-[750px] overflow-hidden"
-            {...roomCarouselDragHandlers}
-            style={{
-              ...roomCarouselDragHandlers.style,
-              transform: state.dragState.isDragging ? `translateX(${state.dragState.deltaX * 0.3}px)` : undefined,
-              transition: state.dragState.isDragging ? 'none' : 'transform 0.3s ease-out',
-            }}
-          >
-            {roomOptions.map((room, index) => {
-              // Calculate if this card should be visible (previous, current, or next)
-              const prevIndex = (state.activeIndex - 1 + roomOptions.length) % roomOptions.length
-              const nextIndex = (state.activeIndex + 1) % roomOptions.length
-              
-              // Only show previous, current, and next cards
-              const isVisible = index === state.activeIndex || index === prevIndex || index === nextIndex
-              
-              if (!isVisible) {
-                return null
-              }
-              
-              return (
-                <div
-                  key={room.id}
-                  className={clsx('w-full absolute transition-all duration-500 ease-in-out', {
-                    'left-0 z-10 sm:w-1/2 sm:left-1/4': state.activeIndex === index,
-                    'left-[-100%] z-5 opacity-70 sm:w-1/2 sm:left-[-30%]': index === prevIndex,
-                    'left-[100%] z-5 opacity-70 sm:w-1/2 sm:left-[80%]': index === nextIndex,
-                  })}
-                >
-                  <RoomCard {...createRoomCardProps(room, index)} />
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Desktop Carousel Navigation - Only visible on Desktop */}
-          <CarouselNavigation
-            onPrev={actions.prevSlide}
-            onNext={actions.nextSlide}
-            previousLabel={resolvedTexts.previousRoom}
-            nextLabel={resolvedTexts.nextRoom}
-          />
-        </div>
-
-        {/* Mobile/Tablet Carousel Controls */}
-        <div className="lg:hidden flex justify-center items-center gap-4 mt-4">
-          <button
-            onClick={actions.prevSlide}
-            className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors duration-200"
-            aria-label={resolvedTexts.previousRoomMobile}
-          >
-            <svg
-              className="h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-
-          <div className="flex gap-2">
-            {roomOptions.map((room, index) => (
-              <button
-                key={`${room.id}-indicator`}
-                onClick={() => actions.setActiveIndex(index)}
-                className={clsx('h-2 w-2 rounded-full transition-all duration-200', {
-                  'bg-black': state.activeIndex === index,
-                  'bg-neutral-300': state.activeIndex !== index,
-                })}
-                aria-label={resolvedTexts.goToRoom.replace('{index}', (index + 1).toString())}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={actions.nextSlide}
-            className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors duration-200"
-            aria-label={resolvedTexts.nextRoomMobile}
-          >
-            <svg
-              className="h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-    </div>
+    <MultiRoomLayout
+      className={className}
+      title={title}
+      subtitle={subtitle}
+      roomCardPropsArray={roomCardPropsArray}
+      state={state}
+      dragHandlers={roomCarouselDragHandlers}
+      onPrevSlide={actions.prevSlide}
+      onNextSlide={actions.nextSlide}
+      onSetActiveIndex={actions.setActiveIndex}
+      navigationLabels={{
+        previousRoom: resolvedTexts.previousRoom,
+        nextRoom: resolvedTexts.nextRoom,
+        previousRoomMobile: resolvedTexts.previousRoomMobile,
+        nextRoomMobile: resolvedTexts.nextRoomMobile,
+        goToRoom: resolvedTexts.goToRoom,
+      }}
+    />
   )
 }
 

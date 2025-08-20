@@ -92,7 +92,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
           <div className="text-sm font-medium mb-2 flex justify-between items-start">
             <span>{dynamicProposeText}</span>
             <div className="text-right">
-              <div className="text-xl font-bold text-black">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
+              <div className="text-lg md:text-xl font-bold text-black">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
               {/* <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div> */}
             </div>
           </div>

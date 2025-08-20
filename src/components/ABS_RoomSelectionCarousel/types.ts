@@ -148,3 +148,6 @@ export type {
   RoomCardState,
   RoomCardProps,
 } from './RoomCard'
+
+// Re-export carousel state from hooks
+export type { CarouselState } from './hooks/useCarouselState'

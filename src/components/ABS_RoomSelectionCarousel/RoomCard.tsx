@@ -1,13 +1,15 @@
 import clsx from 'clsx'
-import { Star, Tag } from 'lucide-react'
 import type React from 'react'
-import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 import { PriceSlider } from './components'
 import { useSlider } from './hooks'
-import { UiButton } from '../ui/button'
-import { UiTooltip, UiTooltipContent, UiTooltipTrigger, TooltipProvider } from '../ui/tooltip'
-import { SegmentBadge } from '../ui/segment-badge'
 import type { RoomOption } from './types'
+
+// Import subcomponents
+import RoomImageCarousel from './components/RoomImageCarousel'
+import RoomBadges from './components/RoomBadges'
+import RoomDetails from './components/RoomDetails'
+import RoomPricing from './components/RoomPricing'
 
 export interface RoomCardTranslations {
   discountBadgeText: string
@@ -116,9 +118,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     activeBid,
   } = state
   const isBidActive = activeBid?.roomId === room.id
-  // State for checking if description is truncated
-  const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false)
-  const descriptionRef = useRef<HTMLParagraphElement>(null)
   
   // State to control slider visibility with smooth transition
   const [sliderVisible, setSliderVisible] = useState(false)
@@ -140,13 +139,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     activeBid,
   })
 
-  // Check if description needs truncation
-  useEffect(() => {
-    if (descriptionRef.current) {
-      const element = descriptionRef.current
-      setIsDescriptionTruncated(element.scrollHeight > element.clientHeight)
-    }
-  }, [room.description])
   
   // Handle slider visibility with a small delay to ensure smooth transition
   useEffect(() => {
@@ -177,8 +169,8 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
 
   const handleSelectRoom = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation()
+    (e?: React.MouseEvent) => {
+      if (e) e.stopPropagation()
       // If the room is already selected, deselect it; otherwise, select it
       const isCurrentlySelected = selectedRoom?.id === room.id
       onSelectRoom(isCurrentlySelected ? null : room)
@@ -344,187 +336,57 @@ const RoomCard: React.FC<RoomCardProps> = ({
         }
       )}
     >
-      {/* Discount Badge */}
-      {room.oldPrice && !selectedRoom?.id && !isBidActive && (
-        <div className="absolute top-3 right-3 bg-black text-white py-1 px-2 rounded text-xs font-bold z-10">
-          <span>
-            {useMemo(() => {
-              if (!room.oldPrice || room.oldPrice === 0) return ''
-              const discountPercentage = Math.round((1 - room.price / room.oldPrice) * 100)
-              return discountBadgeText.includes('{percentage}')
-                ? discountBadgeText.replace('{percentage}', discountPercentage.toString())
-                : `${discountBadgeText}${discountPercentage}%`
-            }, [discountBadgeText, room.price, room.oldPrice])}
-          </span>
-        </div>
-      )}
-
-      {/* Bid Submitted Badge */}
-      {isBidActive && selectedRoom?.id !== room.id && (
-        <div className="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
-          <Tag className="h-3 w-3" />
-          <span>{bidSubmittedText}</span>
-        </div>
-      )}
-
-      {/* Selected Badge */}
-      {selectedRoom?.id === room.id && (
-        <div className="absolute top-2 left-2 z-10 bg-green-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
-          <Star className="h-3 w-3" />
-          <span>{selectedText}</span>
-        </div>
-      )}
+      {/* Badges */}
+      <RoomBadges
+        hasDiscount={!!room.oldPrice && !selectedRoom?.id && !isBidActive}
+        oldPrice={room.oldPrice}
+        currentPrice={room.price}
+        discountBadgeText={discountBadgeText}
+        isSelected={selectedRoom?.id === room.id}
+        selectedText={selectedText}
+        isBidActive={isBidActive && selectedRoom?.id !== room.id}
+        bidSubmittedText={bidSubmittedText}
+      />
 
       {/* Room Image Carousel */}
-      <div 
-        className="relative h-64 bg-neutral-100 group"
-        {...imageDragHandlers}
-        style={{
-          ...imageDragHandlers.style,
-          transform: localImageDragState.isDragging ? `translateX(${localImageDragState.deltaX * 0.5}px)` : undefined,
-          transition: localImageDragState.isDragging ? 'none' : 'transform 0.3s ease-out',
-        }}
-      >
-        <img src={room.images[activeImageIndex]} alt={room.title || room.roomType} className="object-cover w-full h-full rounded-t-lg" />
-        
-        {/* Amenities overlay - top left */}
-        <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1 max-w-[85%]">
-          {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
-            <span
-              key={`${room.id}-${amenity}`}
-              className="text-xs bg-white/90 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-md text-gray-800 shadow-sm"
-            >
-              {amenity}
-            </span>
-          ))}
-        </div>
-
-        {/* Image Navigation Arrows - only show if multiple images */}
-        {room.images.length > 1 && (
-          <>
-            {/* Previous Image */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                handleImageNavigation('prev')
-              }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 text-white rounded-full p-1 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-black/70"
-              aria-label={previousImageLabel}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-
-            {/* Next Image */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                handleImageNavigation('next')
-              }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 text-white rounded-full p-1 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-black/70"
-              aria-label={nextImageLabel}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          </>
-        )}
-
-        {/* Image Indicators */}
-        {room.images.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-            {room.images.map((_, imgIndex) => (
-              <button
-                key={`${room.id}-img-${imgIndex}`}
-                className={clsx('block h-2 w-2 rounded-full transition-colors duration-200', {
-                  'bg-white': activeImageIndex === imgIndex,
-                  'bg-white/50': activeImageIndex !== imgIndex,
-                })}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onImageChange(imgIndex)
-                }}
-                aria-label={viewImageLabel.replace('{index}', (imgIndex + 1).toString())}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      <RoomImageCarousel
+        images={room.images}
+        activeImageIndex={activeImageIndex}
+        title={room.title || room.roomType}
+        dynamicAmenities={dynamicAmenities || room.amenities.slice(0, 3)}
+        roomId={room.id}
+        localImageDragState={localImageDragState}
+        imageDragHandlers={imageDragHandlers}
+        onImageChange={onImageChange}
+        previousImageLabel={previousImageLabel}
+        nextImageLabel={nextImageLabel}
+        viewImageLabel={viewImageLabel}
+      />
 
       {/* Room Details */}
-      <div className="p-4">
-        {room.title && (
-          <h3 className="text-xl font-bold mb-1">{room.title}</h3>
-        )}
-        <h4 className={clsx('font-medium mb-1 text-neutral-600', {
-          'text-base': !room.title,
-          'text-sm': room.title
-        })}>{room.roomType}</h4>
-        <div className="mb-2">
-          <TooltipProvider>
-            <UiTooltip>
-              <UiTooltipTrigger asChild>
-                <p
-                  ref={descriptionRef}
-                  className="text-sm min-h-10 overflow-hidden line-clamp-2 cursor-help"
-                  style={{ maxHeight: '2.5rem' }}
-                >
-                  {room.description}
-                </p>
-              </UiTooltipTrigger>
-              {isDescriptionTruncated && (
-                <UiTooltipContent className="max-w-xs">
-                  <p className="text-sm">{room.description}</p>
-                </UiTooltipContent>
-              )}
-            </UiTooltip>
-          </TooltipProvider>
-        </div>
+      <RoomDetails
+        title={room.title}
+        roomType={room.roomType}
+        description={room.description}
+      />
 
+      {/* Room Pricing */}
+      <RoomPricing
+        price={room.price}
+        oldPrice={room.oldPrice}
+        currencySymbol={currencySymbol}
+        nightText={nightText}
+        isSelected={selectedRoom?.id === room.id}
+        selectedText={selectedText}
+        selectText={selectText}
+        removeText={removeText}
+        instantConfirmationText={instantConfirmationText}
+        segmentDiscount={room.segmentDiscount}
+        onSelect={handleSelectRoom}
+      />
 
-        {/* Action Buttons */}
-        <div className="flex items-start justify-between gap-4 mt-2">
-          <div className='flex flex-col'>
-            {/* Price Display */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-3xl font-bold">{`${currencySymbol}${room.price}`}</span>
-              {room.oldPrice && (
-                <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${room.oldPrice}`}</span>
-              )}
-              <span className="text-base text-neutral-500">{nightText}</span>
-              {/* Segment Badge */}
-              {room.segmentDiscount && (
-                <SegmentBadge segmentDiscount={room.segmentDiscount} />
-              )}
-            </div>
-            
-            {/* Total Price Display */}
-            {/* {nights > 1 && (
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-base font-semibold text-neutral-700">{`${currencySymbol}${totalPrice}`}</span>
-                {totalOldPrice && (
-                  <span className="text-neutral-400 line-through text-sm">{`${currencySymbol}${totalOldPrice}`}</span>
-                )}
-                <span className="text-sm text-neutral-500">{totalPriceText}</span>
-              </div>
-            )} */}
-          </div>
-          <div className="flex flex-col items-end">
-            <UiButton
-              variant={selectedRoom?.id === room.id ? 'destructive' : 'black'}
-              className="w-fit uppercase tracking-wide"
-              onClick={handleSelectRoom}
-            >
-              <span>{selectedRoom?.id === room.id ? removeText : selectText}</span>
-            </UiButton>
-            {/* Instant Confirmation - positioned below the button */}
-            <span className="text-xs text-green-600 font-medium mt-2">{instantConfirmationText}</span>
-          </div>
-        </div>
-
-        {/* Additional Info */}
+      {/* Additional Info */}
+      <div className="px-4 pb-4">
         <p className="text-xs text-neutral-500 mt-2">{priceInfoText}</p>
       </div>
 

@@ -4,19 +4,23 @@ import clsx from 'clsx'
 import { UiButton } from '../ui/button'
 import type { OrderData } from '../../services/orderStorage'
 import { getOrder } from '../../services/orderStorage'
-import { isValidBookingId, formatBookingIdForDisplay } from '../../utils/bookingIdGenerator'
-import ProposalWidget from './components/ProposalWidget'
+import { isValidBookingId } from '../../utils/bookingIdGenerator'
 import { subscribeToOrderProposals, subscribeToOrderUpdates, unsubscribeAll, showNotification, requestNotificationPermission } from '../../lib/realtime'
 import type { ProposalNotification } from '../../lib/realtime'
 
+// Import subcomponents
+import OrderStatusInputForm from './components/OrderStatusInputForm'
+import LoadingState from './components/LoadingState'
+import ErrorState from './components/ErrorState'
+import OrderHeader from './components/OrderHeader'
+import SpecialOffersSection from './components/SpecialOffersSection'
+import HotelProposalsSection from './components/HotelProposalsSection'
+
 // Import components for reuse in consultation mode
 import { ABS_RoomSelectionCarousel } from '../ABS_RoomSelectionCarousel'
-import BookingInfoBar from '../ABS_BookingInfoBar'
 import { ABS_RoomCustomization } from '../ABS_RoomCustomization'
 import PricingSummaryPanel from '../ABS_PricingSummaryPanel'
 import type { PricingItem } from '../ABS_PricingSummaryPanel'
-import { Icon } from '@iconify/react'
-import { AmenityIcon } from '../ABS_RoomCustomization/utils/amenityIcons'
 
 // Import data conversion utilities
 import {
@@ -50,7 +54,6 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
 }) => {
   const [viewState, setViewState] = useState<ViewState>('loading')
   const [orderData, setOrderData] = useState<OrderData | null>(null)
-  const [inputOrderId, setInputOrderId] = useState('')
   const [, setHasNewProposals] = useState(false)
 
   // Fetch dynamic data from Supabase
@@ -145,12 +148,6 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
     }
   }
 
-  const handleOrderIdSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (inputOrderId.trim()) {
-      loadOrderData(inputOrderId.trim())
-    }
-  }
 
   // Convert order data to pricing items for display
   const pricingItems = useMemo((): PricingItem[] => {
@@ -247,188 +244,28 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
     return { sectionsData, sectionOptions }
   }, [sections, customizationOptions, sectionsLoading, optionsLoading])
 
-  // Render order ID input form
-  const renderOrderIdInput = () => (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Your Order</h2>
-          <p className="text-gray-600">Enter your booking ID to view your order status</p>
-        </div>
-        
-        <form onSubmit={handleOrderIdSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="orderId" className="block text-sm font-medium text-gray-700 mb-2">
-              Booking ID
-            </label>
-            <input
-              type="text"
-              id="orderId"
-              value={inputOrderId}
-              onChange={(e) => setInputOrderId(e.target.value.toUpperCase())}
-              placeholder="ABS-20250723-A1B2C3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              maxLength={17}
-            />
-          </div>
-          
-          <UiButton 
-            type="submit" 
-            className="w-full"
-            disabled={!inputOrderId.trim()}
-          >
-            View Order Status
-          </UiButton>
-        </form>
-        
-        {onBackToHome && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={onBackToHome}
-              className="text-blue-600 hover:text-blue-800 text-sm underline"
-            >
-              Back to Home
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-
-  // Render loading state
-  const renderLoading = () => (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading your order...</p>
-      </div>
-    </div>
-  )
-
-  // Render error states
-  const renderError = () => {
-    const isInvalidId = viewState === 'invalid_id'
-    
-    return (
-      <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
-            {isInvalidId ? 'Invalid Booking ID' : 'Order Not Found'}
-          </h2>
-          
-          <p className="text-gray-600 mb-6">
-            {isInvalidId 
-              ? 'Please check your booking ID format. It should look like: ABS-20250723-A1B2C3'
-              : 'We couldn\'t find an order with this booking ID. Please check your ID and try again.'
-            }
-          </p>
-          
-          <div className="space-y-3">
-            <UiButton 
-              onClick={() => {
-                setViewState('loaded')
-                setOrderData(null)
-                setInputOrderId('')
-              }}
-              className="w-full"
-            >
-              Try Another ID
-            </UiButton>
-            
-            {onBackToHome && (
-              <button
-                onClick={onBackToHome}
-                className="w-full text-blue-600 hover:text-blue-800 text-sm underline"
-              >
-                Back to Home
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    )
+  const handleOrderIdSubmit = (orderId: string) => {
+    loadOrderData(orderId)
   }
 
-  // Render order status header
-  const renderOrderHeader = () => {
-    if (!orderData) return null
-    
-    const statusColors = {
-      confirmed: 'bg-green-100 text-green-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      cancelled: 'bg-red-100 text-red-800',
-      modified: 'bg-blue-100 text-blue-800',
-    }
-    
-    return (
-      <div className="rounded-lg mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Order #{formatBookingIdForDisplay(orderData.id)}
-            </h1>
-            <p className="text-gray-600">
-              Created on {new Date(orderData.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-          
-          <div className={clsx(
-            'px-3 py-1 rounded-full text-sm font-medium',
-            statusColors[orderData.status]
-          )}>
-            {orderData.status.charAt(0).toUpperCase() + orderData.status.slice(1)}
-          </div>
-        </div>
-        
-        {/* Booking Info Bar */}
-        <BookingInfoBar
-          items={[
-            {
-              icon: 'Calendar',
-              label: 'Check-in',
-              value: orderData.userInfo.checkIn
-            },
-            {
-              icon: 'Calendar', 
-              label: 'Check-out',
-              value: orderData.userInfo.checkOut
-            },
-            {
-              icon: 'Home',
-              label: 'Room Type',
-              value: orderData.userInfo.roomType
-            },
-            {
-              icon: 'Users',
-              label: 'Occupancy',
-              value: orderData.userInfo.occupancy
-            },
-            ...(orderData.userInfo.reservationCode ? [{
-              icon: 'Tag' as const,
-              label: 'Reservation Code',
-              value: orderData.userInfo.reservationCode
-            }] : [])
-          ]}
-        />
-      </div>
-    )
+  const handleTryAgain = () => {
+    setViewState('loaded')
+    setOrderData(null)
   }
 
   // Main render logic
   if (viewState === 'loading') {
-    return renderLoading()
+    return <LoadingState />
   }
 
   if (viewState === 'invalid_id' || viewState === 'not_found') {
     return (
       <div className={clsx('min-h-screen bg-gray-50 py-12 px-4', className)}>
-        {renderError()}
+        <ErrorState
+          type={viewState}
+          onTryAgain={handleTryAgain}
+          onBackToHome={onBackToHome}
+        />
       </div>
     )
   }
@@ -436,7 +273,10 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
   if (!orderData) {
     return (
       <div className={clsx('min-h-screen bg-gray-50 py-12 px-4', className)}>
-        {renderOrderIdInput()}
+        <OrderStatusInputForm
+          onSubmit={handleOrderIdSubmit}
+          onBackToHome={onBackToHome}
+        />
       </div>
     )
   }
@@ -445,7 +285,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
   return (
     <div className={clsx('min-h-screen bg-gray-50', className)}>
       <div className="container mx-auto px-4 py-8">
-        {renderOrderHeader()}
+        <OrderHeader orderData={orderData} />
         
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main content */}
@@ -586,115 +426,21 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
             )}
             
             {/* Special Offers (Read-only) */}
-            {orderData.selections.offers.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Special Offers</h2>
-                <div className="space-y-4">
-                  {orderData.selections.offers.map(offer => {
-                    // Use room title if available (for room-based special offers)
-                    let displayTitle = offer.title || offer.name
-                    
-                    // Map old package names to room titles for existing orders
-                    const titleMapping: Record<string, string> = {
-                      'Deluxe Experience Package': "Live luxury's pinnacle by the sea",
-                      'Premium Business Package': "Dive in from your private terrace", 
-                      'Romantic Getaway Package': "Supreme luxury with divine views",
-                      'Wellness & Spa Package': "Glam rock with infinite views"
-                    }
-                    
-                    if (titleMapping[displayTitle]) {
-                      displayTitle = titleMapping[displayTitle]
-                    }
-
-                    // Get room amenities based on the room type
-                    const getRoomAmenities = (title: string): string[] => {
-                      switch (title) {
-                        case "Live luxury's pinnacle by the sea":
-                          return ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'AC']
-                        case "Dive in from your private terrace":
-                          return ['24 Hours Room Service', '30 to 35 m2 / 325 to 375 sqft', 'Afternoon Sun']
-                        case "Supreme luxury with divine views":
-                          return ['60 to 70 m2 / 645 to 755 sqft', 'AC', 'Hydromassage Bathtub']
-                        case "Glam rock with infinite views":
-                          return ['60 to 70 m2 / 645 to 755 sqft', 'Coffee Machine', 'Hydromassage Bathtub']
-                        default:
-                          return ['Premium amenities included']
-                      }
-                    }
-
-                    const roomAmenities = getRoomAmenities(displayTitle)
-
-                    return (
-                      <div key={offer.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                        {/* Special Offer Badge */}
-                        <div className="bg-gray-800 text-white px-3 py-1 flex items-center gap-1.5">
-                          <Icon icon="solar:star-bold" className="w-4 h-4" />
-                          <span className="text-xs font-medium">Special Offer</span>
-                        </div>
-                        
-                        <div className="p-4">
-                          {/* Room Title */}
-                          <div className="mb-3">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">{displayTitle}</h3>
-                          </div>
-
-                          {/* Room Amenities - Top 3 Most Relevant */}
-                          <div className="space-y-2 mb-4">
-                            <p className="text-sm text-gray-600 font-medium">Amenidades incluidas:</p>
-                            <div className="grid grid-cols-1 gap-2">
-                              {roomAmenities.slice(0, 3).map((amenity, index) => (
-                                <div key={`${offer.id}-amenity-${index}`} className="flex items-center gap-2">
-                                  <AmenityIcon amenity={amenity} className="w-5 h-5 text-gray-700 flex-shrink-0" />
-                                  <span className="text-sm text-gray-700">{amenity}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Price and Status */}
-                          <div className="flex items-center justify-between border-t pt-3">
-                            <div className="flex items-center gap-2">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                ✓ Selected
-                              </span>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-gray-900">
-                                +{offer.price.toFixed(2)}€ <span className="text-sm font-normal text-gray-600">per night</span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
+            <SpecialOffersSection 
+              offers={orderData.selections.offers}
+              userOccupancy={orderData.userInfo.occupancy}
+            />
             
             {/* Hotel Proposals */}
-            {orderData.hotelProposals.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Hotel Proposals</h2>
-                <p className="text-gray-600 mb-6">
-                  The hotel has made some proposals for your booking. Review and respond to each one below.
-                </p>
-                <div className="space-y-4">
-                  {orderData.hotelProposals.map((proposal) => (
-                    <ProposalWidget
-                      key={proposal.id}
-                      orderId={orderData.id}
-                      proposal={proposal}
-                      onProposalUpdate={(_proposalId, _status) => {
-                        // Proposal updated
-                        // Reload order data to reflect changes
-                        loadOrderData(orderData.id)
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            <HotelProposalsSection
+              proposals={orderData.hotelProposals}
+              orderId={orderData.id}
+              onProposalUpdate={(_proposalId, _status) => {
+                // Proposal updated
+                // Reload order data to reflect changes
+                loadOrderData(orderData.id)
+              }}
+            />
           </div>
           
           {/* Pricing Summary */}
