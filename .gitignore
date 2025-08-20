@@ -25,5 +25,20 @@ dist-ssr
 
 .claude
 
-# Playwright screenshots
+# Testing
+# Coverage reports
+coverage/
+*.lcov
+
+# Vitest
+.vitest/
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
 .playwright-mcp/
+
+# Test artifacts
+*.spec.js.map
+*.test.js.map
