@@ -48,17 +48,18 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
 
   const currentModalSection = sections.find((section) => section.key === modalSection)
 
-  // Filter sections in consultation mode to only show those with selections
+  // Filter sections in consultation mode to only show those with selections (with defensive checks)
   const sectionsToShow = mode === 'consultation' 
-    ? sections.filter(section => selectedOptions[section.key])
-    : sections
+    ? (sections || []).filter(section => section && selectedOptions && selectedOptions[section.key])
+    : (sections || [])
 
   return (
     <>
       <div id={id} data-testid={id} className={clsx('section rounded-lg mt-6', className)}>
         <div className="rounded-lg">
           {sectionsToShow.map((section) => {
-            const options = sectionOptions[section.key] || []
+            if (!section || !section.key) return null
+            const options = (sectionOptions && sectionOptions[section.key]) || []
             return (
               <CustomizationSection
                 key={section.key}

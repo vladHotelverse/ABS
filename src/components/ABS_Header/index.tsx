@@ -2,9 +2,7 @@ import clsx from 'clsx'
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import './styles.css'
-import { ShoppingCart } from 'lucide-react'
 import { formatPrice } from '../../lib/currency'
-import { UiButton } from '../ui/button'
 
 // Re-export RoomTabs component and types for convenience
 export { default as RoomTabs } from './RoomTabs'
@@ -19,9 +17,6 @@ export interface HeaderProps {
   totalPrice?: number
   currencySymbol?: string
   totalLabel?: string
-  onCartClick?: () => void
-  itemsInCart: number
-  isLoading?: boolean
   isSticky?: boolean
 }
 
@@ -30,9 +25,6 @@ const Header: React.FC<HeaderProps> = ({
   totalPrice = 0,
   currencySymbol = '€',
   totalLabel = 'Total:',
-  onCartClick,
-  itemsInCart,
-  isLoading = false,
   isSticky = true,
 }) => {
   const initialHRef = useRef<SVGSVGElement>(null)

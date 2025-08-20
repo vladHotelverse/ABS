@@ -177,7 +177,6 @@ export interface ABSLandingProps {
   initialState?: 'loading' | 'error' | 'normal'
   initialSubtotal?: number
   initialTax?: number
-  onCartClick?: () => void
   onConfirmBooking?: (bookingData: any) => void
   reservationCode?: string
   checkIn?: string
@@ -205,7 +204,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   translations,
   language,
   initialState = 'normal',
-  onCartClick,
   onConfirmBooking,
   reservationCode,
   checkIn,
@@ -284,21 +282,12 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   const {
     roomBookings,
     activeRoomId,
-    totalItemCount: multiBookingItemCount,
     totalPrice: multiBookingTotalPrice,
     handleMultiBookingEditSection,
     handleMultiBookingConfirmAll,
     handleRoomTabClick,
   } = multiBookingState
 
-  // Calculate items and totals
-  const singleBookingItemCount = countCartItems({
-    selectedRoom: state.selectedRoom || undefined,
-    selectedCustomizations: state.customizations,
-    selectedOffers: state.specialOffers as any,
-    activeBid: state.activeBid,
-  })
-  const itemCount = shouldShowMultiBooking ? multiBookingItemCount : singleBookingItemCount
   // Use subtotal for header to match pricing panel (taxes removed)
   const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : subtotal
 
@@ -511,12 +500,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   return (
     <div className={clsx('min-h-screen bg-neutral-50/30 flex flex-col', className)}>
       <Header
-        onCartClick={onCartClick}
-        itemsInCart={itemCount}
         totalPrice={totalPrice}
         totalLabel={t.totalLabel}
         currencySymbol={t.currencySymbol}
-        isLoading={false} // isPriceCalculating is removed from useBookingState
         isSticky={!shouldShowMultiBooking}
       />
 

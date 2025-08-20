@@ -249,9 +249,6 @@ function Home() {
         roomType="DELUXE SILVER"
         occupancy="2 Adults, 0 Children"
         reservationCode="1003066AU"
-        onCartClick={() => {
-          // Cart clicked
-        }}
         onConfirmBooking={handleConfirmBooking}
         compatibilityRules={processedData.compatibilityRules}
       />

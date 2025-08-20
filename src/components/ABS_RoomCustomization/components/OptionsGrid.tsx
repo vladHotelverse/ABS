@@ -32,9 +32,8 @@ const isExactViewOption = (option: CustomizationOption | ViewOption | ExactViewO
 }
 
 const isSpecialOfferOption = (option: CustomizationOption | ViewOption | ExactViewOption | SpecialOfferOption): option is SpecialOfferOption => {
-  const result = 'claim' in option && 'additionalAmenities' in option
-  console.log('[DEBUG] isSpecialOfferOption check:', { option, hasClaim: 'claim' in option, hasAmenities: 'additionalAmenities' in option, result })
-  return result
+  if (!option) return false
+  return 'claim' in option && 'additionalAmenities' in option
 }
 
 const OptionsGrid: React.FC<OptionsGridProps> = ({
@@ -49,15 +48,27 @@ const OptionsGrid: React.FC<OptionsGridProps> = ({
   mode,
   readonly,
 }) => {
+  // Add defensive checks
+  if (!options || !Array.isArray(options)) {
+    return <div className="text-center text-gray-500 py-4">No options available</div>
+  }
+
+  if (!config) {
+    return <div className="text-center text-gray-500 py-4">Section configuration missing</div>
+  }
+
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])
   const isSpecialOfferSection = options.length > 0 && isSpecialOfferOption(options[0])
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-300 -webkit-overflow-scrolling-touch pt-4">
       {options.map((option) => {
-        const isSelected = selectedOptions[config.key]?.id === option.id
-        const isDisabled = disabledOptions[option.id]?.disabled || false
-        const disabledReason = disabledOptions[option.id]?.reason
+        if (!option || !option.id) {
+          return null
+        }
+        const isSelected = selectedOptions && selectedOptions[config.key]?.id === option.id
+        const isDisabled = (disabledOptions && disabledOptions[option.id]?.disabled) || false
+        const disabledReason = disabledOptions && disabledOptions[option.id]?.reason
 
         if (isExactViewSection && isExactViewOption(option)) {
           return (

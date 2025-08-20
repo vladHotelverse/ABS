@@ -51,12 +51,12 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   const [showInfo, setShowInfo] = useState(false)
   const [showAllOptions, setShowAllOptions] = useState(false)
   
-  // Filter options based on mode
+  // Filter options based on mode with defensive checks
   const filteredOptions = mode === 'consultation' 
-    ? selectedOptions[config.key] 
-      ? options.filter(option => option.id === selectedOptions[config.key]?.id)
+    ? (selectedOptions && selectedOptions[config.key]) 
+      ? (options || []).filter(option => option && option.id === selectedOptions[config.key]?.id)
       : []
-    : options.filter(option => !disabledOptions[option.id]?.disabled)
+    : (options || []).filter(option => option && !(disabledOptions && disabledOptions[option.id]?.disabled))
   const INITIAL_ITEMS_COUNT = 3
   const shouldShowMoreButton = mode !== 'consultation' && filteredOptions.length > INITIAL_ITEMS_COUNT
   const displayOptions = (mode === 'consultation' || showAllOptions) ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)
