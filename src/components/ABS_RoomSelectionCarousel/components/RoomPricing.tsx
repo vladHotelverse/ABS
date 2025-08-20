@@ -9,7 +9,6 @@ export interface RoomPricingProps {
   currencySymbol: string
   nightText: string
   isSelected: boolean
-  selectedText: string
   selectText: string
   removeText: string
   instantConfirmationText: string
@@ -23,7 +22,6 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
   currencySymbol,
   nightText,
   isSelected,
-  selectedText,
   selectText,
   removeText,
   instantConfirmationText,

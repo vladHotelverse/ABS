@@ -377,7 +377,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
         currencySymbol={currencySymbol}
         nightText={nightText}
         isSelected={selectedRoom?.id === room.id}
-        selectedText={selectedText}
         selectText={selectText}
         removeText={removeText}
         instantConfirmationText={instantConfirmationText}

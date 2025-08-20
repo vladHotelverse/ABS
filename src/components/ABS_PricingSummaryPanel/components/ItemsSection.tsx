@@ -6,7 +6,6 @@ export interface ItemsSectionProps {
   title: string
   items: PricingItem[]
   euroSuffix: string
-  removeLabel: string
   onRemoveItem: (item: PricingItem) => void
 }
 
@@ -14,7 +13,6 @@ const ItemsSection: React.FC<ItemsSectionProps> = ({
   title,
   items,
   euroSuffix,
-  removeLabel,
   onRemoveItem,
 }) => {
   if (items.length === 0) return null

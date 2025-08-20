@@ -428,7 +428,6 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
             {/* Special Offers (Read-only) */}
             <SpecialOffersSection 
               offers={orderData.selections.offers}
-              userOccupancy={orderData.userInfo.occupancy}
             />
             
             {/* Hotel Proposals */}

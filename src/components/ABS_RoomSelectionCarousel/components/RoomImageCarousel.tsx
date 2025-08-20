@@ -1,6 +1,5 @@
 import type React from 'react'
 import clsx from 'clsx'
-import { useMemo } from 'react'
 
 export interface RoomImageCarouselProps {
   images: string[]

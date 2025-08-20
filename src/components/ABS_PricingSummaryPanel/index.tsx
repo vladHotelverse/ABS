@@ -184,7 +184,6 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           title="Room Customization"
           items={customizeYourRoomItems}
           euroSuffix={labels.euroSuffix}
-          removeLabel="Remove"
           onRemoveItem={handleRemoveItem}
         />
 
@@ -194,7 +193,6 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           title="Stay Enhancement"
           items={enhanceYourStayItems}
           euroSuffix={labels.euroSuffix}
-          removeLabel="Remove"
           onRemoveItem={handleRemoveItem}
         />
 

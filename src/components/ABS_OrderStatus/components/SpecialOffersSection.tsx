@@ -5,12 +5,10 @@ import type { OrderData } from '../../../services/orderStorage'
 
 export interface SpecialOffersSectionProps {
   offers: OrderData['selections']['offers']
-  userOccupancy: string
 }
 
 const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
   offers,
-  userOccupancy,
 }) => {
   if (offers.length === 0) return null
 
