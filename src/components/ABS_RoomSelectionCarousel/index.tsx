@@ -1,9 +1,8 @@
 import clsx from 'clsx'
 import type React from 'react'
-import { useMemo } from 'react'
-import { SingleRoomLayout, TwoRoomLayout, MultiRoomLayout } from './components'
-import { useCarouselState } from './hooks/useCarouselState'
-import { useDragHandlers } from './hooks/useDragHandlers'
+import { useMemo, useState, useCallback, useEffect } from 'react'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel'
+import { RoomCard } from './components'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
 import type { RoomCardTranslations, RoomCardHandlers, RoomCardConfig, RoomCardState, RoomOption } from './types'
 import { getDynamicAmenitiesForAllRooms, getCurrentRoomAmenities } from './utils/amenitiesSelector'
@@ -101,26 +100,55 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     viewImage: getNavigationLabel('viewImage', undefined, 'View image {index}'),
   }
 
+  // Local state for room selection and image indices
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(initialSelectedRoom)
+  const [activeImageIndices, setActiveImageIndices] = useState<Record<number, number>>(() => {
+    const indices: Record<number, number> = {}
+    roomOptions.forEach((_, index) => {
+      indices[index] = 0
+    })
+    return indices
+  })
+  
+  // Carousel API for controlling room navigation
+  const [roomCarouselApi, setRoomCarouselApi] = useState<CarouselApi>()
+  
+  // Make room carousel API available to child components if needed
+  useEffect(() => {
+    if (roomCarouselApi) {
+      // Store reference for potential child access
+      ;(window as any).roomCarouselApi = roomCarouselApi
+    }
+    return () => {
+      delete (window as any).roomCarouselApi
+    }
+  }, [roomCarouselApi])
+
   // Generate dynamic amenities for all rooms
   const dynamicAmenitiesMap = useMemo(() => {
     const userCurrentAmenities = currentRoomAmenities || getCurrentRoomAmenities(currentRoomType, roomOptions)
     return getDynamicAmenitiesForAllRooms(roomOptions, currentRoomType, userCurrentAmenities)
   }, [roomOptions, currentRoomType, currentRoomAmenities])
 
-  // Use separated carousel state management (without slider logic)
-  const { state, actions } = useCarouselState({
-    roomOptions,
-    initialSelectedRoom,
-    onRoomSelected,
-  })
+  // Handle room selection
+  const handleRoomSelection = useCallback((room: RoomOption | null) => {
+    setSelectedRoom(room)
+    onRoomSelected?.(room)
+  }, [onRoomSelected])
 
-  // Drag handlers for room carousel navigation
-  const roomCarouselDragHandlers = useDragHandlers({
-    onDragStart: actions.startDrag,
-    onDragMove: actions.updateDrag,
-    onDragEnd: (options) => actions.endDrag({ roomCount: roomOptions.length, ...options }),
-    disabled: roomOptions.length <= 1,
-  })
+  // Handle image index changes with basic debouncing
+  const handleImageChange = useCallback((roomIndex: number, imageIndex: number) => {
+    setActiveImageIndices(prev => {
+      // Only update if the value actually changed
+      if (prev[roomIndex] === imageIndex) {
+        return prev
+      }
+      return {
+        ...prev,
+        [roomIndex]: imageIndex
+      }
+    })
+  }, [])
 
 
   // Determine if slider should be shown (disabled in consultation mode)
@@ -151,8 +179,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     }
 
     const handlers: RoomCardHandlers = {
-      onSelectRoom: readonly || mode === 'consultation' ? () => {} : actions.selectRoom,
-      onImageChange: (newImageIndex: number) => actions.setActiveImageIndex(roomIndex, newImageIndex),
+      onSelectRoom: readonly || mode === 'consultation' ? () => {} : handleRoomSelection,
+      onImageChange: (newImageIndex: number) => handleImageChange(roomIndex, newImageIndex),
       onLearnMore,
       onMakeOffer,
       onCancelBid,
@@ -160,7 +188,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
 
     const config: RoomCardConfig = {
       currencySymbol: resolvedTexts.currencySymbol,
-      isActive: state.activeIndex === roomIndex,
+      isActive: true, // We'll handle this differently now with carousel
       showPriceSlider: shouldShowSlider,
       minPrice,
       dynamicAmenities: dynamicAmenitiesMap.get(room.id),
@@ -168,8 +196,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     }
 
     const cardState: RoomCardState = {
-      selectedRoom: state.selectedRoom,
-      activeImageIndex: state.activeImageIndices[roomIndex] || 0,
+      selectedRoom,
+      activeImageIndex: activeImageIndices[roomIndex] || 0,
       activeBid,
     }
 
@@ -182,6 +210,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     }
   }
 
+  // Handle empty state
   if (roomOptions.length === 0) {
     return (
       <div className={clsx('text-center py-8', className)}>
@@ -190,65 +219,136 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     )
   }
 
-  // Handle different room counts with different layouts
+  // Single room: No carousel needed
   if (roomOptions.length === 1) {
-    // Single room: No carousel, just display the room card
+    const roomCardProps = createRoomCardProps(roomOptions[0], 0)
     return (
-      <SingleRoomLayout
-        className={className}
-        title={title}
-        subtitle={subtitle}
-        roomCardProps={createRoomCardProps(roomOptions[0], 0)}
-      />
+      <div className={clsx(className)}>
+        {/* Title and Subtitle */}
+        {(title || subtitle) && (
+          <div className="mb-6 text-center">
+            {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
+            {subtitle && <p className="text-neutral-600">{subtitle}</p>}
+          </div>
+        )}
+        
+        <div className="flex justify-center">
+          <RoomCard {...roomCardProps} />
+        </div>
+      </div>
     )
   }
 
-  if (roomOptions.length === 2) {
-    // Two rooms: Show side by side on large screens, carousel on mobile
-    const roomCardPropsArray = roomOptions.map((room, index) => createRoomCardProps(room, index))
-    
-    return (
-      <TwoRoomLayout
-        className={className}
-        title={title}
-        subtitle={subtitle}
-        roomCardPropsArray={roomCardPropsArray}
-        state={state}
-        dragHandlers={roomCarouselDragHandlers}
-        onPrevSlide={actions.prevSlide}
-        onNextSlide={actions.nextSlide}
-        onSetActiveIndex={actions.setActiveIndex}
-        navigationLabels={{
-          previousRoomMobile: resolvedTexts.previousRoomMobile,
-          nextRoomMobile: resolvedTexts.nextRoomMobile,
-          goToRoom: resolvedTexts.goToRoom,
-        }}
-      />
-    )
-  }
-
-  // Three or more rooms: Full carousel behavior
+  // Multiple rooms: Use shadcn/ui Carousel
   const roomCardPropsArray = roomOptions.map((room, index) => createRoomCardProps(room, index))
-  
+
   return (
-    <MultiRoomLayout
-      className={className}
-      title={title}
-      subtitle={subtitle}
-      roomCardPropsArray={roomCardPropsArray}
-      state={state}
-      dragHandlers={roomCarouselDragHandlers}
-      onPrevSlide={actions.prevSlide}
-      onNextSlide={actions.nextSlide}
-      onSetActiveIndex={actions.setActiveIndex}
-      navigationLabels={{
-        previousRoom: resolvedTexts.previousRoom,
-        nextRoom: resolvedTexts.nextRoom,
-        previousRoomMobile: resolvedTexts.previousRoomMobile,
-        nextRoomMobile: resolvedTexts.nextRoomMobile,
-        goToRoom: resolvedTexts.goToRoom,
-      }}
-    />
+    <div className={clsx(className)}>
+      {/* Title and Subtitle */}
+      {(title || subtitle) && (
+        <div className="mb-6 text-center">
+          {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
+          {subtitle && <p className="text-neutral-600">{subtitle}</p>}
+        </div>
+      )}
+
+      {/* Two rooms: Side by side on desktop, carousel on mobile */}
+      {roomOptions.length === 2 ? (
+        <>
+          {/* Desktop: Side by side */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-6">
+            {roomCardPropsArray.map((roomCardProps) => (
+              <RoomCard key={roomCardProps.room.id} {...roomCardProps} />
+            ))}
+          </div>
+
+          {/* Mobile: Carousel */}
+          <div className="lg:hidden">
+            <div className="overflow-hidden px-6">
+              <Carousel 
+                setApi={setRoomCarouselApi}
+                opts={{
+                  align: "center",
+                  loop: false,
+                  containScroll: false,
+                  watchResize: true,
+                  watchSlides: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="flex">
+                  {roomCardPropsArray.map((roomCardProps) => (
+                    <CarouselItem 
+                      key={roomCardProps.room.id}
+                      className="flex-shrink-0"
+                      style={{
+                        flexBasis: '70%',
+                        width: '70%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        padding: '0 4px',
+                      }}
+                    >
+                      <div style={{ width: '320px', maxWidth: '320px' }}>
+                        <RoomCard {...roomCardProps} />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-30" />
+                <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-30" />
+              </Carousel>
+            </div>
+          </div>
+        </>
+      ) : (
+        /* Three or more rooms: Centered carousel with 50/25/25 layout */
+        <div className="relative w-full mx-auto">
+          <div className="overflow-hidden">
+            <Carousel 
+              setApi={setRoomCarouselApi}
+              opts={{
+                align: "center",
+                loop: roomOptions.length > 2,
+                containScroll: false,
+                watchResize: true,
+                watchSlides: true,
+                slidesToScroll: 1,
+              }}
+              className="w-full"
+            >
+              <CarouselContent 
+                className="flex" 
+                style={{
+                  // Container sized to show exactly center + 2 partial sides
+                  width: '100%',
+                }}
+              >
+                {roomCardPropsArray.map((roomCardProps) => (
+                  <CarouselItem 
+                    key={roomCardProps.room.id} 
+                    className="flex-shrink-0"
+                    style={{
+                      // Each slide is 50% of container width
+                      // This means center takes 50%, and each side shows 25%
+                      flexBasis: '60%',
+                      width: '60%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      padding: '0 8px',
+                    }}
+                  >
+                      <RoomCard {...roomCardProps} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-30" />
+              <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-30" />
+            </Carousel>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

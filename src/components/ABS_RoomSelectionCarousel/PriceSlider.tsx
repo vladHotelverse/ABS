@@ -45,6 +45,9 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   onMakeOffer,
   onCancelBid,
 }) => {
+  // Temporarily removed @use-gesture implementation to fix infinite loop
+  // Will re-implement once core functionality is stable
+
   // Generate dynamic propose text
   const dynamicProposeText = roomName
     ? `${proposePriceText.replace(':', '')} for ${roomName}:`
