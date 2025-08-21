@@ -1,6 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
+import useEmblaCarousel, { type EmblaOptionsType } from 'embla-carousel-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface ImageModalProps {
   images: string[]
@@ -18,13 +23,47 @@ const ImageModal: React.FC<ImageModalProps> = ({
   roomTitle,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(initialImageIndex)
+  
+  // Main carousel
+  const [emblaMainRef, emblaMainApi] = useEmblaCarousel({ loop: true })
+  
+  // Thumbnails carousel
+  const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
+    containScroll: 'keepSnaps',
+    dragFree: true
+  })
 
-  // Update current image when modal opens with new initial index
+  // Handle thumbnail click
+  const onThumbClick = useCallback((index: number) => {
+    if (!emblaMainApi || !emblaThumbsApi) return
+    emblaMainApi.scrollTo(index)
+  }, [emblaMainApi, emblaThumbsApi])
+
+  // Sync main carousel selection with thumbnails
+  const onSelect = useCallback(() => {
+    if (!emblaMainApi || !emblaThumbsApi) return
+    setCurrentImageIndex(emblaMainApi.selectedScrollSnap())
+    emblaThumbsApi.scrollTo(emblaMainApi.selectedScrollSnap())
+  }, [emblaMainApi, emblaThumbsApi])
+
+  // Initialize carousel when modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && emblaMainApi) {
+      emblaMainApi.scrollTo(initialImageIndex)
       setCurrentImageIndex(initialImageIndex)
     }
-  }, [isOpen, initialImageIndex])
+  }, [isOpen, initialImageIndex, emblaMainApi])
+
+  // Setup event listeners for main carousel
+  useEffect(() => {
+    if (!emblaMainApi) return
+    onSelect()
+    emblaMainApi.on('select', onSelect).on('reInit', onSelect)
+    
+    return () => {
+      emblaMainApi.off('select', onSelect).off('reInit', onSelect)
+    }
+  }, [emblaMainApi, onSelect])
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -35,108 +74,110 @@ const ImageModal: React.FC<ImageModalProps> = ({
         onClose()
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault()
-        goToPrevious()
+        emblaMainApi?.scrollPrev()
       } else if (e.key === 'ArrowRight') {
         e.preventDefault()
-        goToNext()
+        emblaMainApi?.scrollNext()
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
-
-  const goToPrevious = useCallback(() => {
-    setCurrentImageIndex(prev => 
-      prev === 0 ? images.length - 1 : prev - 1
-    )
-  }, [images.length])
-
-  const goToNext = useCallback(() => {
-    setCurrentImageIndex(prev => 
-      prev === images.length - 1 ? 0 : prev + 1
-    )
-  }, [images.length])
-
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose()
-    }
-  }, [onClose])
-
-  if (!isOpen) return null
+  }, [isOpen, onClose, emblaMainApi])
 
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-      onClick={handleBackdropClick}
-    >
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-        aria-label="Close image modal"
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        className="max-w-[95vw] max-h-[95vh] w-full h-full bg-white border-none p-6 gap-0 z-[101]"
+        hideClose={true}
       >
-        <X size={24} />
-      </button>
+        {/* Hidden title for accessibility */}
+        <DialogTitle className="sr-only">
+          {roomTitle} Image Gallery
+        </DialogTitle>
 
-      {/* Image container */}
-      <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
-        <img
-          src={images[currentImageIndex]}
-          alt={`${roomTitle} - Image ${currentImageIndex + 1}`}
-          className="max-w-full max-h-full object-contain"
-          draggable={false}
-        />
-
-        {/* Navigation buttons */}
-        {images.length > 1 && (
-          <>
-            <button
-              onClick={goToPrevious}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-              aria-label="Previous image"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            
-            <button
-              onClick={goToNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-              aria-label="Next image"
-            >
-              <ChevronRight size={24} />
-            </button>
-          </>
-        )}
-
-        {/* Image indicators */}
-        {images.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={clsx(
-                  'w-2 h-2 rounded-full transition-colors',
-                  index === currentImageIndex 
-                    ? 'bg-white' 
-                    : 'bg-white/40 hover:bg-white/60'
-                )}
-                aria-label={`Go to image ${index + 1}`}
-              />
-            ))}
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold text-gray-900">{roomTitle}</h2>
+            {images.length > 1 && (
+              <span className="text-sm text-gray-500">
+                {currentImageIndex + 1} / {images.length}
+              </span>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Image counter */}
-      {images.length > 1 && (
-        <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-          {currentImageIndex + 1} / {images.length}
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Close image modal"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-      )}
-    </div>
+
+        {/* Main carousel container */}
+        <div className="flex-1 flex flex-col">
+          {/* Main image carousel */}
+          <div className="flex-1 mb-4 relative">
+            <div 
+              className="h-full overflow-hidden rounded-lg bg-gray-50" 
+              ref={emblaMainRef}
+              style={{ cursor: 'grab' }}
+              onMouseDown={(e) => e.currentTarget.style.cursor = 'grabbing'}
+              onMouseUp={(e) => e.currentTarget.style.cursor = 'grab'}
+              onMouseLeave={(e) => e.currentTarget.style.cursor = 'grab'}
+            >
+              <div className="flex h-full touch-pan-y">
+                {images.map((image, index) => (
+                  <div key={index} className="flex-none w-full h-full flex items-center justify-center">
+                    <img
+                      src={image}
+                      alt={`${roomTitle} - Image ${index + 1}`}
+                      className="max-w-full max-h-full object-contain select-none"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Thumbnail carousel */}
+          {images.length > 1 && (
+            <div className="mt-4">
+              <div className="overflow-hidden" ref={emblaThumbsRef}>
+                <div className="flex gap-2">
+                  {images.map((image, index) => (
+                    <div key={index} className="flex-none">
+                      <button
+                        onClick={() => onThumbClick(index)}
+                        className={clsx(
+                          "w-16 h-16 rounded overflow-hidden border-2 transition-all duration-200",
+                          index === currentImageIndex 
+                            ? 'border-blue-500 ring-2 ring-blue-200' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        )}
+                        aria-label={`Go to image ${index + 1}`}
+                      >
+                        <img
+                          src={image}
+                          alt={`${roomTitle} thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          draggable={false}
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

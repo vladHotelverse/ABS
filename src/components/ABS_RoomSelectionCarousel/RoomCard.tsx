@@ -1,7 +1,6 @@
 import clsx from 'clsx'
 import type React from 'react'
 import { useCallback, useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { PriceSlider } from './components'
 import { useSlider } from './hooks'
 import type { RoomOption } from './types'
@@ -153,23 +152,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
-  // Handle image navigation
-  const goToPreviousImage = useCallback(() => {
-    setCurrentImageIndex(prev => 
-      prev === 0 ? room.images.length - 1 : prev - 1
-    )
-  }, [room.images.length])
-
-  const goToNextImage = useCallback(() => {
-    setCurrentImageIndex(prev => 
-      prev === room.images.length - 1 ? 0 : prev + 1
-    )
-  }, [room.images.length])
-
-  const handleImageClick = useCallback((index?: number) => {
-    if (typeof index === 'number') {
-      setCurrentImageIndex(index)
-    }
+  const handleImageClick = useCallback(() => {
     setIsImageModalOpen(true)
   }, [])
 
@@ -212,7 +195,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       />
 
       {/* Room Image Display with Click-to-Modal */}
-      <div className="relative h-64 bg-neutral-100 group cursor-pointer" onClick={() => handleImageClick(currentImageIndex)}>
+      <div className="relative h-64 bg-neutral-100 group cursor-zoom-in" onClick={handleImageClick}>
         {/* Current image */}
         <img 
           src={room.images[currentImageIndex]} 
@@ -221,56 +204,14 @@ const RoomCard: React.FC<RoomCardProps> = ({
           draggable={false}
         />
         
-        {/* Navigation buttons for multiple images */}
+        {/* Multiple images indicator - simple overlay */}
         {room.images.length > 1 && (
-          <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                goToPreviousImage()
-              }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-1 bg-black/50 border-none text-white hover:bg-black/70 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              aria-label="Previous image"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                goToNextImage()
-              }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-1 bg-black/50 border-none text-white hover:bg-black/70 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              aria-label="Next image"
-            >
-              <ChevronRight size={20} />
-            </button>
-
-            {/* Image indicators */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
-              {room.images.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setCurrentImageIndex(index)
-                  }}
-                  className={clsx(
-                    'w-2 h-2 rounded-full transition-colors',
-                    index === currentImageIndex 
-                      ? 'bg-white' 
-                      : 'bg-white/50 hover:bg-white/75'
-                  )}
-                  aria-label={`Go to image ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            {/* Image counter */}
-            <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
-              {currentImageIndex + 1} / {room.images.length}
-            </div>
-          </>
+          <div className="absolute bottom-3 right-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <span>{room.images.length} photos</span>
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />
+            </svg>
+          </div>
         )}
         
         {/* Amenities overlay - top left */}
