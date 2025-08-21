@@ -56,7 +56,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
     ? (selectedOptions && selectedOptions[config.key]) 
       ? (options || []).filter(option => option && option.id === selectedOptions[config.key]?.id)
       : []
-    : (options || []).filter(option => option && !(disabledOptions && disabledOptions[option.id]?.disabled))
+    : (options || [])
   const INITIAL_ITEMS_COUNT = 3
   const shouldShowMoreButton = mode !== 'consultation' && filteredOptions.length > INITIAL_ITEMS_COUNT
   const displayOptions = (mode === 'consultation' || showAllOptions) ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)

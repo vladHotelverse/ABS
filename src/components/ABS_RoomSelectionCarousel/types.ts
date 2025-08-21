@@ -149,5 +149,9 @@ export type {
   RoomCardProps,
 } from './RoomCard'
 
-// Re-export carousel state from hooks
-export type { CarouselState } from './hooks/useCarouselState'
+// Carousel state types (simplified since we removed the old hook)
+export interface CarouselState {
+  activeIndex: number
+  activeImageIndices: Record<number, number>
+  selectedRoom: RoomOption | null
+}

@@ -1,20 +1,19 @@
-import type React from 'react'
 import clsx from 'clsx'
+import type React from 'react'
 import { RoomCard } from '../components'
-import type { RoomCardProps } from '../types'
 
-export interface SingleRoomLayoutProps {
-  className?: string
+interface SingleRoomLayoutProps {
   title?: string
   subtitle?: string
-  roomCardProps: RoomCardProps
+  className?: string
+  roomCardPropsArray: any[]
 }
 
-const SingleRoomLayout: React.FC<SingleRoomLayoutProps> = ({
-  className,
+export const SingleRoomLayout: React.FC<SingleRoomLayoutProps> = ({
   title,
   subtitle,
-  roomCardProps,
+  className,
+  roomCardPropsArray,
 }) => {
   return (
     <div className={clsx(className)}>
@@ -26,11 +25,9 @@ const SingleRoomLayout: React.FC<SingleRoomLayoutProps> = ({
         </div>
       )}
 
-      <div className="w-full max-w-md">
-        <RoomCard {...roomCardProps} />
+      <div className="flex justify-center">
+        <RoomCard {...roomCardPropsArray[0]} />
       </div>
     </div>
   )
 }
-
-export default SingleRoomLayout

@@ -1,69 +1,153 @@
-# React + TypeScript + Vite
+# 🏨 ABS - Advanced Booking System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, React-based hotel booking platform that provides guests with an interactive and customizable booking experience.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Interactive Room Selection**: Browse rooms with high-quality images and detailed information
+- **Room Customization**: Upgrade beds, views, floors, and amenities
+- **Special Offers**: Dynamic offer system with real-time pricing
+- **Multi-language Support**: English and Spanish localization
+- **Order Tracking**: Real-time booking status and management
+- **Interactive Maps**: Visual room selection via hotel floor plans
+- **Mobile Responsive**: Optimized for all devices and screen sizes
+- **Dynamic Content**: Content management through Supabase integration
 
-## Expanding the ESLint configuration
+## 🚀 Quick Start
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 18+ 
+- pnpm (recommended) or npm
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Clone the repository
+git clone <repository-url>
+cd ABS
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment Setup
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Copy environment file and configure:
+```bash
+cp .env.example .env.local
 ```
+
+2. Add your Supabase credentials to `.env.local`:
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+## 🛠️ Development
+
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm test` | Run unit tests |
+| `pnpm test:ui` | Run tests with UI |
+| `pnpm test:coverage` | Generate test coverage |
+| `pnpm test:e2e` | Run end-to-end tests |
+
+### Project Structure
+
+```
+src/
+├── components/           # React components
+│   ├── ABS_Landing/     # Main booking interface
+│   ├── ABS_OrderStatus/ # Order tracking
+│   ├── ABS_RoomSelection/ # Room selection logic
+│   ├── ABS_RoomCustomization/ # Room upgrades
+│   ├── ABS_SpecialOffers/ # Special offers
+│   ├── ABS_PricingSummaryPanel/ # Cart & pricing
+│   └── ui/              # Base UI components
+├── hooks/               # Custom React hooks
+├── lib/                 # Utilities and configurations
+├── services/            # API services
+├── types/               # TypeScript definitions
+└── i18n/                # Internationalization
+```
+
+## 🧪 Testing
+
+### Unit Tests
+```bash
+pnpm test           # Run all tests
+pnpm test:ui        # Interactive test runner
+pnpm test:coverage  # Generate coverage report
+```
+
+### End-to-End Tests
+```bash
+pnpm test:e2e           # Run E2E tests
+pnpm test:e2e:ui        # Interactive E2E runner
+pnpm test:e2e:report    # View test results
+```
+
+## 🗄️ Database
+
+The project uses Supabase for dynamic content management. Database migrations are located in `supabase/migrations/`.
+
+### Running Migrations
+
+```bash
+# Apply migrations
+node scripts/apply-migration.js
+```
+
+## 🌐 Internationalization
+
+The app supports multiple languages using i18next:
+
+- English (default)
+- Spanish (es)
+
+Translations are stored in `src/i18n/locales/`.
+
+## 🏗️ Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React | 19.1.0 | UI Framework |
+| TypeScript | ~5.8.3 | Type Safety |
+| Vite | ^5.4.19 | Build Tool |
+| Tailwind CSS | ^4.0.0 | Styling |
+| Radix UI | Various | Accessible Components |
+| Supabase | ^2.52.0 | Backend Services |
+| React Router | ^7.7.0 | Routing |
+| i18next | ^25.3.0 | Internationalization |
+
+## 📚 Documentation
+
+Detailed documentation is available in the `docs/` directory:
+
+- [Project Overview](docs/01-project-overview.md)
+- [Component Architecture](docs/02-component-architecture.md) 
+- [Database Integration](docs/03-database-integration.md)
+- [Development Guide](docs/04-development-guide.md)
+- [Testing Framework](docs/testing-framework.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is proprietary and confidential.
