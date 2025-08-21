@@ -3,7 +3,6 @@ import type React from 'react'
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialogHeadless'
 import { CustomizationSection } from './components/CustomizationSection'
-import { ConflictResolutionDialog } from './components/ConflictResolutionDialog'
 import { useCustomizationState } from './hooks/useCustomizationState'
 import type { RoomCustomizationProps } from './types'
 
@@ -24,11 +23,8 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
     selectedOptions, 
     openSections, 
     disabledOptions,
-    pendingConflict,
     toggleSection, 
     handleSelect,
-    resolveConflict,
-    dismissConflict,
   } = useCustomizationState({
     initialSelections,
     sectionOptions,
@@ -136,13 +132,6 @@ const RoomCustomization: React.FC<RoomCustomizationProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Conflict Resolution Dialog */}
-      <ConflictResolutionDialog
-        conflict={pendingConflict}
-        texts={texts}
-        onResolve={resolveConflict}
-        onDismiss={dismissConflict}
-      />
     </>
   )
 }

@@ -1,15 +1,15 @@
 import clsx from 'clsx'
 import type React from 'react'
-import { useMemo, useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { PriceSlider } from './components'
 import { useSlider } from './hooks'
 import type { RoomOption } from './types'
 
 // Import subcomponents
-import RoomImageCarousel from './components/RoomImageCarousel'
 import RoomBadges from './components/RoomBadges'
 import RoomDetails from './components/RoomDetails'
 import RoomPricing from './components/RoomPricing'
+import ImageModal from './components/ImageModal'
 
 export interface RoomCardTranslations {
   discountBadgeText: string
@@ -86,9 +86,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     removeText,
     instantConfirmationText = 'Instant Confirmation',
     bidSubmittedText = 'Bid Submitted',
-    previousImageLabel = 'Previous image',
-    nextImageLabel = 'Next image',
-    viewImageLabel = 'View image {index}',
     proposePriceText,
     availabilityText,
     currencyText,
@@ -99,7 +96,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
   const {
     onSelectRoom,
-    onImageChange,
     onMakeOffer,
     onCancelBid,
   } = handlers
@@ -114,13 +110,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
   const {
     selectedRoom,
-    activeImageIndex,
     activeBid,
   } = state
   const isBidActive = activeBid?.roomId === room.id
   
   // State to control slider visibility with smooth transition
   const [sliderVisible, setSliderVisible] = useState(false)
+  
 
   // Slider logic is now local to each card
   const {
@@ -139,7 +135,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     activeBid,
   })
 
-  
   // Handle slider visibility with a small delay to ensure smooth transition
   useEffect(() => {
     if (isActive && showPriceSlider) {
@@ -152,21 +147,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
       setSliderVisible(false)
     }
   }, [isActive, showPriceSlider])
-  // Memoized handlers
-  const handleImageNavigation = useCallback(
-    (direction: 'prev' | 'next') => {
-      const totalImages = room.images.length
-      if (direction === 'prev') {
-        const newIndex = activeImageIndex > 0 ? activeImageIndex - 1 : totalImages - 1
-        onImageChange(newIndex)
-      } else {
-        const newIndex = (activeImageIndex + 1) % totalImages
-        onImageChange(newIndex)
-      }
-    },
-    [room.images.length, activeImageIndex, onImageChange]
-  )
 
+  // Image modal state
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+  const [currentImageIndex] = useState(0)
+
+  const handleImageClick = useCallback(() => {
+    setIsImageModalOpen(true)
+  }, [])
+
+  const handleCloseModal = useCallback(() => {
+    setIsImageModalOpen(false)
+  }, [])
 
   const handleSelectRoom = useCallback(
     (e?: React.MouseEvent) => {
@@ -178,156 +170,10 @@ const RoomCard: React.FC<RoomCardProps> = ({
     [onSelectRoom, room, selectedRoom]
   )
 
-  // Image drag handlers using separate local state
-  const [localImageDragState, setLocalImageDragState] = useState({
-    isDragging: false,
-    startX: 0,
-    currentX: 0,
-    deltaX: 0,
-    startTime: 0,
-  })
-
-  // Create separate drag handlers specifically for image navigation
-  const imageDragHandlers = useMemo(() => ({
-    onMouseDown: (e: React.MouseEvent) => {
-      if (room.images.length <= 1) return
-      e.preventDefault()
-      e.stopPropagation() // Prevent main carousel from responding
-      
-      const startX = e.clientX
-      const startTime = Date.now()
-      setLocalImageDragState({
-        isDragging: true,
-        startX,
-        currentX: startX,
-        deltaX: 0,
-        startTime,
-      })
-
-      const handleMouseMove = (moveE: MouseEvent) => {
-        const currentX = moveE.clientX
-        const deltaX = currentX - startX
-        setLocalImageDragState(prev => ({
-          ...prev,
-          currentX,
-          deltaX,
-        }))
-      }
-
-      const handleMouseUp = () => {
-        setLocalImageDragState(currentState => {
-          const duration = Date.now() - startTime
-          const velocity = Math.abs(currentState.deltaX) / Math.max(duration, 1)
-          
-          // Navigation thresholds
-          const DRAG_DISTANCE_THRESHOLD = 50
-          const DRAG_VELOCITY_THRESHOLD = 0.5
-          
-          const shouldNavigate = Math.abs(currentState.deltaX) > DRAG_DISTANCE_THRESHOLD || velocity > DRAG_VELOCITY_THRESHOLD
-          
-          if (shouldNavigate && Math.abs(currentState.deltaX) > 10) {
-            if (currentState.deltaX < 0) {
-              // Swipe left - next image
-              handleImageNavigation('next')
-            } else {
-              // Swipe right - previous image  
-              handleImageNavigation('prev')
-            }
-          }
-          
-          return {
-            isDragging: false,
-            startX: 0,
-            currentX: 0,
-            deltaX: 0,
-            startTime: 0,
-          }
-        })
-        
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-      }
-
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-    },
-    onTouchStart: (e: React.TouchEvent) => {
-      if (room.images.length <= 1) return
-      e.stopPropagation() // Prevent main carousel from responding
-      
-      const touch = e.touches[0]
-      if (!touch) return
-      
-      const startX = touch.clientX
-      const startTime = Date.now()
-      setLocalImageDragState({
-        isDragging: true,
-        startX,
-        currentX: startX,
-        deltaX: 0,
-        startTime,
-      })
-    },
-    onTouchMove: (e: React.TouchEvent) => {
-      if (!localImageDragState.isDragging || room.images.length <= 1) return
-      e.stopPropagation() // Prevent main carousel from responding
-      
-      const touch = e.touches[0]
-      if (!touch) return
-      
-      const currentX = touch.clientX
-      const deltaX = currentX - localImageDragState.startX
-      setLocalImageDragState(prev => ({
-        ...prev,
-        currentX,
-        deltaX,
-      }))
-    },
-    onTouchEnd: (e: React.TouchEvent) => {
-      e.stopPropagation() // Prevent main carousel from responding
-      
-      setLocalImageDragState(currentState => {
-        if (!currentState.isDragging) return currentState
-        
-        const duration = Date.now() - currentState.startTime
-        const velocity = Math.abs(currentState.deltaX) / Math.max(duration, 1)
-        
-        // Navigation thresholds
-        const DRAG_DISTANCE_THRESHOLD = 50
-        const DRAG_VELOCITY_THRESHOLD = 0.5
-        
-        const shouldNavigate = Math.abs(currentState.deltaX) > DRAG_DISTANCE_THRESHOLD || velocity > DRAG_VELOCITY_THRESHOLD
-        
-        if (shouldNavigate && Math.abs(currentState.deltaX) > 10) {
-          if (currentState.deltaX < 0) {
-            // Swipe left - next image
-            handleImageNavigation('next')
-          } else {
-            // Swipe right - previous image
-            handleImageNavigation('prev')
-          }
-        }
-        
-        return {
-          isDragging: false,
-          startX: 0,
-          currentX: 0,
-          deltaX: 0,
-          startTime: 0,
-        }
-      })
-    },
-    style: {
-      touchAction: room.images.length <= 1 ? 'auto' : 'none',
-      userSelect: room.images.length <= 1 ? 'auto' : 'none',
-      cursor: room.images.length <= 1 ? 'default' : 'grab',
-    } as React.CSSProperties,
-  }), [room.images.length, localImageDragState, handleImageNavigation])
-
   return (
     <div
       className={clsx(
-        'relative rounded-lg overflow-visible md:shadow-sm max-w-lg transition-all duration-300',
+        'relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
         isActive && showPriceSlider ? 'bg-gray-50 md:ring-2 ring-gray-200' : 'bg-white',
         {
           'border-2 border-green-300 bg-green-50/30': selectedRoom?.id === room.id,
@@ -348,20 +194,38 @@ const RoomCard: React.FC<RoomCardProps> = ({
         bidSubmittedText={bidSubmittedText}
       />
 
-      {/* Room Image Carousel */}
-      <RoomImageCarousel
-        images={room.images}
-        activeImageIndex={activeImageIndex}
-        title={room.title || room.roomType}
-        dynamicAmenities={dynamicAmenities || room.amenities.slice(0, 3)}
-        roomId={room.id}
-        localImageDragState={localImageDragState}
-        imageDragHandlers={imageDragHandlers}
-        onImageChange={onImageChange}
-        previousImageLabel={previousImageLabel}
-        nextImageLabel={nextImageLabel}
-        viewImageLabel={viewImageLabel}
-      />
+      {/* Room Image Display with Click-to-Modal */}
+      <div className="relative h-64 bg-neutral-100 group cursor-zoom-in" onClick={handleImageClick}>
+        {/* Current image */}
+        <img 
+          src={room.images[currentImageIndex]} 
+          alt={`${room.title || room.roomType} - Image ${currentImageIndex + 1}`} 
+          className="object-cover w-full h-full rounded-t-lg" 
+          draggable={false}
+        />
+        
+        {/* Multiple images indicator - simple overlay */}
+        {room.images.length > 1 && (
+          <div className="absolute bottom-3 right-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <span>{room.images.length} photos</span>
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />
+            </svg>
+          </div>
+        )}
+        
+        {/* Amenities overlay - top left */}
+        <div className="absolute top-3 left-3 z-30 flex flex-wrap gap-1 max-w-[85%]">
+          {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
+            <span
+              key={`${room.id}-${amenity}`}
+              className="text-xs bg-white/90 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-md text-gray-800 shadow-sm"
+            >
+              {amenity}
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* Room Details */}
       <RoomDetails
@@ -426,6 +290,15 @@ const RoomCard: React.FC<RoomCardProps> = ({
           />
         </div>
       </div>
+
+      {/* Image Modal */}
+      <ImageModal
+        images={room.images}
+        isOpen={isImageModalOpen}
+        initialImageIndex={currentImageIndex}
+        onClose={handleCloseModal}
+        roomTitle={room.title || room.roomType}
+      />
     </div>
   )
 }

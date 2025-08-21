@@ -45,13 +45,44 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   onMakeOffer,
   onCancelBid,
 }) => {
+  // Temporarily removed @use-gesture implementation to fix infinite loop
+  // Will re-implement once core functionality is stable
+
   // Generate dynamic propose text
   const dynamicProposeText = roomName
     ? `${proposePriceText.replace(':', '')} for ${roomName}:`
     : proposePriceText
 
+  const handlePointerEvent = (e: React.PointerEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+  }
+
+  const handleTouchEvent = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+  }
+
+  // Use capture phase to intercept events before they reach carousel
+  const handleCaptureTouch = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.nativeEvent.stopPropagation()
+  }
+
   return (
-    <div className={clsx('w-full', className)}>
+    <div 
+      className={clsx('w-full select-none', className)}
+      onPointerDown={handlePointerEvent}
+      onMouseDown={handlePointerEvent}
+      onTouchStart={handleTouchEvent}
+      onTouchStartCapture={handleCaptureTouch}
+      onTouchMove={handleTouchEvent}
+      onTouchMoveCapture={handleCaptureTouch}
+      onTouchEnd={handleTouchEvent}
+      onTouchEndCapture={handleCaptureTouch}
+      onDragStart={(e) => e.preventDefault()}
+      data-carousel-drag-disabled="true"
+      style={{ touchAction: 'manipulation', userSelect: 'none' }}
+    >
       {bidStatus === 'submitted' && submittedPrice ? (
         // Submitted bid view
         <div className="space-y-3">
@@ -96,7 +127,17 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               {/* <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div> */}
             </div>
           </div>
-          <div className="relative w-full py-2">
+          <div 
+            className="relative w-full py-2"
+            onPointerDown={handlePointerEvent}
+            onMouseDown={handlePointerEvent}
+            onTouchStart={handleTouchEvent}
+            onTouchMove={handleTouchEvent}
+            onTouchEnd={handleTouchEvent}
+            onPointerMove={(e) => e.stopPropagation()}
+            data-carousel-drag-disabled="true"
+            style={{ touchAction: 'manipulation' }}
+          >
             <Slider
               min={minPrice}
               max={maxPrice}
@@ -104,6 +145,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               value={[proposedPrice]}
               onValueChange={(value) => onPriceChange(value[0])}
               className="w-full transition-all"
+              data-carousel-drag-disabled
             />
             <div className="w-full flex justify-between text-xs text-neutral-500 mt-2">
               <span>{`${minPrice} ${currencyText}/${nightText}`}</span>

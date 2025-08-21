@@ -92,12 +92,6 @@ function getRoomLevel(roomType: string): number {
   return index >= 0 ? index : 0
 }
 
-/**
- * Check if an amenity represents a unique benefit compared to current room
- */
-function isUniqueAmenity(amenity: string, currentRoomAmenities: string[]): boolean {
-  return !currentRoomAmenities.includes(amenity)
-}
 
 /**
  * Select the 3 best amenities for a room upgrade
@@ -115,51 +109,74 @@ export function selectBestAmenities(
 ): string[] {
   const roomLevel = getRoomLevel(room.roomType)
   const currentLevel = getRoomLevel(currentRoomType)
+  const upgradeBonus = Math.max(0, (roomLevel - currentLevel) * 0.5)
   
-  // Score each amenity
-  const amenitiesWithScores: AmenityWithScore[] = room.amenities.map(amenity => {
+  // Convert currentRoomAmenities to Set for O(1) lookups instead of O(n)
+  const currentAmenitiesSet = new Set(currentRoomAmenities)
+  
+  // Use partial sort approach - find top 3 without fully sorting entire array
+  const topAmenities: AmenityWithScore[] = []
+  
+  for (const amenity of room.amenities) {
     let score = getAmenityScore(amenity)
-    const isUnique = isUniqueAmenity(amenity, currentRoomAmenities)
+    const isUnique = !currentAmenitiesSet.has(amenity)
     
-    // Boost score for unique amenities (new benefits)
-    if (isUnique) {
-      score += 3
-    }
-    
-    // Boost score based on room upgrade level
-    const upgradeBonus = Math.max(0, (roomLevel - currentLevel) * 0.5)
+    // Apply scoring logic with early optimizations
+    if (isUnique) score += 3
     score += upgradeBonus
+    if (usedAmenities.has(amenity)) score -= 5
     
-    // Penalize if already used by another room
-    if (usedAmenities.has(amenity)) {
-      score -= 5
-    }
+    const amenityWithScore: AmenityWithScore = { amenity, score, isUnique }
     
-    return {
-      amenity,
-      score,
-      isUnique
-    }
-  })
-  
-  // Sort by score (descending) and select top 3
-  const selectedAmenities = amenitiesWithScores
-    .sort((a, b) => {
-      // First sort by uniqueness (unique amenities first)
-      if (a.isUnique !== b.isUnique) {
-        return a.isUnique ? -1 : 1
+    // Use insertion approach to maintain top 3, avoiding full sort
+    if (topAmenities.length < 3) {
+      topAmenities.push(amenityWithScore)
+      // Sort only when we have multiple items
+      if (topAmenities.length > 1) {
+        topAmenities.sort(compareAmenities)
       }
-      // Then by score
-      return b.score - a.score
-    })
-    .slice(0, 3)
-    .map(item => item.amenity)
+    } else {
+      // Check if current amenity is better than worst in top 3
+      const worstIndex = topAmenities.length - 1
+      if (compareAmenities(amenityWithScore, topAmenities[worstIndex]) < 0) {
+        topAmenities[worstIndex] = amenityWithScore
+        // Re-sort only the top 3
+        topAmenities.sort(compareAmenities)
+      }
+    }
+  }
   
-  return selectedAmenities
+  return topAmenities.map(({ amenity }) => amenity)
+}
+
+// Extracted comparison function for better performance and reusability
+function compareAmenities(a: AmenityWithScore, b: AmenityWithScore): number {
+  // First sort by uniqueness (unique amenities first)
+  if (a.isUnique !== b.isUnique) {
+    return a.isUnique ? -1 : 1
+  }
+  // Then by score (descending)
+  return b.score - a.score
+}
+
+// Cache for room levels to avoid repeated calculations
+const roomLevelCache = new Map<string, number>()
+
+/**
+ * Get cached room level to avoid repeated calculations
+ */
+function getCachedRoomLevel(roomType: string): number {
+  if (roomLevelCache.has(roomType)) {
+    return roomLevelCache.get(roomType)!
+  }
+  const level = getRoomLevel(roomType)
+  roomLevelCache.set(roomType, level)
+  return level
 }
 
 /**
  * Get dynamic amenities for all rooms, ensuring no repetition
+ * Optimized with caching and efficient data structures
  * @param rooms - Array of room options
  * @param currentRoomType - The user's current room type
  * @param currentRoomAmenities - Amenities from the user's current room
@@ -173,12 +190,16 @@ export function getDynamicAmenitiesForAllRooms(
   const usedAmenities = new Set<string>()
   const roomAmenities = new Map<string, string[]>()
   
-  // Sort rooms by upgrade level to prioritize better rooms for amenity selection
-  const sortedRooms = [...rooms].sort((a, b) => {
-    return getRoomLevel(b.roomType) - getRoomLevel(a.roomType)
-  })
+  // Early return for empty rooms array
+  if (rooms.length === 0) return roomAmenities
   
-  // Select amenities for each room
+  // Pre-sort rooms by upgrade level using cached levels
+  const sortedRooms = rooms
+    .map(room => ({ room, level: getCachedRoomLevel(room.roomType) }))
+    .sort((a, b) => b.level - a.level)
+    .map(({ room }) => room)
+  
+  // Select amenities for each room with optimized processing
   for (const room of sortedRooms) {
     const selectedAmenities = selectBestAmenities(
       room,
@@ -187,7 +208,7 @@ export function getDynamicAmenitiesForAllRooms(
       usedAmenities
     )
     
-    // Add selected amenities to used set
+    // Batch add amenities to used set
     selectedAmenities.forEach(amenity => usedAmenities.add(amenity))
     
     roomAmenities.set(room.id, selectedAmenities)

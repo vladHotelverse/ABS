@@ -552,7 +552,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       />
 
       <main className="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 flex-grow pb-24 lg:pb-8">
-        <div className="flex-grow space-y-8 w-full">
+        <div className="flex-grow space-y-8 w-full xl:max-w-[calc(100%-432px)]">
           {/* Room Selection Section */}
           <RoomSelectionSection
             roomOptions={roomOptions}
