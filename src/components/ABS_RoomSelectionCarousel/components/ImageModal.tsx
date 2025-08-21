@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
-import useEmblaCarousel, { type EmblaOptionsType } from 'embla-carousel-react'
+import useEmblaCarousel from 'embla-carousel-react'
 import {
   Dialog,
   DialogContent,

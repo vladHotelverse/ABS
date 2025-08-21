@@ -150,7 +150,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
   // Image modal state
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [currentImageIndex] = useState(0)
 
   const handleImageClick = useCallback(() => {
     setIsImageModalOpen(true)
