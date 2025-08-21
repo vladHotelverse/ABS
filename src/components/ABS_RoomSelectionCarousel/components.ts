@@ -8,3 +8,11 @@ export { useSlider } from './hooks/useSlider'
 export { default as RoomBadges } from './components/RoomBadges'
 export { default as RoomDetails } from './components/RoomDetails'
 export { default as RoomPricing } from './components/RoomPricing'
+
+// Export layout components
+export { SingleRoomLayout } from './components/SingleRoomLayout'
+export { TwoRoomLayout } from './components/TwoRoomLayout'
+export { MultiRoomLayout } from './components/MultiRoomLayout'
+
+// Export image modal
+export { default as ImageModal } from './components/ImageModal'
