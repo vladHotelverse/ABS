@@ -6,6 +6,7 @@ import { RoomCard } from './components'
 import type { RoomSelectionCarouselProps, RoomSelectionCarouselTranslations } from './types'
 import type { RoomCardTranslations, RoomCardHandlers, RoomCardConfig, RoomCardState, RoomOption } from './types'
 import { getDynamicAmenitiesForAllRooms, getCurrentRoomAmenities } from './utils/amenitiesSelector'
+import { cn } from '@/lib/utils'
 
 const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
   className,
@@ -282,8 +283,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                       key={roomCardProps.room.id}
                       className="flex-shrink-0"
                       style={{
-                        flexBasis: '70%',
-                        width: '70%',
+                        flexBasis: '100%',
+                        width: '100%',
                         display: 'flex',
                         justifyContent: 'center',
                         padding: '0 4px',
@@ -295,14 +296,13 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-30" />
-                <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-30" />
+                <CarouselPrevious className={cn('absolute left-2 bottom-0 z-30')} />
+                <CarouselNext className={cn('absolute right-2  bottom-0 z-30')} />
               </Carousel>
             </div>
           </div>
         </>
       ) : (
-        /* Three or more rooms: Centered carousel with 50/25/25 layout */
         <div className="relative w-full mx-auto">
           <div className="overflow-hidden">
             <Carousel 
@@ -318,7 +318,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
               className="w-full"
             >
               <CarouselContent 
-                className="flex" 
+                className="flex pb-1" 
                 style={{
                   // Container sized to show exactly center + 2 partial sides
                   width: '100%',
@@ -327,23 +327,14 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 {roomCardPropsArray.map((roomCardProps) => (
                   <CarouselItem 
                     key={roomCardProps.room.id} 
-                    className="flex-shrink-0"
-                    style={{
-                      // Each slide is 50% of container width
-                      // This means center takes 50%, and each side shows 25%
-                      flexBasis: '60%',
-                      width: '60%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      padding: '0 8px',
-                    }}
+                    className="flex-shrink-0 lg:basis-[50%] lg:w-[50%] basis-full w-full flex justify-center"
                   >
                       <RoomCard {...roomCardProps} />
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-30" />
-              <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-30" />
+              <CarouselPrevious className={cn('relative left-2 -bottom-4 z-30')} />
+              <CarouselNext className={cn('relative -right-4  -bottom-4 z-30')} />
             </Carousel>
           </div>
         </div>
