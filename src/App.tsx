@@ -1,10 +1,11 @@
 import { useState, useEffect, Suspense, lazy } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BrowserRouter, Routes, Route, useParams, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useParams, useNavigate, useLocation } from 'react-router-dom'
 
 // Lazy load heavy components
 const ABSLanding = lazy(() => import('@/components/ABS_Landing/ABS_Landing').then(m => ({ default: m.ABSLanding })))
 const ABS_OrderStatus = lazy(() => import('@/components/ABS_OrderStatus').then(m => ({ default: m.ABS_OrderStatus })))
+const PreBookingForm = lazy(() => import('@/components/PreBookingForm'))
 import { createOrder, createSampleOrder, convertBookingDataToOrder } from '@/utils/orderGenerator'
 import { initializeDemoData } from '@/utils/createSampleData'
 import { useAuth } from '@/hooks/useAuth'
@@ -33,6 +34,7 @@ function Home() {
   const { i18n } = useTranslation()
   const [currentLanguage] = useState('en')
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Set English as default on mount and initialize demo data
   useEffect(() => {
@@ -234,6 +236,18 @@ function Home() {
     },
   }
 
+  // Get booking info from navigation state (if coming from pre-booking form)
+  const bookingInfo = location.state?.bookingInfo
+  const isMultiBookingMode = bookingInfo?.isMultiRoom || false
+
+  // Use booking info if available, otherwise use defaults
+  const checkIn = bookingInfo?.checkIn || "2025-10-10"
+  const checkOut = bookingInfo?.checkOut || "2025-10-15"
+  const roomType = bookingInfo?.roomType || "DELUXE SILVER"
+  const occupancy = bookingInfo?.occupancy || "2 Adults, 0 Children"
+  const reservationCode = bookingInfo?.reservationCode || "1003066AU"
+  const guestName = bookingInfo?.guestName || "Demo Guest"
+
   return (
     <main className="min-h-screen bg-background">
       <ABSLanding
@@ -244,13 +258,29 @@ function Home() {
         roomSelectionMap={roomSelectionMap}
         translations={processedData.translations}
         language={currentLang}
-        checkIn="2025-10-10"
-        checkOut="2025-10-15"
-        roomType="DELUXE SILVER"
-        occupancy="2 Adults, 0 Children"
-        reservationCode="1003066AU"
+        checkIn={checkIn}
+        checkOut={checkOut}
+        roomType={roomType}
+        occupancy={occupancy}
+        reservationCode={reservationCode}
         onConfirmBooking={handleConfirmBooking}
         compatibilityRules={processedData.compatibilityRules}
+        // Multi-booking support
+        isMultiBooking={isMultiBookingMode}
+        initialRoomBookings={bookingInfo?.rooms?.map(room => ({
+          id: room.id,
+          roomName: room.roomName,
+          roomNumber: room.roomNumber,
+          guestName: room.guestName,
+          checkIn: room.checkIn,
+          checkOut: room.checkOut,
+          guests: room.guests,
+          nights: room.nights,
+          payAtHotel: true,
+          items: [
+            { id: `room-${room.id}`, name: room.roomName, price: 129.99, type: 'room' as const }
+          ]
+        })) || []}
       />
     </main>
   )
@@ -358,6 +388,25 @@ function OrderStatusPage() {
   )
 }
 
+// Pre-Booking Form component wrapper
+function PreBookingFormPage() {
+  return <PreBookingForm />
+}
+
+// Multi-booking route - same as Home but explicitly multi-booking
+function MultiBookingPage() {
+  const location = useLocation()
+  const bookingInfo = location.state?.bookingInfo
+
+  // If no booking info, redirect to pre-booking form
+  if (!bookingInfo) {
+    return <PreBookingForm />
+  }
+
+  // Force multi-booking mode
+  return <Home />
+}
+
 // Loading component
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -372,6 +421,9 @@ function App() {
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/booking/:reservationCode" element={<PreBookingFormPage />} />
+          <Route path="/booking" element={<PreBookingFormPage />} />
+          <Route path="/multi-booking" element={<MultiBookingPage />} />
           <Route path="/new-order/:orderId" element={<NewOrderStatusPage />} />
           <Route path="/order/:orderId" element={<OrderStatusPage />} />
           <Route path="/order" element={<ABS_OrderStatus onBackToHome={() => window.location.href = '/'} />} />
