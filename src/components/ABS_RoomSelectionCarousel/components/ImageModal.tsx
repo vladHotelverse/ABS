@@ -23,10 +23,10 @@ const ImageModal: React.FC<ImageModalProps> = ({
   roomTitle,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(initialImageIndex)
-  
+
   // Main carousel
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel({ loop: true })
-  
+
   // Thumbnails carousel
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
     containScroll: 'keepSnaps',
@@ -59,7 +59,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
     if (!emblaMainApi) return
     onSelect()
     emblaMainApi.on('select', onSelect).on('reInit', onSelect)
-    
+
     return () => {
       emblaMainApi.off('select', onSelect).off('reInit', onSelect)
     }
@@ -87,7 +87,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
         className="max-w-[95vw] max-h-[95vh] w-full h-full bg-white border-none p-6 gap-0 z-[101]"
         hideClose={true}
       >
@@ -97,15 +97,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
         </DialogTitle>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-gray-900">{roomTitle}</h2>
-            {images.length > 1 && (
-              <span className="text-sm text-gray-500">
-                {currentImageIndex + 1} / {images.length}
-              </span>
-            )}
-          </div>
+        <div className="flex items-center justify-end mb-4">
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -121,8 +113,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
         <div className="flex-1 flex flex-col">
           {/* Main image carousel */}
           <div className="flex-1 mb-4 relative">
-            <div 
-              className="h-full overflow-hidden rounded-lg bg-gray-50" 
+            <div
+              className="h-full overflow-hidden rounded-lg"
               ref={emblaMainRef}
               style={{ cursor: 'grab' }}
               onMouseDown={(e) => e.currentTarget.style.cursor = 'grabbing'}
@@ -135,7 +127,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
                     <img
                       src={image}
                       alt={`${roomTitle} - Image ${index + 1}`}
-                      className="max-w-full max-h-full object-contain select-none"
+                      className="max-w-full max-h-full object-contain select-none rounded"
                       draggable={false}
                     />
                   </div>
@@ -149,15 +141,15 @@ const ImageModal: React.FC<ImageModalProps> = ({
           {images.length > 1 && (
             <div className="mt-4">
               <div className="overflow-hidden" ref={emblaThumbsRef}>
-                <div className="flex gap-2">
+                <div className="flex items-center justify-center w-full gap-2">
                   {images.map((image, index) => (
                     <div key={index} className="flex-none">
                       <button
                         onClick={() => onThumbClick(index)}
                         className={clsx(
                           "w-16 h-16 rounded overflow-hidden border-2 transition-all duration-200",
-                          index === currentImageIndex 
-                            ? 'border-blue-500 ring-2 ring-blue-200' 
+                          index === currentImageIndex
+                            ? 'border-blue-500 ring-2 ring-blue-200'
                             : 'border-gray-200 hover:border-gray-300'
                         )}
                         aria-label={`Go to image ${index + 1}`}

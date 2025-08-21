@@ -5,8 +5,7 @@ import type {
   ViewOption, 
   ExactViewOption,
   SpecialOfferOption,
-  CompatibilityRules,
-  ConflictResolution
+  CompatibilityRules
 } from '../types'
 import { CompatibilityEngine, defaultCompatibilityRules } from '../compatibilityRules'
 
@@ -27,10 +26,11 @@ export const useCustomizationState = ({
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     Object.fromEntries(Object.keys(sectionOptions).map((key) => [key, true]))
   )
-  const [pendingConflict, setPendingConflict] = useState<ConflictResolution | null>(null)
 
   // Sync internal state when initialSelections changes (e.g., when removed from pricing panel)
   useEffect(() => {
+    console.log('🔄 initialSelections changed:', initialSelections)
+    console.log('📊 Current selectedOptions:', selectedOptions)
     setSelectedOptions(initialSelections)
   }, [initialSelections])
 
@@ -52,6 +52,9 @@ export const useCustomizationState = ({
 
   const handleSelect = useCallback(
     (category: string, optionId: string) => {
+      console.log('🎯 handleSelect called:', category, optionId)
+      console.log('📊 Current selections before:', selectedOptions)
+      
       const options = sectionOptions[category]
       const optionDetails = options?.find((o) => o.id === optionId)
 
@@ -61,6 +64,7 @@ export const useCustomizationState = ({
 
       if (currentSelectedId === optionId) {
         // Deselect if already selected
+        console.log('❌ Deselecting option:', optionId)
         const newSelectedOptions = { ...selectedOptions }
         delete newSelectedOptions[category]
         setSelectedOptions(newSelectedOptions)
@@ -74,80 +78,37 @@ export const useCustomizationState = ({
         return
       }
 
-      // Check for conflicts before selecting
-      const conflict = compatibilityEngine.checkForConflicts(
-        optionId, 
-        category, 
-        selectedOptions, 
-        sectionOptions
-      )
-
-      if (conflict) {
-        setPendingConflict(conflict)
-        return
-      }
-
-      // No conflicts, proceed with selection
+      // Proceed with selection - disabled options are handled by UI
+      console.log('✅ Selecting option:', optionId)
       selectOption(category, optionId, optionDetails)
     },
     [selectedOptions, sectionOptions, onCustomizationChange, disabledOptions, compatibilityEngine]
   )
 
   const selectOption = useCallback((category: string, optionId: string, optionDetails: any) => {
+    console.log('🔧 selectOption called:', category, optionId)
     // For special offers, prefer roomTitle over claim
     const optionLabel = category === 'specialOffers' && 'roomTitle' in optionDetails ? optionDetails.roomTitle :
                        'label' in optionDetails ? optionDetails.label : 
                        'name' in optionDetails ? optionDetails.name : 
                        'claim' in optionDetails ? optionDetails.claim : 
                        optionId
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [category]: {
-        id: optionId,
-        label: optionLabel,
-        price: optionDetails.price,
-      },
-    }))
+    setSelectedOptions((prev) => {
+      console.log('📈 Updating selections from:', prev)
+      const newState = {
+        ...prev,
+        [category]: {
+          id: optionId,
+          label: optionLabel,
+          price: optionDetails.price,
+        },
+      }
+      console.log('📈 Updating selections to:', newState)
+      return newState
+    })
     onCustomizationChange?.(category, optionId, optionLabel, optionDetails.price)
   }, [onCustomizationChange])
 
-  const resolveConflict = useCallback(
-    (keepNew: boolean) => {
-      if (!pendingConflict) return
-
-      const { conflictingOption } = pendingConflict
-      const optionDetails = sectionOptions[conflictingOption.category]?.find(
-        (o) => o.id === conflictingOption.id
-      )
-
-      if (!optionDetails) {
-        setPendingConflict(null)
-        return
-      }
-
-      if (keepNew) {
-        // Remove conflicting options and select the new one
-        const resolvedSelections = compatibilityEngine.resolveConflicts(
-          conflictingOption.id,
-          conflictingOption.category,
-          selectedOptions,
-          true
-        )
-        
-        setSelectedOptions(resolvedSelections)
-        
-        // Select the new option
-        selectOption(conflictingOption.category, conflictingOption.id, optionDetails)
-      }
-
-      setPendingConflict(null)
-    },
-    [pendingConflict, sectionOptions, selectedOptions, compatibilityEngine, selectOption]
-  )
-
-  const dismissConflict = useCallback(() => {
-    setPendingConflict(null)
-  }, [])
 
   const isOptionDisabled = useCallback(
     (optionId: string): boolean => {
@@ -174,11 +135,8 @@ export const useCustomizationState = ({
     selectedOptions,
     openSections,
     disabledOptions,
-    pendingConflict,
     toggleSection,
     handleSelect,
-    resolveConflict,
-    dismissConflict,
     isOptionDisabled,
     getDisabledReason,
     getConflictingOptions,
