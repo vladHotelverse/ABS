@@ -110,19 +110,35 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     })
     return indices
   })
-  
+
   // Carousel API for controlling room navigation
   const [roomCarouselApi, setRoomCarouselApi] = useState<CarouselApi>()
-  
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(0)
+
   // Make room carousel API available to child components if needed
   useEffect(() => {
     if (roomCarouselApi) {
       // Store reference for potential child access
-      ;(window as any).roomCarouselApi = roomCarouselApi
+      ; (window as any).roomCarouselApi = roomCarouselApi
     }
     return () => {
       delete (window as any).roomCarouselApi
     }
+  }, [roomCarouselApi])
+
+  // Handle carousel events for dots
+  useEffect(() => {
+    if (!roomCarouselApi) {
+      return
+    }
+
+    setCount(roomCarouselApi.scrollSnapList().length)
+    setCurrent(roomCarouselApi.selectedScrollSnap() + 1)
+
+    roomCarouselApi.on("select", () => {
+      setCurrent(roomCarouselApi.selectedScrollSnap() + 1)
+    })
   }, [roomCarouselApi])
 
   // Generate dynamic amenities for all rooms
@@ -180,7 +196,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
     }
 
     const handlers: RoomCardHandlers = {
-      onSelectRoom: readonly || mode === 'consultation' ? () => {} : handleRoomSelection,
+      onSelectRoom: readonly || mode === 'consultation' ? () => { } : handleRoomSelection,
       onImageChange: (newImageIndex: number) => handleImageChange(roomIndex, newImageIndex),
       onLearnMore,
       onMakeOffer,
@@ -232,7 +248,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
             {subtitle && <p className="text-neutral-600">{subtitle}</p>}
           </div>
         )}
-        
+
         <div className="flex justify-center">
           <RoomCard {...roomCardProps} />
         </div>
@@ -266,7 +282,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
           {/* Mobile: Carousel */}
           <div className="lg:hidden">
             <div className="overflow-hidden px-6">
-              <Carousel 
+              <Carousel
                 setApi={setRoomCarouselApi}
                 opts={{
                   align: "center",
@@ -279,7 +295,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
               >
                 <CarouselContent className="flex">
                   {roomCardPropsArray.map((roomCardProps) => (
-                    <CarouselItem 
+                    <CarouselItem
                       key={roomCardProps.room.id}
                       className="flex-shrink-0"
                       style={{
@@ -299,13 +315,33 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
                 <CarouselPrevious className={cn('absolute left-2 bottom-0 z-30')} />
                 <CarouselNext className={cn('absolute right-2  bottom-0 z-30')} />
               </Carousel>
+
+              {/* Dots indicator for mobile */}
+              <div className="flex justify-center mt-6">
+                <div className="flex items-center">
+                  {Array.from({ length: count }, (_, index) => (
+                    <button
+                      key={index}
+                      className={cn(
+                        "w-10 h-10 flex items-center justify-center rounded-full relative transition-colors",
+                        "after:content-[''] after:w-[14px] after:h-[14px] after:rounded-full after:flex after:items-center after:border-2",
+                        current === index + 1
+                          ? "after:border-gray-800"
+                          : "after:border-gray-400"
+                      )}
+                      onClick={() => roomCarouselApi?.scrollTo(index)}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </>
       ) : (
         <div className="relative w-full mx-auto">
           <div className="overflow-hidden">
-            <Carousel 
+            <Carousel
               setApi={setRoomCarouselApi}
               opts={{
                 align: "center",
@@ -317,24 +353,48 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = ({
               }}
               className="w-full"
             >
-              <CarouselContent 
-                className="flex pb-1" 
+              <CarouselContent
+                className="flex pb-1"
                 style={{
                   // Container sized to show exactly center + 2 partial sides
                   width: '100%',
                 }}
               >
                 {roomCardPropsArray.map((roomCardProps) => (
-                  <CarouselItem 
-                    key={roomCardProps.room.id} 
+                  <CarouselItem
+                    key={roomCardProps.room.id}
                     className="flex-shrink-0 lg:basis-[50%] lg:w-[50%] basis-full w-full flex justify-center"
                   >
-                      <RoomCard {...roomCardProps} />
+                    <RoomCard {...roomCardProps} />
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className={cn('relative left-2 -bottom-4 z-30')} />
-              <CarouselNext className={cn('relative -right-4  -bottom-4 z-30')} />
+              <div className='flex justify-between'>
+                <div>
+                  <CarouselPrevious className={cn('relative left-2 -bottom-4 z-30')} />
+                  <CarouselNext className={cn('relative -right-4  -bottom-4 z-30')} />
+                </div>
+                {/* Dots indicator for mobile */}
+                <div className="flex justify-center">
+                  <div className="flex items-center">
+                    {Array.from({ length: count }, (_, index) => (
+                      <button
+                        key={index}
+                        className={cn(
+                          "w-8 h-10 flex items-center justify-center rounded-full relative transition-colors",
+                          "after:content-[''] after:w-[14px] after:h-[14px] after:rounded-full after:flex after:items-center after:border-2",
+                          current === index + 1
+                            ? "after:border-gray-800"
+                            : "after:border-gray-400"
+                        )}
+                        onClick={() => roomCarouselApi?.scrollTo(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
             </Carousel>
           </div>
         </div>
