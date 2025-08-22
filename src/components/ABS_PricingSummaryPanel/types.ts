@@ -12,6 +12,8 @@ export interface PricingItem {
   itemStatus?: 'sent_to_hotel' | 'accepted_by_hotel' | 'rejected_by_hotel'
   statusDescription?: string
   segmentDiscount?: SegmentDiscount
+  // For customizations: store original option ID to match with UI selection state
+  originalOptionId?: string
 }
 
 // Available section interface

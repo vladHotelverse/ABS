@@ -49,6 +49,9 @@ export interface RoomSelectionSectionProps {
     bidAmount: number
     status: 'pending' | 'submitted' | 'accepted' | 'rejected'
   }
+  // Multibooking support
+  contextRoomId?: string
+  roomSpecificSelections?: Record<string, string>
 }
 
 // Convert RoomOption to CarouselRoomOption for compatibility
@@ -89,6 +92,8 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
   isVisible = true,
   showPriceSlider = false,
   activeBid,
+  contextRoomId,
+  roomSpecificSelections,
 }) => {
   if (!isVisible || roomOptions.length === 0) {
     return null
@@ -146,6 +151,8 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
         updateBidText={texts.updateBidText}
         cancelBidText={texts.cancelBidText}
         activeBid={activeBid}
+        contextRoomId={contextRoomId}
+        roomSpecificSelections={roomSpecificSelections}
       />
     </section>
   )

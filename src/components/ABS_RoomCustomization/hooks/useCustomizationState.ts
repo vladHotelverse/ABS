@@ -29,8 +29,6 @@ export const useCustomizationState = ({
 
   // Sync internal state when initialSelections changes (e.g., when removed from pricing panel)
   useEffect(() => {
-    console.log('🔄 initialSelections changed:', initialSelections)
-    console.log('📊 Current selectedOptions:', selectedOptions)
     setSelectedOptions(initialSelections)
   }, [initialSelections])
 
@@ -52,9 +50,6 @@ export const useCustomizationState = ({
 
   const handleSelect = useCallback(
     (category: string, optionId: string) => {
-      console.log('🎯 handleSelect called:', category, optionId)
-      console.log('📊 Current selections before:', selectedOptions)
-      
       const options = sectionOptions[category]
       const optionDetails = options?.find((o) => o.id === optionId)
 
@@ -64,7 +59,6 @@ export const useCustomizationState = ({
 
       if (currentSelectedId === optionId) {
         // Deselect if already selected
-        console.log('❌ Deselecting option:', optionId)
         const newSelectedOptions = { ...selectedOptions }
         delete newSelectedOptions[category]
         setSelectedOptions(newSelectedOptions)
@@ -79,33 +73,26 @@ export const useCustomizationState = ({
       }
 
       // Proceed with selection - disabled options are handled by UI
-      console.log('✅ Selecting option:', optionId)
       selectOption(category, optionId, optionDetails)
     },
     [selectedOptions, sectionOptions, onCustomizationChange, disabledOptions, compatibilityEngine]
   )
 
   const selectOption = useCallback((category: string, optionId: string, optionDetails: any) => {
-    console.log('🔧 selectOption called:', category, optionId)
     // For special offers, prefer roomTitle over claim
     const optionLabel = category === 'specialOffers' && 'roomTitle' in optionDetails ? optionDetails.roomTitle :
                        'label' in optionDetails ? optionDetails.label : 
                        'name' in optionDetails ? optionDetails.name : 
                        'claim' in optionDetails ? optionDetails.claim : 
                        optionId
-    setSelectedOptions((prev) => {
-      console.log('📈 Updating selections from:', prev)
-      const newState = {
-        ...prev,
-        [category]: {
-          id: optionId,
-          label: optionLabel,
-          price: optionDetails.price,
-        },
-      }
-      console.log('📈 Updating selections to:', newState)
-      return newState
-    })
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [category]: {
+        id: optionId,
+        label: optionLabel,
+        price: optionDetails.price,
+      },
+    }))
     onCustomizationChange?.(category, optionId, optionLabel, optionDetails.price)
   }, [onCustomizationChange])
 

@@ -26,6 +26,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = (props) => {
     mode = 'selection',
     readonly = false,
     activeBid,
+    contextRoomId,
+    roomSpecificSelections,
     // Deprecated props for backward compatibility
     learnMoreText,
     nightText,
@@ -84,6 +86,8 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = (props) => {
     roomOptions,
     initialSelectedRoom,
     onRoomSelected,
+    contextRoomId,
+    roomSpecificSelections,
   })
 
   // Generate dynamic amenities for all rooms
