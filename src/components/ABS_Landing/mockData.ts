@@ -689,7 +689,7 @@ export const translations = {
 
     // Multi-booking labels
     multiBookingLabels: {
-      multiRoomBookingsTitle: 'Reservas de Múltiples Habitaciones',
+      multiRoomBookingsTitle: 'Selecciones de Múltiples Habitaciones',
       roomsCountLabel: 'habitaciones',
       singleRoomLabel: 'habitación',
       clickToExpandLabel: 'Haz clic para expandir/colapsar',
@@ -706,7 +706,7 @@ export const translations = {
       totalLabel: 'Total',
       payAtHotelLabel: 'El pago se realizará en el hotel',
       viewTermsLabel: 'Ver Términos y Condiciones',
-      confirmAllButtonLabel: 'Confirmar Todas las Reservas',
+      confirmAllButtonLabel: 'Confirmar Todas las Selecciones',
       confirmingAllLabel: 'Confirmando...',
       editLabel: 'Editar',
       addLabel: 'Añadir',

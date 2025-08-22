@@ -126,8 +126,8 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   })
 
   return (
-    <div className={cn('sticky top-28', className)}>
-      <div className="w-[400px] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+    <div className={cn('sticky md:top-28', className)}>
+      <div className="min-w-[400px] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
         <div className="p-4 border-b bg-gray-50">
           <h2 className="text-lg font-semibold text-gray-900">{labels.multiRoomBookingsTitle}</h2>

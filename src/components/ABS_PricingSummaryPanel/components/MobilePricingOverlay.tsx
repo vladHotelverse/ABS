@@ -1,7 +1,10 @@
 import { X } from 'lucide-react'
 import React, { useCallback, useEffect, useRef } from 'react'
 import PricingSummaryPanel from '../index'
+import MultiBookingPricingSummaryPanel from '../MultiBookingPricingSummaryPanel'
 import type { PricingSummaryPanelProps } from '../types'
+import type { RoomBooking, MultiBookingLabels } from '../MultiBookingPricingSummaryPanel'
+import type { PricingItem } from '../types'
 import { cn } from '../../../lib/utils'
 import { UiButton } from '../../ui/button'
 import { Dialog, DialogContent } from '../../ui/dialog'
@@ -13,6 +16,18 @@ export interface MobilePricingOverlayProps extends PricingSummaryPanelProps {
   overlayTitle?: string
   closeButtonLabel?: string
   testId?: string
+  
+  // Multibooking support
+  isMultiBooking?: boolean
+  roomBookings?: RoomBooking[]
+  activeRoom?: string
+  onActiveRoomChange?: (roomId: string) => void
+  multiBookingLabels?: MultiBookingLabels
+  onMultiBookingRemoveItem?: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
+  onMultiBookingEditSection?: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
+  onMultiBookingConfirmAll?: () => Promise<void>
+  multiBookingCurrency?: string
+  multiBookingLocale?: string
 }
 
 const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
@@ -22,6 +37,19 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
   overlayTitle = 'Resumen de reserva',
   closeButtonLabel = 'Cerrar',
   testId = 'mobile-pricing-overlay',
+  
+  // Multibooking props
+  isMultiBooking = false,
+  roomBookings,
+  activeRoom,
+  onActiveRoomChange,
+  multiBookingLabels,
+  onMultiBookingRemoveItem,
+  onMultiBookingEditSection,
+  onMultiBookingConfirmAll,
+  multiBookingCurrency = 'EUR',
+  multiBookingLocale = 'en-US',
+  
   ...pricingSummaryProps
 }) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -82,10 +110,26 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
             id="pricing-overlay-content"
             className="flex-1"
           >
-            <PricingSummaryPanel 
-              {...pricingSummaryProps} 
-              className={cn('h-fit border-0 shadow-none bg-transparent rounded-none')} 
-            />
+            {isMultiBooking && roomBookings && multiBookingLabels ? (
+              <MultiBookingPricingSummaryPanel
+                roomBookings={roomBookings}
+                labels={multiBookingLabels}
+                currency={multiBookingCurrency}
+                locale={multiBookingLocale}
+                isLoading={false}
+                activeRoom={activeRoom}
+                onActiveRoomChange={onActiveRoomChange}
+                onRemoveItem={onMultiBookingRemoveItem!}
+                onEditSection={onMultiBookingEditSection!}
+                onConfirmAll={onMultiBookingConfirmAll!}
+                className={cn('h-fit border-0 shadow-none bg-transparent rounded-none')}
+              />
+            ) : (
+              <PricingSummaryPanel 
+                {...pricingSummaryProps} 
+                className={cn('h-fit border-0 shadow-none bg-transparent rounded-none')} 
+              />
+            )}
           </div>
           
           <div className="h-[env(safe-area-inset-bottom)] bg-white" />

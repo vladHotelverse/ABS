@@ -283,7 +283,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     roomBookings,
     activeRoomId,
     totalPrice: multiBookingTotalPrice,
+    totalItemCount,
     setRoomBookings,
+    setIsMobilePricingOverlayOpen,
+    isMobilePricingOverlayOpen,
     handleMultiBookingRemoveItem,
     handleMultiBookingEditSection,
     handleMultiBookingConfirmAll,
@@ -918,78 +921,144 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           )} */}
       {/* Mobile Pricing Widget */}
       <MobilePricingWidget
-        total={total}
+        total={shouldShowMultiBooking ? totalPrice : total}
         currencySymbol={translations.currencySymbol}
-        itemCount={cartItemCount}
-        onShowPricing={handleShowMobilePricing}
+        itemCount={shouldShowMultiBooking ? totalItemCount : cartItemCount}
+        onShowPricing={shouldShowMultiBooking 
+          ? () => setIsMobilePricingOverlayOpen(true)
+          : handleShowMobilePricing
+        }
         isLoading={false} // isPriceCalculating is removed from useBookingState
         summaryButtonLabel={translations.summaryButtonLabel}
+        
+        // Multibooking props
+        isMultiBooking={shouldShowMultiBooking}
+        roomCount={shouldShowMultiBooking ? roomBookings.length : undefined}
+        roomsLabel={shouldShowMultiBooking ? "rooms" : undefined}
       />
 
       {/* Mobile Pricing Overlay */}
       <MobilePricingOverlay
-        isOpen={showMobilePricing}
-        onClose={handleCloseMobilePricing}
-        roomImage={state.selectedRoom?.image || fallbackImageUrl}
-        items={pricingItems}
-        pricing={{ subtotal, taxes: tax }}
-        isLoading={false} // isPriceCalculating is removed from useBookingState
-        availableSections={computedAvailableSections}
-        labels={{
-          selectedRoomLabel: t.selectedRoomLabel,
-          upgradesLabel: t.upgradesLabel,
-          specialOffersLabel: t.specialOffersLabel,
-          chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
-          customizeYourRoomLabel: t.customizeYourRoomLabel,
-          enhanceYourStayLabel: t.enhanceYourStayLabel,
-          chooseYourRoomLabel: t.chooseYourRoomLabel,
-          subtotalLabel: t.subtotalLabel,
-          taxesLabel: t.taxesLabel,
-          totalLabel: t.totalLabel,
-          payAtHotelLabel: t.payAtHotelLabel,
-          viewTermsLabel: t.viewTermsLabel,
-          confirmButtonLabel: t.confirmButtonLabel,
-          noUpgradesSelectedLabel: t.noUpgradesSelectedLabel,
-          noOffersSelectedLabel: t.noOffersSelectedLabel,
-          emptyCartMessage: t.emptyCartMessage,
-          editLabel: t.editLabel,
-          roomRemovedMessage: t.roomRemovedMessage,
-          offerRemovedMessagePrefix: t.offerRemovedMessagePrefix,
-          customizationRemovedMessagePrefix: t.customizationRemovedMessagePrefix,
-          addedMessagePrefix: t.addedMessagePrefix,
-          euroSuffix: t.euroSuffix,
-          loadingLabel: t.loadingLabel,
-          roomImageAltText: t.roomImageAltText,
-          removeRoomUpgradeLabel: t.removeRoomUpgradeLabel,
-          exploreLabel: t.exploreLabel,
-          fromLabel: t.fromLabel,
-          customizeStayTitle: t.customizeTitle || 'Customize Your Stay',
-          chooseOptionsSubtitle: t.customizeSubtitle || 'Choose your preferred options',
-
-          // Error messages (i18n)
-          missingLabelsError: 'Missing labels error',
-          invalidPricingError: 'Invalid pricing error',
-          currencyFormatError: 'Currency format error',
-          performanceWarning: 'Performance warning',
-
-          // Accessibility labels (i18n)
-          notificationsLabel: 'Notifications',
-          closeNotificationLabel: 'Close notification',
-          pricingSummaryLabel: 'Pricing summary',
-          processingLabel: 'Processing',
-          bidForUpgradeLabel: 'Bid for Upgrade',
-        }}
-        currency="EUR"
-        locale={language === 'en' ? 'en-US' : 'es-ES'}
-        onRemoveItem={(id: string | number, name: string, type: PricingItem['type']) => {
-          handleRemoveItem(id, name, type)
-        }}
-        onConfirm={handleConfirm}
-        onEditSection={(section: 'room' | 'customizations' | 'offers') => {
-          if (section === 'room') handleEditSection('room')
-          else if (section === 'customizations') handleEditSection('customizations')
-          else if (section === 'offers') handleEditSection('offer')
-        }}
+        isOpen={shouldShowMultiBooking ? isMobilePricingOverlayOpen : showMobilePricing}
+        onClose={shouldShowMultiBooking ? () => setIsMobilePricingOverlayOpen(false) : handleCloseMobilePricing}
+        
+        {...(shouldShowMultiBooking ? {
+          // Multibooking props
+          isMultiBooking: true,
+          roomBookings: roomBookings,
+          activeRoom: activeRoomId,
+          onActiveRoomChange: handleRoomTabClick,
+          multiBookingLabels: t.multiBookingLabels,
+          onMultiBookingRemoveItem: handleMultiBookingRemoveItem,
+          onMultiBookingEditSection: handleMultiBookingEditSection,
+          onMultiBookingConfirmAll: handleMultiBookingConfirmAll,
+          multiBookingCurrency: "EUR",
+          multiBookingLocale: language === 'en' ? 'en-US' : 'es-ES',
+          // Required base props (even though they won't be used in multibooking mode)
+          roomImage: fallbackImageUrl,
+          items: [],
+          pricing: { subtotal: 0 },
+          labels: {
+            selectedRoomLabel: t.selectedRoomLabel,
+            upgradesLabel: t.upgradesLabel,
+            specialOffersLabel: t.specialOffersLabel,
+            chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
+            customizeYourRoomLabel: t.customizeYourRoomLabel,
+            enhanceYourStayLabel: t.enhanceYourStayLabel,
+            chooseYourRoomLabel: t.chooseYourRoomLabel,
+            subtotalLabel: t.subtotalLabel,
+            taxesLabel: t.taxesLabel,
+            totalLabel: t.totalLabel,
+            payAtHotelLabel: t.payAtHotelLabel,
+            viewTermsLabel: t.viewTermsLabel,
+            confirmButtonLabel: t.confirmButtonLabel,
+            noUpgradesSelectedLabel: t.noUpgradesSelectedLabel,
+            noOffersSelectedLabel: t.noOffersSelectedLabel,
+            emptyCartMessage: t.emptyCartMessage,
+            editLabel: t.editLabel,
+            roomRemovedMessage: t.roomRemovedMessage,
+            offerRemovedMessagePrefix: t.offerRemovedMessagePrefix,
+            customizationRemovedMessagePrefix: t.customizationRemovedMessagePrefix,
+            addedMessagePrefix: t.addedMessagePrefix,
+            euroSuffix: t.euroSuffix,
+            loadingLabel: t.loadingLabel,
+            roomImageAltText: t.roomImageAltText,
+            removeRoomUpgradeLabel: t.removeRoomUpgradeLabel,
+            exploreLabel: t.exploreLabel,
+            fromLabel: t.fromLabel,
+            customizeStayTitle: t.customizeTitle || 'Customize Your Stay',
+            chooseOptionsSubtitle: t.customizeSubtitle || 'Choose your preferred options',
+            missingLabelsError: 'Missing labels error',
+            invalidPricingError: 'Invalid pricing error',
+            currencyFormatError: 'Currency format error',
+            performanceWarning: 'Performance warning',
+            notificationsLabel: 'Notifications',
+            closeNotificationLabel: 'Close notification',
+            pricingSummaryLabel: 'Pricing summary',
+            processingLabel: 'Processing',
+            bidForUpgradeLabel: 'Bid for Upgrade',
+          },
+          onRemoveItem: () => {},
+          onConfirm: () => {}
+        } : {
+          // Single booking props (existing)
+          roomImage: state.selectedRoom?.image || fallbackImageUrl,
+          items: pricingItems,
+          pricing: { subtotal, taxes: tax },
+          isLoading: false,
+          availableSections: computedAvailableSections,
+          labels: {
+            selectedRoomLabel: t.selectedRoomLabel,
+            upgradesLabel: t.upgradesLabel,
+            specialOffersLabel: t.specialOffersLabel,
+            chooseYourSuperiorRoomLabel: t.chooseYourSuperiorRoomLabel,
+            customizeYourRoomLabel: t.customizeYourRoomLabel,
+            enhanceYourStayLabel: t.enhanceYourStayLabel,
+            chooseYourRoomLabel: t.chooseYourRoomLabel,
+            subtotalLabel: t.subtotalLabel,
+            taxesLabel: t.taxesLabel,
+            totalLabel: t.totalLabel,
+            payAtHotelLabel: t.payAtHotelLabel,
+            viewTermsLabel: t.viewTermsLabel,
+            confirmButtonLabel: t.confirmButtonLabel,
+            noUpgradesSelectedLabel: t.noUpgradesSelectedLabel,
+            noOffersSelectedLabel: t.noOffersSelectedLabel,
+            emptyCartMessage: t.emptyCartMessage,
+            editLabel: t.editLabel,
+            roomRemovedMessage: t.roomRemovedMessage,
+            offerRemovedMessagePrefix: t.offerRemovedMessagePrefix,
+            customizationRemovedMessagePrefix: t.customizationRemovedMessagePrefix,
+            addedMessagePrefix: t.addedMessagePrefix,
+            euroSuffix: t.euroSuffix,
+            loadingLabel: t.loadingLabel,
+            roomImageAltText: t.roomImageAltText,
+            removeRoomUpgradeLabel: t.removeRoomUpgradeLabel,
+            exploreLabel: t.exploreLabel,
+            fromLabel: t.fromLabel,
+            customizeStayTitle: t.customizeTitle || 'Customize Your Stay',
+            chooseOptionsSubtitle: t.customizeSubtitle || 'Choose your preferred options',
+            missingLabelsError: 'Missing labels error',
+            invalidPricingError: 'Invalid pricing error',
+            currencyFormatError: 'Currency format error',
+            performanceWarning: 'Performance warning',
+            notificationsLabel: 'Notifications',
+            closeNotificationLabel: 'Close notification',
+            pricingSummaryLabel: 'Pricing summary',
+            processingLabel: 'Processing',
+            bidForUpgradeLabel: 'Bid for Upgrade',
+          },
+          currency: "EUR",
+          locale: language === 'en' ? 'en-US' : 'es-ES',
+          onRemoveItem: (id: string | number, name: string, type: PricingItem['type']) => {
+            handleRemoveItem(id, name, type)
+          },
+          onConfirm: handleConfirm,
+          onEditSection: (section: 'room' | 'customizations' | 'offers') => {
+            if (section === 'room') handleEditSection('room')
+            else if (section === 'customizations') handleEditSection('customizations')
+            else if (section === 'offers') handleEditSection('offer')
+          }
+        })}
       />
     </div>
   )

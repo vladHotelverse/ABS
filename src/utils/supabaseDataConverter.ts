@@ -346,9 +346,9 @@ export function convertTranslations(translationMap: TranslationMap): Translation
     // Booking state section
     loadingLabel: translationMap.loadingLabel || 'Loading...',
     errorTitle: translationMap.errorTitle || 'Oops! Something went wrong',
-    errorMessage: translationMap.errorMessage || 'Sorry, there was an error loading the booking information. Please try again later.',
+    errorMessage: translationMap.errorMessage || 'Sorry, there was an error loading the selection information. Please try again later.',
     tryAgainLabel: translationMap.tryAgainLabel || 'Try Again',
-    bookingConfirmedTitle: translationMap.bookingConfirmedTitle || 'Booking Confirmed!',
+    bookingConfirmedTitle: translationMap.bookingConfirmedTitle || 'Selection Confirmed!',
     confirmationMessage: translationMap.confirmationMessage || 'Your room customization has been saved successfully. Thank you for personalizing your stay!',
     backToHomeLabel: translationMap.backToHomeLabel || 'Back to Home',
 
@@ -367,7 +367,7 @@ export function convertTranslations(translationMap: TranslationMap): Translation
     taxesLabel: translationMap.taxesLabel || 'Taxes',
     payAtHotelLabel: translationMap.payAtHotelLabel || 'Pay at Hotel',
     viewTermsLabel: translationMap.viewTermsLabel || 'View Terms',
-    confirmButtonLabel: translationMap.confirmButtonLabel || 'Confirm Booking',
+    confirmButtonLabel: translationMap.confirmButtonLabel || 'Confirm Selection',
     noUpgradesSelectedLabel: translationMap.noUpgradesSelectedLabel || 'No upgrades selected',
     noOffersSelectedLabel: translationMap.noOffersSelectedLabel || 'No offers selected',
     editLabel: translationMap.editLabel || 'Edit',
@@ -394,7 +394,7 @@ export function convertTranslations(translationMap: TranslationMap): Translation
 
     // Multi-booking support
     multiBookingLabels: {
-      multiRoomBookingsTitle: translationMap.multiRoomBookingsTitle || 'Multi-Room Bookings',
+      multiRoomBookingsTitle: translationMap.multiRoomBookingsTitle || 'Multi-Room Selections',
       roomsCountLabel: translationMap.roomsCountLabel || 'rooms',
       singleRoomLabel: translationMap.singleRoomLabel || 'room',
       clickToExpandLabel: translationMap.clickToExpandLabel || 'Click to expand',
@@ -410,7 +410,7 @@ export function convertTranslations(translationMap: TranslationMap): Translation
       totalLabel: translationMap.totalLabel || 'Total',
       payAtHotelLabel: translationMap.payAtHotelLabel || 'Pay at Hotel',
       viewTermsLabel: translationMap.viewTermsLabel || 'View Terms',
-      confirmAllButtonLabel: translationMap.confirmAllButtonLabel || 'Confirm All Bookings',
+      confirmAllButtonLabel: translationMap.confirmAllButtonLabel || 'Confirm All Selections',
       confirmingAllLabel: translationMap.confirmingAllLabel || 'Confirming All...',
       editLabel: translationMap.editLabel || 'Edit',
       addLabel: translationMap.addLabel || 'Add',
