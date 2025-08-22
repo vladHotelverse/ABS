@@ -134,11 +134,21 @@ Translations are stored in `src/i18n/locales/`.
 
 Detailed documentation is available in the `docs/` directory:
 
-- [Project Overview](docs/01-project-overview.md)
-- [Component Architecture](docs/02-component-architecture.md) 
-- [Database Integration](docs/03-database-integration.md)
-- [Development Guide](docs/04-development-guide.md)
-- [Testing Framework](docs/testing-framework.md)
+### Feature Specifications (Requirements → Design → Implementation)
+- **[All Specifications](docs/specs/)** - Complete feature specifications
+- [Multi-Booking System](docs/specs/multi-booking-system/) - Room-specific customizations
+- [Room Customization System](docs/specs/room-customization-system/) - Room customization and upgrades  
+- [Testing Framework](docs/specs/testing-framework/) - Quality assurance
+- [Special Offers](docs/specs/special-offers-system/) - Dynamic offers
+- [Order Management](docs/specs/order-management/) - Booking tracking
+- [Content Management](docs/specs/content-management/) - Dynamic content
+- [Internationalization](docs/specs/internationalization/) - Multi-language support
+
+### Core Documentation
+- [Project Overview](docs/01-project-overview.md) - Architecture and tech stack
+- [Component Architecture](docs/02-component-architecture.md) - Technical breakdown
+- [Database Integration](docs/03-database-integration.md) - Supabase integration
+- [Development Guide](docs/04-development-guide.md) - Setup and workflow
 
 ## 🤝 Contributing
 
