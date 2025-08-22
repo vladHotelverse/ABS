@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
@@ -14,7 +13,7 @@ interface PreBookingFormProps {
 }
 
 const PreBookingForm: React.FC<PreBookingFormProps> = ({ onBookingValidated }) => {
-  const { t } = useTranslation()
+  // const { t } = useTranslation()
   const navigate = useNavigate()
   const { reservationCode: urlReservationCode } = useParams<{ reservationCode: string }>()
   
@@ -83,10 +82,10 @@ const PreBookingForm: React.FC<PreBookingFormProps> = ({ onBookingValidated }) =
     validateReservation(reservationCode)
   }
 
-  const handleManualEntry = () => {
-    setShowManualEntry(true)
-    setError('')
-  }
+  // const handleManualEntry = () => {
+  //   setShowManualEntry(true)
+  //   setError('')
+  // }
 
   const handleRetry = () => {
     setError('')
@@ -226,7 +225,8 @@ const mockBookingLookup = async (code: string): Promise<BookingInfo | null> => {
           checkIn: '2025-10-10',
           checkOut: '2025-10-15',
           guests: 2,
-          nights: 5
+          nights: 5,
+          roomImage: 'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt633/c37cc822-a6bf-4345-93f8-deb22d186d10/image.webp'
         }
       ]
     },
@@ -248,7 +248,8 @@ const mockBookingLookup = async (code: string): Promise<BookingInfo | null> => {
           checkIn: '2025-10-10',
           checkOut: '2025-10-15',
           guests: 2,
-          nights: 5
+          nights: 5,
+          roomImage: 'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt633/c37cc822-a6bf-4345-93f8-deb22d186d10/image.webp'
         },
         {
           id: 'booking-2',
@@ -258,7 +259,8 @@ const mockBookingLookup = async (code: string): Promise<BookingInfo | null> => {
           checkIn: '2025-10-10',
           checkOut: '2025-10-15',
           guests: 3,
-          nights: 5
+          nights: 5,
+          roomImage: 'https://images.unsplash.com/photo-1595576508898-0ad5c879a061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80'
         },
         {
           id: 'booking-3',
@@ -268,7 +270,8 @@ const mockBookingLookup = async (code: string): Promise<BookingInfo | null> => {
           checkIn: '2025-10-10',
           checkOut: '2025-10-15',
           guests: 2,
-          nights: 5
+          nights: 5,
+          roomImage: 'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt640/3e7e2260-63e3-4934-9358-ebf08bb6d96a/image.webp'
         }
       ]
     },
@@ -290,7 +293,8 @@ const mockBookingLookup = async (code: string): Promise<BookingInfo | null> => {
           checkIn: '2025-10-12',
           checkOut: '2025-10-16',
           guests: 2,
-          nights: 4
+          nights: 4,
+          roomImage: 'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt640/3e7e2260-63e3-4934-9358-ebf08bb6d96a/image.webp'
         },
         {
           id: 'booking-5',
@@ -300,7 +304,8 @@ const mockBookingLookup = async (code: string): Promise<BookingInfo | null> => {
           checkIn: '2025-10-12',
           checkOut: '2025-10-16',
           guests: 2,
-          nights: 4
+          nights: 4,
+          roomImage: 'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt640/3e7e2260-63e3-4934-9358-ebf08bb6d96a/image.webp'
         }
       ]
     }

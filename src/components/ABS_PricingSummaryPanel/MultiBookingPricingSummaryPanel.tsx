@@ -84,6 +84,8 @@ export interface MultiBookingPricingSummaryPanelProps {
   currency?: string
   locale?: string
   isLoading?: boolean
+  activeRoom?: string
+  onActiveRoomChange?: (roomId: string) => void
   onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
   onEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   onConfirmAll: () => Promise<void>
@@ -96,12 +98,18 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   currency,
   locale,
   isLoading = false,
+  activeRoom,
+  onActiveRoomChange,
   onRemoveItem,
   onConfirmAll,
 }) => {
   // Custom hooks
   const { toasts, showToast, removeToast } = useToasts(3000)
-  const { handleAccordionToggle, isRoomActive } = useAccordionState(roomBookings[0]?.id)
+  const { handleAccordionToggle, isRoomActive } = useAccordionState(
+    activeRoom || roomBookings[0]?.id,
+    activeRoom,
+    onActiveRoomChange
+  )
   const { overallTotal } = useRoomCalculations(roomBookings)
   const formatCurrency = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({

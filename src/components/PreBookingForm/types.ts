@@ -9,6 +9,7 @@ export interface BookingRoom {
   checkOut: string
   guests: number
   nights: number
+  roomImage?: string
 }
 
 export interface BookingInfo {

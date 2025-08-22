@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { RoomBooking } from '../../ABS_PricingSummaryPanel/MultiBookingPricingSummaryPanel'
 import type { PricingItem } from '../../ABS_PricingSummaryPanel'
+import type { RoomOption } from '../types'
 
 export interface UseMultiBookingStateProps {
   initialRoomBookings?: RoomBooking[]
@@ -30,6 +31,7 @@ export interface UseMultiBookingStateReturn {
   handleMultiBookingEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   handleMultiBookingConfirmAll: () => Promise<void>
   handleRoomTabClick: (roomId: string) => void
+  handleRoomUpgrade: (roomId: string, newRoom: RoomOption, currentRoomPrice?: number) => void
 
   // Computed values
   totalItemCount: number
@@ -43,7 +45,9 @@ export const useMultiBookingState = ({
 }: UseMultiBookingStateProps): UseMultiBookingStateReturn => {
   // State management
   const [roomBookings, setRoomBookings] = useState<RoomBooking[]>(initialRoomBookings)
-  const [activeRoomId, setActiveRoomId] = useState<string | undefined>(initialRoomBookings[0]?.id)
+  const [activeRoomId, setActiveRoomId] = useState<string | undefined>(
+    initialRoomBookings.length > 0 ? initialRoomBookings[0].id : undefined
+  )
   const [isMobilePricingOverlayOpen, setIsMobilePricingOverlayOpen] = useState<boolean>(false)
 
   // Handlers
@@ -86,6 +90,50 @@ export const useMultiBookingState = ({
     setActiveRoomId(roomId)
   }
 
+  const handleRoomUpgrade = (roomId: string, newRoom: RoomOption, currentRoomPrice?: number) => {
+    const updatedBookings = roomBookings.map(booking => {
+      if (booking.id === roomId) {
+        // Find the current base room item
+        const currentRoomItem = booking.items.find(item => item.type === 'room')
+        const currentPrice = currentRoomPrice || currentRoomItem?.price || 129.99
+        
+        // Remove any existing room upgrade customizations
+        const itemsWithoutRoomUpgrades = booking.items.filter(item => 
+          !(item.type === 'customization' && (item.category === 'room-upgrade' || item.category?.startsWith('room-upgrade')))
+        )
+        
+        // Update the base room item with new room data
+        const updatedItems = itemsWithoutRoomUpgrades.map(item => {
+          if (item.type === 'room') {
+            return {
+              ...item,
+              name: newRoom.roomType,
+              price: newRoom.price,
+              concept: 'choose-your-superior-room' as const,
+              // Add upgrade metadata for tracking
+              isUpgraded: true,
+              originalPrice: currentPrice,
+              upgradePrice: newRoom.price - currentPrice,
+            }
+          }
+          return item
+        })
+
+        // Update the room booking with new room information
+        return {
+          ...booking,
+          roomName: newRoom.roomType,
+          roomImage: newRoom.image || newRoom.images?.[0] || booking.roomImage,
+          items: updatedItems,
+        }
+      }
+      return booking
+    })
+
+    setRoomBookings(updatedBookings)
+    handleMultiBookingChange(updatedBookings)
+  }
+
   // Computed values
   const totalItemCount = roomBookings.reduce((sum, booking) => sum + booking.items.length, 0)
   const totalPrice = roomBookings.reduce((sum, booking) => {
@@ -110,6 +158,7 @@ export const useMultiBookingState = ({
     handleMultiBookingEditSection,
     handleMultiBookingConfirmAll,
     handleRoomTabClick,
+    handleRoomUpgrade,
 
     // Computed values
     totalItemCount,

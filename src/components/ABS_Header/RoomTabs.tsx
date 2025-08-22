@@ -143,9 +143,16 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
                 >
                   <div className="flex items-center space-x-2">
                     {isActive && <Check className="w-4 h-4" />}
-                    <span className="font-semibold">{room.roomNumber}</span>
-                    <span className="opacity-75">•</span>
-                    <span className="truncate max-w-20 md:max-w-none">{room.guestName}</span>
+                    <div className="flex flex-col items-start min-w-0">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-semibold">{room.roomNumber}</span>
+                        <span className="opacity-75">•</span>
+                        <span className="truncate max-w-20 md:max-w-none">{room.guestName}</span>
+                      </div>
+                      <div className="text-xs opacity-75 truncate max-w-32 md:max-w-none">
+                        {room.roomName}
+                      </div>
+                    </div>
                   </div>
                 </UiButton>
               )

@@ -47,8 +47,15 @@ const RoomAccordionItem: React.FC<RoomAccordionItemProps> = memo(
               ) : (
                 <ChevronRight className="w-4 h-4 text-gray-500" aria-hidden="true" />
               )}
-              <div>
-                <h3 className="font-semibold text-gray-900 text-sm">{room.roomName}</h3>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-gray-900 text-sm">{room.roomName}</h3>
+                  {room.items.some((item: any) => item.isUpgraded) && (
+                    <span className="bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-xs font-medium">
+                      Upgraded
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-gray-500">
                   Room {room.roomNumber} • {room.guestName}
                 </p>

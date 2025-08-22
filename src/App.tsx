@@ -246,7 +246,7 @@ function Home() {
   const roomType = bookingInfo?.roomType || "DELUXE SILVER"
   const occupancy = bookingInfo?.occupancy || "2 Adults, 0 Children"
   const reservationCode = bookingInfo?.reservationCode || "1003066AU"
-  const guestName = bookingInfo?.guestName || "Demo Guest"
+  // const guestName = bookingInfo?.guestName || "Demo Guest"
 
   return (
     <main className="min-h-screen bg-background">
@@ -267,20 +267,43 @@ function Home() {
         compatibilityRules={processedData.compatibilityRules}
         // Multi-booking support
         isMultiBooking={isMultiBookingMode}
-        initialRoomBookings={bookingInfo?.rooms?.map(room => ({
-          id: room.id,
-          roomName: room.roomName,
-          roomNumber: room.roomNumber,
-          guestName: room.guestName,
-          checkIn: room.checkIn,
-          checkOut: room.checkOut,
-          guests: room.guests,
-          nights: room.nights,
-          payAtHotel: true,
-          items: [
-            { id: `room-${room.id}`, name: room.roomName, price: 129.99, type: 'room' as const }
-          ]
-        })) || []}
+        initialRoomBookings={bookingInfo?.rooms?.map((room: any) => {
+          // Find matching room option to get accurate pricing
+          const matchingRoomOption = processedData.roomOptions.find(option => 
+            option.roomType === room.roomName || 
+            option.roomType.includes(room.roomName.replace(' Room', '').toUpperCase()) ||
+            room.roomName.includes(option.roomType) ||
+            // Fallback matches for common room name variations
+            (room.roomName.toLowerCase().includes('deluxe') && option.roomType.toLowerCase().includes('deluxe')) ||
+            (room.roomName.toLowerCase().includes('premium') && option.roomType.toLowerCase().includes('premium')) ||
+            (room.roomName.toLowerCase().includes('executive') && option.roomType.toLowerCase().includes('suite')) ||
+            (room.roomName.toLowerCase().includes('rock') && option.roomType.toLowerCase().includes('rock'))
+          )
+          
+          const roomPrice = matchingRoomOption?.price || 129.99 // Fallback to default if no match
+          
+          return {
+            id: room.id,
+            roomName: room.roomName,
+            roomNumber: room.roomNumber,
+            guestName: room.guestName,
+            checkIn: room.checkIn,
+            checkOut: room.checkOut,
+            guests: room.guests,
+            nights: room.nights,
+            payAtHotel: true,
+            roomImage: room.roomImage,
+            items: [
+              { 
+                id: `room-${room.id}`, 
+                name: room.roomName, 
+                price: roomPrice, 
+                type: 'room' as const,
+                concept: 'choose-your-superior-room' as const
+              }
+            ]
+          }
+        }) || []}
       />
     </main>
   )
