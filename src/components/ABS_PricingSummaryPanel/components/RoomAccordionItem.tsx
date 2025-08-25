@@ -28,7 +28,7 @@ const RoomAccordionItem: React.FC<RoomAccordionItemProps> = memo(
           variant="ghost"
           className={cn(
             'w-full h-auto p-4 text-left justify-start transition-all duration-200 hover:bg-gray-50',
-            isActive && 'bg-blue-50 border-l-4 border-l-blue-500'
+            isActive && 'bg-blue-50'
           )}
           onClick={() => onToggle(room.id)}
           onKeyDown={(e) => {
@@ -57,7 +57,7 @@ const RoomAccordionItem: React.FC<RoomAccordionItemProps> = memo(
                   )}
                 </div>
                 <p className="text-xs text-gray-500">
-                  Room {room.roomNumber} • {room.guestName}
+                  {room.guestName}
                 </p>
               </div>
             </div>

@@ -18,6 +18,7 @@ interface PriceBreakdownLabels {
 interface PriceBreakdownProps {
   subtotal: number
   isLoading: boolean
+  disabled?: boolean
   labels: PriceBreakdownLabels
   currency?: string
   locale?: string
@@ -27,6 +28,7 @@ interface PriceBreakdownProps {
 const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
   subtotal,
   isLoading,
+  disabled = false,
   labels,
   currency,
   locale,
@@ -71,7 +73,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       {/* Confirm Button */}
       <UiButton
         onClick={onConfirm}
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         variant="black"
         className="inline-flex w-full items-center justify-center py-3 transition-all duration-200 hover:shadow-md disabled:hover:shadow-none cursor-pointer"
       >

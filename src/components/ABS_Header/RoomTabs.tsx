@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import { Check } from 'lucide-react'
 import { UiButton } from '../ui/button'
 
@@ -16,7 +16,6 @@ export interface RoomTabsProps {
   activeRoomId?: string
   onRoomTabClick?: (roomId: string) => void
   isSticky?: boolean
-  headerHeight?: number
 }
 
 const RoomTabs: React.FC<RoomTabsProps> = ({
@@ -25,26 +24,11 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
   activeRoomId,
   onRoomTabClick,
   isSticky = true,
-  headerHeight = 50,
 }) => {
-  const [stickyTop, setStickyTop] = useState(headerHeight)
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
 
-  useEffect(() => {
-    if (!isSticky) return
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const headerIsVisible = scrollY < headerHeight
-
-      setStickyTop(headerIsVisible ? headerHeight : 0)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isSticky, headerHeight])
 
   // Keyboard navigation handler
   const handleKeyDown = useCallback(
@@ -105,11 +89,10 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
     <div
       ref={containerRef}
       className={clsx(
-        'bg-black text-white border-t border-white/10 shadow-md transition-all duration-300 ease-in-out',
-        isSticky && 'sticky z-100',
+        'bg-black text-white shadow-lg',
+        isSticky && 'sticky top-0 z-[200]',
         className
       )}
-      style={isSticky ? { top: `${stickyTop}px` } : undefined}
       onKeyDown={handleKeyDown}
       role="tablist"
       aria-label="Room tabs navigation"
@@ -139,18 +122,16 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
                   aria-selected={isActive}
                   aria-controls={`room-panel-${room.id}`}
                   tabIndex={0}
-                  aria-label={`Switch to ${room.roomName} - Room ${room.roomNumber} for ${room.guestName}`}
+                  aria-label={`Switch to Room ${index + 1}`}
                 >
                   <div className="flex items-center space-x-2">
                     {isActive && <Check className="w-4 h-4" />}
                     <div className="flex flex-col items-start min-w-0">
                       <div className="flex items-center space-x-2">
-                        <span className="font-semibold">{room.roomNumber}</span>
-                        <span className="opacity-75">•</span>
-                        <span className="truncate max-w-20 md:max-w-none">{room.guestName}</span>
-                      </div>
-                      <div className="text-xs opacity-75 truncate max-w-32 md:max-w-none">
-                        {room.roomName}
+                        <span className="font-semibold">
+                          Room {index + 1}
+                          <span className="hidden md:inline font-normal opacity-75"> ({room.roomName})</span>
+                        </span>
                       </div>
                     </div>
                   </div>

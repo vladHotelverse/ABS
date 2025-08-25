@@ -84,8 +84,8 @@ export interface MultiBookingPricingSummaryPanelProps {
   currency?: string
   locale?: string
   isLoading?: boolean
-  activeRoom?: string
-  onActiveRoomChange?: (roomId: string) => void
+  activeRooms?: string[]
+  onActiveRoomsChange?: (roomIds: string[]) => void
   onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
   onEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   onConfirmAll: () => Promise<void>
@@ -98,19 +98,20 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   currency,
   locale,
   isLoading = false,
-  activeRoom,
-  onActiveRoomChange,
+  activeRooms,
+  onActiveRoomsChange,
   onRemoveItem,
   onConfirmAll,
 }) => {
   // Custom hooks
   const { toasts, showToast, removeToast } = useToasts(3000)
   const { handleAccordionToggle, isRoomActive } = useAccordionState(
-    activeRoom || roomBookings[0]?.id,
-    activeRoom,
-    onActiveRoomChange
+    roomBookings.map(room => room.id), // Pass all room IDs
+    activeRooms,
+    onActiveRoomsChange,
+    true // Enable multiple open accordions
   )
-  const { overallTotal } = useRoomCalculations(roomBookings)
+  const { overallTotal, totalItemsCount } = useRoomCalculations(roomBookings)
   const formatCurrency = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({
     roomBookings,
@@ -158,6 +159,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
           <PriceBreakdown
             subtotal={overallTotal}
             isLoading={confirmingAll || isLoading}
+            disabled={totalItemsCount === 0}
             labels={{
               subtotalLabel: labels.subtotalLabel,
               totalLabel: labels.totalLabel,
@@ -165,7 +167,9 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
               viewTermsLabel: labels.viewTermsLabel,
               confirmButtonLabel: confirmingAll
                 ? labels.confirmingAllLabel
-                : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
+                : totalItemsCount === 0
+                ? labels.confirmAllButtonLabel
+                : `${labels.confirmAllButtonLabel} ${totalItemsCount} ${totalItemsCount === 1 ? 'Selection' : 'Selections'}`,
               loadingLabel: labels.confirmingAllLabel,
               euroSuffix: labels.euroSuffix,
             }}

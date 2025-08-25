@@ -292,6 +292,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     handleMultiBookingConfirmAll,
     handleRoomTabClick,
     handleRoomUpgrade,
+    handleRoomBid,
   } = multiBookingState
 
   // Room-specific selection tracking for multibooking room upgrade isolation
@@ -504,8 +505,15 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   }
 
   const handleMakeOffer = (price: number, room: RoomOption) => {
-    actions.makeOffer(price, room)
-    showToast(`Bid of ${translations.currencySymbol}${price} submitted for ${room.title || room.roomType}.`, 'success')
+    if (isMultiBooking && activeRoomId) {
+      // Use multibooking bid handler
+      handleRoomBid(activeRoomId, price, room.roomType)
+      showToast(`Bid of ${translations.currencySymbol}${price} submitted for ${room.title || room.roomType}.`, 'success')
+    } else {
+      // Use single booking bid handler
+      actions.makeOffer(price, room)
+      showToast(`Bid of ${translations.currencySymbol}${price} submitted for ${room.title || room.roomType}.`, 'success')
+    }
   }
 
   const handleCancelBid = (roomId: string) => {
@@ -674,7 +682,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           roomTabs={roomTabs}
           activeRoomId={activeRoomId}
           onRoomTabClick={handleRoomTabClick}
-          headerHeight={50}
         />
       )}
 
@@ -946,8 +953,8 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               currency="EUR"
               locale={language === 'en' ? 'en-US' : 'es-ES'}
               isLoading={false} // isPriceCalculating is removed from useBookingState
-              activeRoom={activeRoomId}
-              onActiveRoomChange={handleRoomTabClick}
+              activeRooms={activeRoomId ? [activeRoomId] : []}
+              onActiveRoomsChange={(roomIds) => roomIds[0] && handleRoomTabClick(roomIds[0])}
               onRemoveItem={(roomId, itemId, itemName, itemType) =>
                 handleRemoveItem(itemId, itemName, itemType, roomId)
               }

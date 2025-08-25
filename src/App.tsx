@@ -268,20 +268,6 @@ function Home() {
         // Multi-booking support
         isMultiBooking={isMultiBookingMode}
         initialRoomBookings={bookingInfo?.rooms?.map((room: any) => {
-          // Find matching room option to get accurate pricing
-          const matchingRoomOption = processedData.roomOptions.find(option => 
-            option.roomType === room.roomName || 
-            option.roomType.includes(room.roomName.replace(' Room', '').toUpperCase()) ||
-            room.roomName.includes(option.roomType) ||
-            // Fallback matches for common room name variations
-            (room.roomName.toLowerCase().includes('deluxe') && option.roomType.toLowerCase().includes('deluxe')) ||
-            (room.roomName.toLowerCase().includes('premium') && option.roomType.toLowerCase().includes('premium')) ||
-            (room.roomName.toLowerCase().includes('executive') && option.roomType.toLowerCase().includes('suite')) ||
-            (room.roomName.toLowerCase().includes('rock') && option.roomType.toLowerCase().includes('rock'))
-          )
-          
-          const roomPrice = matchingRoomOption?.price || 129.99 // Fallback to default if no match
-          
           return {
             id: room.id,
             roomName: room.roomName,
@@ -293,15 +279,7 @@ function Home() {
             nights: room.nights,
             payAtHotel: true,
             roomImage: room.roomImage,
-            items: [
-              { 
-                id: `room-${room.id}`, 
-                name: room.roomName, 
-                price: roomPrice, 
-                type: 'room' as const,
-                concept: 'choose-your-superior-room' as const
-              }
-            ]
+            items: []
           }
         }) || []}
       />

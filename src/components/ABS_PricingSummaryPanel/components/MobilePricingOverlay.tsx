@@ -20,8 +20,8 @@ export interface MobilePricingOverlayProps extends PricingSummaryPanelProps {
   // Multibooking support
   isMultiBooking?: boolean
   roomBookings?: RoomBooking[]
-  activeRoom?: string
-  onActiveRoomChange?: (roomId: string) => void
+  activeRooms?: string[]
+  onActiveRoomsChange?: (roomIds: string[]) => void
   multiBookingLabels?: MultiBookingLabels
   onMultiBookingRemoveItem?: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
   onMultiBookingEditSection?: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
@@ -41,8 +41,8 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
   // Multibooking props
   isMultiBooking = false,
   roomBookings,
-  activeRoom,
-  onActiveRoomChange,
+  activeRooms,
+  onActiveRoomsChange,
   multiBookingLabels,
   onMultiBookingRemoveItem,
   onMultiBookingEditSection,
@@ -84,7 +84,7 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent 
           className={cn(
-            'z-[101] w-full h-full overflow-y-auto max-w-none p-0 bg-neutral-50 border-none',
+            'z-[300] w-full h-full overflow-y-auto max-w-none p-0 bg-neutral-50 border-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
             'duration-300 ease-in-out'
@@ -117,8 +117,8 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
                 currency={multiBookingCurrency}
                 locale={multiBookingLocale}
                 isLoading={false}
-                activeRoom={activeRoom}
-                onActiveRoomChange={onActiveRoomChange}
+                activeRooms={activeRooms}
+                onActiveRoomsChange={onActiveRoomsChange}
                 onRemoveItem={onMultiBookingRemoveItem!}
                 onEditSection={onMultiBookingEditSection!}
                 onConfirmAll={onMultiBookingConfirmAll!}
@@ -138,5 +138,6 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
     </div>
   )
 }
+
 
 export default React.memo(MobilePricingOverlay)

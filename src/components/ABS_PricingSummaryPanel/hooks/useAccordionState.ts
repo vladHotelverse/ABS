@@ -1,45 +1,71 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export const useAccordionState = (
-  initialRoomId?: string,
-  externalActiveRoom?: string,
-  onActiveRoomChange?: (roomId: string) => void
+  roomIds: string[] = [],
+  externalActiveRooms?: string[],
+  onActiveRoomsChange?: (roomIds: string[]) => void,
+  multipleOpen = true
 ) => {
-  const [internalActiveRoom, setInternalActiveRoom] = useState<string | null>(initialRoomId || null)
+  // Use a ref to track if we've initialized
+  const initializedRef = useRef(false)
+  
+  // Initialize with all rooms open by default for multiple mode, or first room for single mode
+  const [internalActiveRooms, setInternalActiveRooms] = useState<string[]>(() => {
+    return multipleOpen ? roomIds : roomIds.length > 0 ? [roomIds[0]] : []
+  })
   
   // Use external control if provided, otherwise use internal state
-  const activeRoom = externalActiveRoom !== undefined ? externalActiveRoom : internalActiveRoom
+  const activeRooms = externalActiveRooms !== undefined ? externalActiveRooms : internalActiveRooms
 
   // Sync internal state when external control changes
   useEffect(() => {
-    if (externalActiveRoom !== undefined) {
-      setInternalActiveRoom(externalActiveRoom)
+    if (externalActiveRooms !== undefined) {
+      setInternalActiveRooms(externalActiveRooms)
     }
-  }, [externalActiveRoom])
+  }, [externalActiveRooms])
+
+  // Initialize with roomIds only once
+  useEffect(() => {
+    if (!initializedRef.current && externalActiveRooms === undefined && roomIds.length > 0) {
+      const newActiveRooms = multipleOpen ? roomIds : [roomIds[0]]
+      setInternalActiveRooms(newActiveRooms)
+      initializedRef.current = true
+    }
+  }, [roomIds, multipleOpen, externalActiveRooms])
 
   const handleAccordionToggle = useCallback((roomId: string) => {
-    const newActiveRoom = activeRoom === roomId ? null : roomId
+    let newActiveRooms: string[]
+    
+    if (multipleOpen) {
+      // Multiple mode: toggle the specific room
+      newActiveRooms = activeRooms.includes(roomId)
+        ? activeRooms.filter(id => id !== roomId)
+        : [...activeRooms, roomId]
+    } else {
+      // Single mode: only one room can be active
+      newActiveRooms = activeRooms.includes(roomId) ? [] : [roomId]
+    }
     
     // Handle external control
-    if (onActiveRoomChange && newActiveRoom) {
-      onActiveRoomChange(newActiveRoom)
+    if (onActiveRoomsChange) {
+      onActiveRoomsChange(newActiveRooms)
     }
     
     // Handle internal state (for uncontrolled usage)
-    if (externalActiveRoom === undefined) {
-      setInternalActiveRoom(newActiveRoom)
+    if (externalActiveRooms === undefined) {
+      setInternalActiveRooms(newActiveRooms)
     }
-  }, [activeRoom, externalActiveRoom, onActiveRoomChange])
+  }, [activeRooms, multipleOpen, externalActiveRooms, onActiveRoomsChange])
 
   const isRoomActive = useCallback(
     (roomId: string) => {
-      return activeRoom === roomId
+      return activeRooms.includes(roomId)
     },
-    [activeRoom]
+    [activeRooms]
   )
 
   return {
-    activeRoom,
+    activeRooms,
     handleAccordionToggle,
     isRoomActive,
   }

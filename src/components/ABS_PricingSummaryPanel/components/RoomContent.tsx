@@ -20,18 +20,18 @@ const RoomContent: React.FC<RoomContentProps> = memo(
     const chooseYourSuperiorRoomItems = room.items.filter((item) => item.concept === 'choose-your-superior-room')
     const customizeYourRoomItems = room.items.filter((item) => item.concept === 'customize-your-room')
     const enhanceYourStayItems = room.items.filter((item) => item.concept === 'enhance-your-stay')
+    const bidForUpgradeItems = room.items.filter((item) => item.concept === 'bid-for-upgrade')
     const total = room.items.reduce((sum, item) => sum + item.price, 0)
 
     return (
       <div className="border-t border-gray-100 bg-white">
         {/* Room image */}
-        <div className="w-full h-40 overflow-hidden relative">
+        {/* <div className="w-full h-40 overflow-hidden relative">
           <img
             src={room.roomImage || '/hotel-room.png'}
             alt={labels.roomImageAltText}
             className="w-full h-full object-cover"
           />
-          {/* Upgraded room indicator */}
           {room.items.some((item: any) => item.isUpgraded) && (
             <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -40,69 +40,92 @@ const RoomContent: React.FC<RoomContentProps> = memo(
               Upgraded
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Content */}
         <div className="p-4 space-y-4">
-          {/* Choose Your Room Section */}
-          {chooseYourRoomItems.length > 0 && (
-            <ItemSection
-              title="Room Selection"
-              items={chooseYourRoomItems}
-              emptyMessage="No room selected"
-              removingItems={removingItems}
-              labels={labels}
-              roomId={room.id}
-              onRemoveItem={onRemoveItem}
-            />
-          )}
-
-          {/* Choose Your Superior Room Section */}
-          {chooseYourSuperiorRoomItems.length > 0 && (
-            <ItemSection
-              title={chooseYourSuperiorRoomItems.some((item: any) => item.isUpgraded) ? "Room Upgrade" : "Superior Room Selection"}
-              items={chooseYourSuperiorRoomItems}
-              emptyMessage="No superior room selected"
-              removingItems={removingItems}
-              labels={labels}
-              roomId={room.id}
-              onRemoveItem={onRemoveItem}
-            />
-          )}
-
-          {/* Customize Your Room Section */}
-          {customizeYourRoomItems.length > 0 && (
-            <ItemSection
-              title="Room Customization"
-              items={customizeYourRoomItems}
-              emptyMessage="No customizations selected"
-              removingItems={removingItems}
-              labels={labels}
-              roomId={room.id}
-              onRemoveItem={onRemoveItem}
-            />
-          )}
-
-          {/* Enhance Your Stay Section */}
-          {enhanceYourStayItems.length > 0 && (
-            <ItemSection
-              title="Stay Enhancement"
-              items={enhanceYourStayItems}
-              emptyMessage="No enhancements selected"
-              removingItems={removingItems}
-              labels={labels}
-              roomId={room.id}
-              onRemoveItem={onRemoveItem}
-            />
-          )}
-
-          {/* Room Total */}
-          <div className="border-t pt-4">
-            <div className="flex justify-between items-center">
-              <span className="text-base font-bold text-gray-900">{labels.roomTotalLabel}</span>
-              <span className="text-base font-bold text-gray-900">{formatCurrency(total)}</span>
+          {total === 0 ? (
+            /* Empty State */
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-sm">No selections made for this room yet.</p>
+              <p className="text-xs mt-1">Add upgrades or customizations to see them here.</p>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Choose Your Room Section */}
+              {chooseYourRoomItems.length > 0 && (
+                <ItemSection
+                  title="Room Selection"
+                  items={chooseYourRoomItems}
+                  emptyMessage="No room selected"
+                  removingItems={removingItems}
+                  labels={labels}
+                  roomId={room.id}
+                  onRemoveItem={onRemoveItem}
+                />
+              )}
+
+              {/* Choose Your Superior Room Section */}
+              {chooseYourSuperiorRoomItems.length > 0 && (
+                <ItemSection
+                  title={chooseYourSuperiorRoomItems.some((item: any) => item.isUpgraded) ? "Room Upgrade" : "Superior Room Selection"}
+                  items={chooseYourSuperiorRoomItems}
+                  emptyMessage="No superior room selected"
+                  removingItems={removingItems}
+                  labels={labels}
+                  roomId={room.id}
+                  onRemoveItem={onRemoveItem}
+                />
+              )}
+
+              {/* Customize Your Room Section */}
+              {customizeYourRoomItems.length > 0 && (
+                <ItemSection
+                  title="Room Customization"
+                  items={customizeYourRoomItems}
+                  emptyMessage="No customizations selected"
+                  removingItems={removingItems}
+                  labels={labels}
+                  roomId={room.id}
+                  onRemoveItem={onRemoveItem}
+                />
+              )}
+
+              {/* Enhance Your Stay Section */}
+              {enhanceYourStayItems.length > 0 && (
+                <ItemSection
+                  title="Stay Enhancement"
+                  items={enhanceYourStayItems}
+                  emptyMessage="No enhancements selected"
+                  removingItems={removingItems}
+                  labels={labels}
+                  roomId={room.id}
+                  onRemoveItem={onRemoveItem}
+                />
+              )}
+
+              {/* Bid for Upgrade Section */}
+              {bidForUpgradeItems.length > 0 && (
+                <ItemSection
+                  title="Bid for Upgrade"
+                  items={bidForUpgradeItems}
+                  emptyMessage="No bids submitted"
+                  removingItems={removingItems}
+                  labels={labels}
+                  roomId={room.id}
+                  onRemoveItem={onRemoveItem}
+                />
+              )}
+
+              {/* Room Total - Only show when there are selections */}
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-base font-bold text-gray-900">{labels.roomTotalLabel}</span>
+                  <span className="text-base font-bold text-gray-900">{formatCurrency(total)}</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     )

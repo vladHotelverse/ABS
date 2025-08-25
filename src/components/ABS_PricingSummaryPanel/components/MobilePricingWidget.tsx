@@ -125,7 +125,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
             aria-label={`${summaryButtonLabel} - ${itemCount} ${itemsLabel}, total ${formattedTotal}`}
             aria-describedby={itemCount > 0 ? "item-count" : undefined}
           >
-            <ShoppingCart className="w-5 h-5 mr-2" aria-hidden="true" />
+            <ShoppingCart className="w-5 h-5" aria-hidden="true" />
           </UiButton>
         </div>
       </div>
