@@ -127,8 +127,8 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   })
 
   return (
-    <div className={cn('sticky md:top-28', className)}>
-      <div className="min-w-[400px] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+    <div className={cn('sticky md:top-28 w-full', className)}>
+      <div className="min-w-[350px] w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
         <div className="p-4 border-b bg-gray-50">
           <h2 className="text-lg font-semibold text-gray-900">{labels.multiRoomBookingsTitle}</h2>
@@ -159,7 +159,6 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
           <PriceBreakdown
             subtotal={overallTotal}
             isLoading={confirmingAll || isLoading}
-            disabled={totalItemsCount === 0}
             labels={{
               subtotalLabel: labels.subtotalLabel,
               totalLabel: labels.totalLabel,
@@ -167,9 +166,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
               viewTermsLabel: labels.viewTermsLabel,
               confirmButtonLabel: confirmingAll
                 ? labels.confirmingAllLabel
-                : totalItemsCount === 0
-                ? labels.confirmAllButtonLabel
-                : `${labels.confirmAllButtonLabel} ${totalItemsCount} ${totalItemsCount === 1 ? 'Selection' : 'Selections'}`,
+                : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
               loadingLabel: labels.confirmingAllLabel,
               euroSuffix: labels.euroSuffix,
             }}
