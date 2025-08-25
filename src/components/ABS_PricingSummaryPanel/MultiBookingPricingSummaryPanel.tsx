@@ -111,7 +111,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
     onActiveRoomsChange,
     true // Enable multiple open accordions
   )
-  const { overallTotal, totalItemsCount } = useRoomCalculations(roomBookings)
+  const { overallTotal } = useRoomCalculations(roomBookings)
   const formatCurrency = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({
     roomBookings,

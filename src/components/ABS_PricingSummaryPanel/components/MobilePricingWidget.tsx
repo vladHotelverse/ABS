@@ -78,7 +78,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
     >
       <div className="flex items-center justify-between px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
         <div className="flex flex-col text-left">
-          <span className="text-sm text-neutral-500" id="pricing-label">
+          <span className="text-sm sm:text-base text-neutral-500" id="pricing-label">
             {isMultiBooking && roomCount 
               ? `${roomCount} ${roomsLabel} • ${totalUpgradesLabel}`
               : totalUpgradesLabel
@@ -91,7 +91,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
             </div>
           ) : (
             <span 
-              className="text-lg font-bold text-blue-600 whitespace-nowrap"
+              className="text-lg sm:text-xl font-bold text-blue-600 whitespace-nowrap"
               aria-labelledby="pricing-label"
             >
               {formattedTotal}
@@ -103,7 +103,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
           {itemCount > 0 && (
             <span 
               className={clsx(
-                "inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-sm font-medium text-green-700",
+                "inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-sm sm:text-base font-medium text-green-700",
                 "transition-all duration-200 ease-in-out"
               )}
               id="item-count"

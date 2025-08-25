@@ -723,10 +723,11 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             })}
       />
 
-      <main className="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 flex-grow pb-24 lg:pb-8">
-        <div className="flex-grow space-y-8 w-full xl:max-w-[calc(100%-480px)]">
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 flex-grow pb-20 lg:pb-8">
+        <div className="flex-grow space-y-6 sm:space-y-8 w-full xl:max-w-[calc(100%-480px)]">
           {/* Room Selection Section */}
-          <RoomSelectionSection
+          <section className="sm:bg-transparent sm:shadow-none sm:p-0 bg-white rounded-lg p-4 shadow-sm">
+            <RoomSelectionSection
             roomOptions={roomOptions}
             selectedRoom={(() => {
               if (shouldShowMultiBooking) {
@@ -818,9 +819,11 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             contextRoomId={shouldShowMultiBooking ? activeRoomId : undefined}
             roomSpecificSelections={shouldShowMultiBooking ? roomSpecificSelections : undefined}
           />
+          </section>
 
           {/* Room Customization Section */}
-          <CustomizationSection
+          <section className="sm:shadow-none sm:p-0 bg-neutral-50/30 rounded-lg p-4">
+            <CustomizationSection
             sections={sections}
             sectionOptions={sectionOptions}
             selectedCustomizations={(() => {
@@ -882,19 +885,23 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             isVisible={shouldShowSection('customization', computedAvailableSections)}
             compatibilityRules={compatibilityRules}
           />
+          </section>
 
           {/* ABS Room Selection Section */}
           {roomSelectionMap && (
-            <ABS_RoomSelection
-              title={roomSelectionMap.title}
-              description={roomSelectionMap.description}
-              url={roomSelectionMap.url}
-              iframe={roomSelectionMap.iframe}
-            />
+            <section className="sm:bg-transparent sm:shadow-none sm:p-0 bg-white rounded-lg p-4 shadow-sm">
+              <ABS_RoomSelection
+                title={roomSelectionMap.title}
+                description={roomSelectionMap.description}
+                url={roomSelectionMap.url}
+                iframe={roomSelectionMap.iframe}
+              />
+            </section>
           )}
 
           {/* Special Offers Section */}
-          <SpecialOffersSection
+          <section className="sm:bg-transparent sm:shadow-none sm:p-0 bg-neutral-50/30 rounded-lg p-4">
+            <SpecialOffersSection
             specialOffers={specialOffers}
             selectedOffers={(() => {
               if (shouldShowMultiBooking) {
@@ -943,6 +950,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             })()}
             isVisible={shouldShowSection('offer', computedAvailableSections)}
           />
+          </section>
         </div>
 
         <aside className="flex-shrink-0 md:max-w-md sticky top-24 self-start w-full">

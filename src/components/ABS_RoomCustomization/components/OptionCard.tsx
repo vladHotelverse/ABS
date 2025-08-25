@@ -39,7 +39,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
   const cardContent = (
     <div className={clsx(
-      'flex-none sm:w-auto h-full bg-white border border-neutral-300 rounded-lg overflow-hidden snap-center transition-all duration-200 relative',
+      'flex-none sm:w-auto h-full bg-white border border-neutral-200 rounded-lg overflow-hidden snap-center transition-all duration-200 shadow-sm relative',
       {
         'opacity-50 cursor-not-allowed': isDisabled,
         'hover:shadow-md': !isDisabled,
@@ -52,7 +52,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
           Selected
         </div>
       )}
-      <div className="p-4 flex flex-col h-full">
+      <div className="p-3 sm:p-4 flex flex-col h-full">
         <div className="flex flex-col mb-1">
           <div className="flex gap-2.5 items-center w-20">
             <div className={clsx(
@@ -65,7 +65,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
             </div>
           </div>
           <h3 className={clsx(
-            "font-medium text-sm",
+            "font-medium text-base sm:text-lg",
             {
               'text-neutral-400': isDisabled,
             }
@@ -75,7 +75,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         </div>
         {option.description && (
           <p className={clsx(
-            "text-xs mb-1",
+            "text-sm sm:text-base mb-1",
             {
               'text-neutral-300': isDisabled,
               'text-neutral-500': !isDisabled,
@@ -85,7 +85,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
           </p>
         )}
         <p className={clsx(
-          "text-sm font-semibold mb-4",
+          "text-base sm:text-lg font-bold mb-4",
           {
             'text-neutral-400': isDisabled,
           }
@@ -100,7 +100,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
               variant={isSelected ? 'destructive' : 'secondary'} 
               size="sm" 
               className={clsx(
-                "w-full transition-all border",
+                "w-full transition-all border min-h-[44px] touch-manipulation",
                 {
                   "hover:bg-black hover:text-white": !isSelected,
                 }
