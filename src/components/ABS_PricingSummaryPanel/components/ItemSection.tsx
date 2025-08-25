@@ -33,7 +33,19 @@ const ItemSection: React.FC<ItemSectionProps> = memo(
                 removingItems.has(String(item.id)) && 'opacity-50 scale-95'
               )}
             >
-              <span className="text-sm text-gray-900">{item.name}</span>
+              <div className="flex-1">
+                <span className="text-sm text-gray-900">{item.name}</span>
+                {(item as any).isUpgraded && (item as any).originalPrice && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    Upgraded from €{(item as any).originalPrice} 
+                    {(item as any).upgradePrice > 0 && (
+                      <span className="text-green-600 ml-1">
+                        (+€{(item as any).upgradePrice})
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <PriceChangeIndicator price={item.price} euroSuffix={labels.euroSuffix} />
                 <UiButton

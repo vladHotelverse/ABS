@@ -95,6 +95,10 @@ export interface RoomSelectionCarouselProps {
   currentRoomAmenities?: string[]
   mode?: 'selection' | 'consultation'
   readonly?: boolean
+  
+  // Multibooking support
+  contextRoomId?: string // The room context (e.g., "room1", "room2") for multibooking scenarios
+  roomSpecificSelections?: Record<string, string> // Maps contextRoomId -> selectedRoomId
 
   // Deprecated individual text props - keeping for backward compatibility but will be removed
   /** @deprecated Use translations.learnMoreText instead */

@@ -6,15 +6,29 @@ interface UseCarouselStateParams {
   roomOptions: RoomOption[]
   initialSelectedRoom: RoomOption | null
   onRoomSelected?: (room: RoomOption | null) => void
+  contextRoomId?: string
+  roomSpecificSelections?: Record<string, string>
 }
 
 export const useCarouselState = ({
   roomOptions,
   initialSelectedRoom,
   onRoomSelected,
+  contextRoomId,
+  roomSpecificSelections,
 }: UseCarouselStateParams) => {
-  // Local state for room selection and image indices
-  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(initialSelectedRoom)
+  // Determine the selected room based on context
+  const getSelectedRoomForContext = (): RoomOption | null => {
+    if (contextRoomId && roomSpecificSelections?.[contextRoomId]) {
+      // Find room by ID from roomSpecificSelections
+      const selectedRoomId = roomSpecificSelections[contextRoomId]
+      return roomOptions.find(room => room.id === selectedRoomId) || null
+    }
+    return initialSelectedRoom
+  }
+  
+  // Local state for room selection and image indices  
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(getSelectedRoomForContext())
   const [activeImageIndices, setActiveImageIndices] = useState<Record<number, number>>(() => {
     const indices: Record<number, number> = {}
     roomOptions.forEach((_, index) => {
@@ -38,6 +52,12 @@ export const useCarouselState = ({
       delete (window as any).roomCarouselApi
     }
   }, [roomCarouselApi])
+
+  // Update selected room when contextRoomId or roomSpecificSelections change
+  useEffect(() => {
+    const newSelectedRoom = getSelectedRoomForContext()
+    setSelectedRoom(newSelectedRoom)
+  }, [contextRoomId, roomSpecificSelections, roomOptions, initialSelectedRoom])
 
   // Handle carousel events for dots
   useEffect(() => {

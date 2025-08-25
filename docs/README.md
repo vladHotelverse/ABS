@@ -10,22 +10,21 @@ Welcome to the ABS project documentation. This React-based hotel booking system 
 - [Database Integration](./03-database-integration.md) - Supabase integration guide
 - [Development Guide](./04-development-guide.md) - Setup and development workflow
 
-### Technical Documentation
-- [API Reference](./05-api-reference.md) - Backend API endpoints and schemas
-- [State Management](./06-state-management.md) - Component state and data flow
-- [Styling Guide](./07-styling-guide.md) - Tailwind CSS conventions and patterns
-- [Testing Guide](./08-testing-guide.md) - Testing strategies and examples
+### Feature Specifications (NEW ✨)
+- **[Feature Specifications](./specs/)** - Requirements → Design → Implementation workflow
+  - [Multi-Booking System](./specs/multi-booking-system/) - Room-specific customizations
+  - [Room Customization System](./specs/room-customization-system/) - Room customization and upgrades
+  - [Testing Framework](./specs/testing-framework/) - Quality assurance and automation
+  - [Special Offers System](./specs/special-offers-system/) - Dynamic offer management
+  - [Order Management](./specs/order-management/) - Booking tracking and proposals
+  - [Content Management](./specs/content-management/) - Database-driven content
+  - [Internationalization](./specs/internationalization/) - Multilingual support
 
-### Feature Documentation
-- [Booking Flow](./features/booking-flow.md) - Complete booking process walkthrough
-- [Room Selection](./features/room-selection.md) - Room selection and customization
-- [Special Offers](./features/special-offers.md) - Dynamic offers system
-- [Order Management](./features/order-management.md) - Order tracking and status
-
-### Reference
+### Legacy Documentation
 - [Completed Features](./09-completed-features.md) - List of implemented functionality
 - [Next Steps](./10-next-steps.md) - Planned improvements and roadmap
-- [Troubleshooting](./11-troubleshooting.md) - Common issues and solutions
+
+> **Note**: Multi-booking guides, testing framework documentation, and booking flow details have been migrated to the new [Feature Specifications](./specs/) structure.
 
 ## 🚀 Quick Start
 

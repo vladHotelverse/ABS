@@ -76,23 +76,21 @@ export const MultiRoomLayout: React.FC<MultiRoomLayoutProps> = ({
                 <CarouselNext className={cn('relative -right-4  -bottom-4 z-30')} />
               </div>
               {/* Dots indicator for mobile */}
-              <div className="flex justify-center">
-                <div className="flex items-center">
-                  {Array.from({ length: count }, (_, index) => (
-                    <button
-                      key={index}
-                      className={cn(
-                        "w-8 h-10 flex items-center justify-center rounded-full relative transition-colors",
-                        "after:content-[''] after:w-[14px] after:h-[14px] after:rounded-full after:flex after:items-center after:border-2",
-                        current === index + 1
-                          ? "after:border-gray-800"
-                          : "after:border-gray-400"
-                      )}
-                      onClick={() => roomCarouselApi?.scrollTo(index)}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
+              <div className="flex items-center justify-center mr-2">
+                {Array.from({ length: count }, (_, index) => (
+                  <button
+                    key={index}
+                    className={cn(
+                      "w-8 h-10 flex items-center justify-center rounded-full relative transition-colors",
+                      "after:content-[''] after:w-[14px] after:h-[14px] after:rounded-full after:flex after:items-center after:border-2",
+                      current === index + 1
+                        ? "after:border-gray-800"
+                        : "after:border-gray-400"
+                    )}
+                    onClick={() => roomCarouselApi?.scrollTo(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </Carousel>

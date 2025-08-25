@@ -16,6 +16,11 @@ export interface MobilePricingWidgetProps {
   locale?: string
   disabled?: boolean
   testId?: string
+  
+  // Multibooking support
+  isMultiBooking?: boolean
+  roomCount?: number
+  roomsLabel?: string
 }
 
 const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
@@ -31,6 +36,11 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
   locale = 'en-US',
   disabled = false,
   testId = 'mobile-pricing-widget',
+  
+  // Multibooking props
+  isMultiBooking = false,
+  roomCount,
+  roomsLabel = 'rooms',
 }) => {
   const formatPrice = useCallback((price: number): string => {
     try {
@@ -68,8 +78,11 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
     >
       <div className="flex items-center justify-between px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
         <div className="flex flex-col text-left">
-          <span className="text-sm text-neutral-500" id="pricing-label">
-            {totalUpgradesLabel}
+          <span className="text-sm sm:text-base text-neutral-500" id="pricing-label">
+            {isMultiBooking && roomCount 
+              ? `${roomCount} ${roomsLabel} • ${totalUpgradesLabel}`
+              : totalUpgradesLabel
+            }
           </span>
           {isLoading ? (
             <div className="animate-pulse" aria-label="Loading price">
@@ -78,7 +91,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
             </div>
           ) : (
             <span 
-              className="text-lg font-bold text-blue-600 whitespace-nowrap"
+              className="text-lg sm:text-xl font-bold text-blue-600 whitespace-nowrap"
               aria-labelledby="pricing-label"
             >
               {formattedTotal}
@@ -90,7 +103,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
           {itemCount > 0 && (
             <span 
               className={clsx(
-                "inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-sm font-medium text-green-700",
+                "inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-sm sm:text-base font-medium text-green-700",
                 "transition-all duration-200 ease-in-out"
               )}
               id="item-count"
@@ -112,7 +125,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
             aria-label={`${summaryButtonLabel} - ${itemCount} ${itemsLabel}, total ${formattedTotal}`}
             aria-describedby={itemCount > 0 ? "item-count" : undefined}
           >
-            <ShoppingCart className="w-5 h-5 mr-2" aria-hidden="true" />
+            <ShoppingCart className="w-5 h-5" aria-hidden="true" />
           </UiButton>
         </div>
       </div>

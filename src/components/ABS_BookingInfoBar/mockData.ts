@@ -99,7 +99,7 @@ export const createStoryRoomBookings = (): RoomBookingInfo[] => [
 
 // Shared labels for stories
 export const SPANISH_LABELS: MultiBookingInfoLabels = {
-  multiRoomBookingsTitle: 'Reservas múltiples',
+  multiRoomBookingsTitle: 'Selecciones múltiples',
   roomsCountLabel: 'habitaciones',
   singleRoomLabel: 'habitación',
   clickToExpandLabel: 'Haz clic para expandir',
@@ -109,7 +109,7 @@ export const SPANISH_LABELS: MultiBookingInfoLabels = {
 }
 
 export const ENGLISH_LABELS: MultiBookingInfoLabels = {
-  multiRoomBookingsTitle: 'Multiple Bookings',
+  multiRoomBookingsTitle: 'Multiple Selections',
   roomsCountLabel: 'rooms',
   singleRoomLabel: 'room',
   clickToExpandLabel: 'Click to expand',

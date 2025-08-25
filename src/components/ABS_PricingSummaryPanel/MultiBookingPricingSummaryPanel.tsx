@@ -84,6 +84,8 @@ export interface MultiBookingPricingSummaryPanelProps {
   currency?: string
   locale?: string
   isLoading?: boolean
+  activeRooms?: string[]
+  onActiveRoomsChange?: (roomIds: string[]) => void
   onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
   onEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   onConfirmAll: () => Promise<void>
@@ -96,12 +98,19 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   currency,
   locale,
   isLoading = false,
+  activeRooms,
+  onActiveRoomsChange,
   onRemoveItem,
   onConfirmAll,
 }) => {
   // Custom hooks
   const { toasts, showToast, removeToast } = useToasts(3000)
-  const { handleAccordionToggle, isRoomActive } = useAccordionState(roomBookings[0]?.id)
+  const { handleAccordionToggle, isRoomActive } = useAccordionState(
+    roomBookings.map(room => room.id), // Pass all room IDs
+    activeRooms,
+    onActiveRoomsChange,
+    true // Enable multiple open accordions
+  )
   const { overallTotal } = useRoomCalculations(roomBookings)
   const formatCurrency = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({
@@ -118,8 +127,8 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   })
 
   return (
-    <div className={cn('sticky top-28', className)}>
-      <div className="w-[400px] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+    <div className={cn('sticky md:top-28 w-full', className)}>
+      <div className="min-w-[350px] w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
         <div className="p-4 border-b bg-gray-50">
           <h2 className="text-lg font-semibold text-gray-900">{labels.multiRoomBookingsTitle}</h2>

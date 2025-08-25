@@ -94,7 +94,7 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
   return (
     <div id={id} className={clsx('transition-all duration-300 ease-in-out', className)}>
       <div className={clsx(
-        'grid gap-4 sm:gap-6',
+        'grid gap-6 sm:gap-8',
         offers.length === 1 
           ? 'grid-cols-1 max-w-md' 
           : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl'

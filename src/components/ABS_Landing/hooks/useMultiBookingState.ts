@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { RoomBooking } from '../../ABS_PricingSummaryPanel/MultiBookingPricingSummaryPanel'
 import type { PricingItem } from '../../ABS_PricingSummaryPanel'
+import type { RoomOption } from '../types'
 
 export interface UseMultiBookingStateProps {
   initialRoomBookings?: RoomBooking[]
@@ -30,6 +31,8 @@ export interface UseMultiBookingStateReturn {
   handleMultiBookingEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   handleMultiBookingConfirmAll: () => Promise<void>
   handleRoomTabClick: (roomId: string) => void
+  handleRoomUpgrade: (roomId: string, newRoom: RoomOption, currentRoomPrice?: number) => void
+  handleRoomBid: (roomId: string, bidAmount: number, roomType: string) => void
 
   // Computed values
   totalItemCount: number
@@ -43,7 +46,9 @@ export const useMultiBookingState = ({
 }: UseMultiBookingStateProps): UseMultiBookingStateReturn => {
   // State management
   const [roomBookings, setRoomBookings] = useState<RoomBooking[]>(initialRoomBookings)
-  const [activeRoomId, setActiveRoomId] = useState<string | undefined>(initialRoomBookings[0]?.id)
+  const [activeRoomId, setActiveRoomId] = useState<string | undefined>(
+    initialRoomBookings.length > 0 ? initialRoomBookings[0].id : undefined
+  )
   const [isMobilePricingOverlayOpen, setIsMobilePricingOverlayOpen] = useState<boolean>(false)
 
   // Handlers
@@ -82,8 +87,102 @@ export const useMultiBookingState = ({
     }
   }
 
+  const handleRoomBid = (roomId: string, bidAmount: number, roomType: string) => {
+    const updatedBookings = roomBookings.map(booking => {
+      if (booking.id === roomId) {
+        // Remove ALL room items (base rooms, upgraded rooms) and existing bids (mutually exclusive)
+        const itemsWithoutConflicts = booking.items.filter(item => 
+          !(item.type === 'room') && // Remove ALL room items regardless of concept
+          !(item.type === 'bid' || item.concept === 'bid-for-upgrade') &&
+          !(item.type === 'customization' && (item.category === 'room-upgrade' || item.category?.startsWith('room-upgrade')))
+        )
+        
+        // Create bid item
+        const bidItem = {
+          id: `bid-${roomId}-${Date.now()}`,
+          name: `Bid for ${roomType}`,
+          price: bidAmount,
+          type: 'bid' as const,
+          concept: 'bid-for-upgrade' as const,
+          bidStatus: 'submitted' as const,
+          roomId: roomId,
+        }
+        
+        return {
+          ...booking,
+          items: [...itemsWithoutConflicts, bidItem],
+        }
+      }
+      return booking
+    })
+    
+    setRoomBookings(updatedBookings)
+    handleMultiBookingChange(updatedBookings)
+  }
+
   const handleRoomTabClick = (roomId: string) => {
     setActiveRoomId(roomId)
+  }
+
+  const handleRoomUpgrade = (roomId: string, newRoom: RoomOption, currentRoomPrice?: number) => {
+    const updatedBookings = roomBookings.map(booking => {
+      if (booking.id === roomId) {
+        // Find the current base room item
+        const currentRoomItem = booking.items.find(item => item.type === 'room')
+        const currentPrice = currentRoomPrice || currentRoomItem?.price || 129.99
+        
+        // Remove existing bids (mutually exclusive) but keep non-room items
+        const itemsWithoutConflicts = booking.items.filter(item => 
+          !(item.type === 'customization' && (item.category === 'room-upgrade' || item.category?.startsWith('room-upgrade'))) &&
+          !(item.type === 'bid' || item.concept === 'bid-for-upgrade')
+        )
+        
+        let updatedItems
+        if (currentRoomItem) {
+          // Update existing room item
+          updatedItems = itemsWithoutConflicts.map(item => {
+            if (item.type === 'room') {
+              return {
+                ...item,
+                name: newRoom.roomType,
+                price: newRoom.price,
+                concept: 'choose-your-superior-room' as const,
+                // Add upgrade metadata for tracking
+                isUpgraded: true,
+                originalPrice: currentPrice,
+                upgradePrice: newRoom.price - currentPrice,
+              }
+            }
+            return item
+          })
+        } else {
+          // Create new room item if none exists
+          const newRoomItem = {
+            id: `room-${roomId}`,
+            name: newRoom.roomType,
+            price: newRoom.price,
+            type: 'room' as const,
+            concept: 'choose-your-superior-room' as const,
+            isUpgraded: true,
+            originalPrice: currentPrice,
+            upgradePrice: newRoom.price - currentPrice,
+          }
+          updatedItems = [...itemsWithoutConflicts, newRoomItem]
+        }
+
+        // Update the room booking with new room information
+        return {
+          ...booking,
+          roomName: newRoom.roomType,
+          roomImage: newRoom.image || newRoom.images?.[0] || booking.roomImage,
+          items: updatedItems,
+        }
+      }
+      return booking
+    })
+
+    setRoomBookings(updatedBookings)
+    handleMultiBookingChange(updatedBookings)
   }
 
   // Computed values
@@ -110,6 +209,8 @@ export const useMultiBookingState = ({
     handleMultiBookingEditSection,
     handleMultiBookingConfirmAll,
     handleRoomTabClick,
+    handleRoomUpgrade,
+    handleRoomBid,
 
     // Computed values
     totalItemCount,

@@ -11,7 +11,7 @@ interface RoomItemsGridProps {
 export const RoomItemsGrid: React.FC<RoomItemsGridProps> = ({ items, roomId, isMobile = false }) => {
   if (isMobile) {
     return (
-      <div className="grid grid-cols-1 gap-3 pt-3 min-w-0 overflow-hidden">
+      <div className="grid grid-cols-1 gap-4 pt-3 min-w-0 overflow-hidden">
         {items.map((item, index) => (
           <BookingInfoItem
             key={`mobile-${roomId}-${item.icon}-${item.label}-${index}`}
@@ -25,7 +25,7 @@ export const RoomItemsGrid: React.FC<RoomItemsGridProps> = ({ items, roomId, isM
   }
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 h-full w-full max-w-[60%] min-w-0">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 h-full w-full max-w-[60%] min-w-0">
       {items.map((item, index) => (
         <div key={`${roomId}-${item.icon}-${item.label}-${index}`} className="flex items-center gap-4 h-full min-w-0">
           <div className="flex-shrink-0">{getIcon(item.icon, 'h-4 w-4 text-gray-400')}</div>

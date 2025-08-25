@@ -17,11 +17,16 @@ export const useRoomCalculations = (roomBookings: RoomBooking[]) => {
     return Object.values(roomTotals).reduce((sum, total) => sum + total, 0)
   }, [roomTotals])
 
+  const totalItemsCount = useMemo(() => {
+    return roomBookings.reduce((count, room) => count + room.items.length, 0)
+  }, [roomBookings])
+
   const getRoomTotal = (roomId: string) => roomTotals[roomId] || 0
 
   return {
     roomTotals,
     overallTotal,
+    totalItemsCount,
     getRoomTotal,
   }
 }

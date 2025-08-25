@@ -113,10 +113,10 @@ const RoomCard: React.FC<RoomCardProps> = ({
     activeBid,
   } = state
   const isBidActive = activeBid?.roomId === room.id
-  
+
   // State to control slider visibility with smooth transition
   const [sliderVisible, setSliderVisible] = useState(false)
-  
+
 
   // Slider logic is now local to each card
   const {
@@ -182,28 +182,16 @@ const RoomCard: React.FC<RoomCardProps> = ({
         }
       )}
     >
-      {/* Badges */}
-      <RoomBadges
-        hasDiscount={!!room.oldPrice && !selectedRoom?.id && !isBidActive}
-        oldPrice={room.oldPrice}
-        currentPrice={room.price}
-        discountBadgeText={discountBadgeText}
-        isSelected={selectedRoom?.id === room.id}
-        selectedText={selectedText}
-        isBidActive={isBidActive && selectedRoom?.id !== room.id}
-        bidSubmittedText={bidSubmittedText}
-      />
-
       {/* Room Image Display with Click-to-Modal */}
       <div className="relative h-64 bg-neutral-100 group cursor-zoom-in" onClick={handleImageClick}>
         {/* Current image */}
-        <img 
-          src={room.images[currentImageIndex]} 
-          alt={`${room.title || room.roomType} - Image ${currentImageIndex + 1}`} 
-          className="object-cover w-full h-full rounded-t-lg" 
+        <img
+          src={room.images[currentImageIndex]}
+          alt={`${room.title || room.roomType} - Image ${currentImageIndex + 1}`}
+          className="object-cover w-full h-full rounded-t-lg"
           draggable={false}
         />
-        
+
         {/* Multiple images indicator - simple overlay */}
         {room.images.length > 1 && (
           <div className="absolute bottom-3 right-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
@@ -213,7 +201,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             </svg>
           </div>
         )}
-        
+
         {/* Amenities overlay - top left */}
         <div className="absolute top-3 left-3 z-30 flex flex-wrap gap-1 max-w-[85%]">
           {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
@@ -225,6 +213,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
             </span>
           ))}
         </div>
+
+        {/* Badges */}
+        <RoomBadges
+          hasDiscount={!!room.oldPrice && !selectedRoom?.id && !isBidActive}
+          oldPrice={room.oldPrice}
+          currentPrice={room.price}
+          discountBadgeText={discountBadgeText}
+          isSelected={selectedRoom?.id === room.id}
+          selectedText={selectedText}
+          isBidActive={isBidActive && selectedRoom?.id !== room.id}
+          bidSubmittedText={bidSubmittedText}
+        />
       </div>
 
       {/* Room Details */}
