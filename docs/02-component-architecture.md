@@ -44,25 +44,38 @@ App.tsx (Root)
 - `SpecialOffersSection`: Dynamic offers display
 - `RoomSelectionMapSection`: Interactive room maps
 
-**State Management**:
+**State Management** (Updated Implementation):
 ```typescript
-// Main booking state
+// Unified Zustand store with performance optimization
 const {
-  selectedRooms,
-  selectedCustomizations,
-  selectedOffers,
-  bidUpgrades,
-  updateSelection,
+  rooms,
+  activeRoomId,
+  mode,
+  addRoom,
+  setActiveRoom,
+  addItemToRoom,
+  removeItemFromRoom,
+  getRoomTotal,
   getTotalPrice
-} = useBookingState()
+} = useBookingStore()
 
-// Multi-booking support
+// Performance-optimized hook for high-frequency operations
 const {
-  bookings,
-  currentBookingIndex,
-  addBooking,
-  switchBooking
-} = useMultiBookingState()
+  addItemOptimistically,
+  switchRoomOptimistically,
+  performanceMetrics
+} = useOptimizedBooking()
+
+// Specialized hooks for specific features
+const {
+  sectionConfiguration,
+  updateSectionVisibility
+} = useSectionConfiguration()
+
+const {
+  formatCurrency,
+  formatPriceWithCurrency
+} = useCurrencyFormatter({ currency: 'EUR', locale: 'en-US' })
 ```
 
 ### 2. ABS_OrderStatus Component
@@ -123,27 +136,59 @@ interface CompatibilityRules {
 - Per-stay offers (packages)
 - Date-specific promotions
 
-### 5. ABS_PricingSummaryPanel Component
+### 5. ABS_PricingSummaryPanel Component (Refactored)
 **Location**: `src/components/ABS_PricingSummaryPanel/`
-**Purpose**: Shopping cart and pricing display
+**Purpose**: Shopping cart and pricing display with enhanced multi-booking support
 
 **Key Features**:
-- Real-time price calculations
-- Item management (add/remove/modify)
-- Discount applications
-- Mobile-optimized overlay
-- Multi-booking support
+- **Multi-room pricing summaries** with collapsible sections
+- **Section-based rendering** with configurable visibility
+- **Performance optimizations** with React.memo and shallow comparison
+- **Enhanced component composition** with dedicated sub-components
+- **Improved accessibility** with ARIA labels and keyboard navigation
 
-**Price Components**:
+**New Component Structure**:
+```
+ABS_PricingSummaryPanel/
+├── components/
+│   ├── BidUpgradesSection.tsx      # Bid upgrade items display
+│   ├── PricingSummaryHeader.tsx    # Header with room context
+│   ├── SectionRenderer.tsx         # Generic section renderer
+│   ├── PriceBreakdown.tsx          # Enhanced price calculations
+│   ├── RoomSection.tsx             # Individual room pricing
+│   └── index.ts                    # Component exports
+├── hooks/
+│   ├── useSectionConfiguration.ts  # Section visibility management
+│   └── index.ts                    # Hook exports
+├── examples/                       # Usage examples
+└── MultiBookingPricingSummaryPanel.tsx # Main component
+```
+
+**Updated BookingItem Interface**:
 ```typescript
-interface PricingItem {
+export interface BookingItem {
   id: string
   name: string
-  type: 'room' | 'customization' | 'offer' | 'bid'
   price: number
-  quantity?: number
-  currency: string
-  period?: 'perNight' | 'perStay' | 'perPerson'
+  type: 'room' | 'customization' | 'offer' | 'bid'
+  concept?: 'choose-your-superior-room' | 'customize-your-room' | 'enhance-your-stay' | 'choose-your-room' | 'bid-for-upgrade'
+  category?: string
+  roomId: string              // New: Room association
+  metadata?: Record<string, unknown>
+  addedAt: Date              // New: Timestamp tracking
+}
+
+export interface RoomBooking {
+  id: string
+  roomName: string
+  roomNumber: string
+  guestName: string
+  nights: number
+  items: BookingItem[]
+  baseRoom?: RoomOption
+  isActive: boolean
+  payAtHotel: boolean        // Multi-booking compatibility
+  roomImage?: string         // Visual enhancements
 }
 ```
 
@@ -176,9 +221,18 @@ Built on Radix UI primitives with Tailwind CSS styling:
 | `calendar` | Date selection | Booking dates, offer periods |
 
 ### Custom Components
-- `segment-badge`: Customer segment indicators
+- `segment-badge`: Customer segment indicators  
 - `dialogHeadless`: Unstyled dialog base
-- `skeleton`: Loading state placeholders
+- `skeleton`: Enhanced loading state placeholders with animation variants
+- `sonner`: Toast notification system for user feedback
+
+### Shared Components (`src/components/shared/`)
+**New shared component library for reusable UI patterns:**
+
+- **Currency formatters**: Consistent price display across components
+- **Loading states**: Standardized skeleton loaders and spinners  
+- **Form components**: Enhanced form inputs with validation
+- **Layout primitives**: Flexible containers and spacing utilities
 
 ## 🔄 Data Flow Patterns
 
@@ -311,11 +365,14 @@ export default Component
 - Leverage discriminated unions for variants
 - Export types for component consumers
 
-### 3. Performance Optimization
-- Use `React.memo` for expensive components
-- Optimize re-renders with `useCallback` and `useMemo`
-- Lazy load heavy components
-- Minimize bundle size with tree shaking
+### 3. Performance Optimization (Enhanced)
+- **Zustand with shallow comparison**: `useShallow` prevents unnecessary re-renders
+- **Optimistic updates**: Immediate UI feedback with background validation
+- **React.memo with custom comparison**: Strategic memoization for expensive components
+- **Performance monitoring**: Real-time metrics for room switching (<50ms target)
+- **Debounced operations**: Rate-limited state updates for rapid user interactions
+- **Lazy loading**: Code splitting for non-critical components
+- **Bundle optimization**: Tree shaking and selective imports
 
 ### 4. Accessibility Standards
 - Semantic HTML structure

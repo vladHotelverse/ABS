@@ -63,49 +63,72 @@ interface MultiBookingState {
 }
 ```
 
-### State Management Hook Design
+### State Management Implementation (Updated)
+**Current Implementation**: Unified Zustand Store with Performance Optimization
+
 ```typescript
-export const useMultiBookingState = () => {
-  const [roomBookings, setRoomBookings] = useState<RoomBooking[]>([])
-  const [activeRoomId, setActiveRoomId] = useState<string>('')
+// Unified Booking Store - Replaces multiple state hooks
+export interface BookingState {
+  mode: 'single' | 'multi'
+  rooms: RoomBooking[]
+  activeRoomId: string | null
   
-  // State selectors
-  const getCurrentRoom = useCallback((): RoomBooking | undefined => {
-    return roomBookings.find(room => room.id === activeRoomId)
-  }, [roomBookings, activeRoomId])
+  // Actions
+  addRoom: (room: RoomBooking) => void
+  removeRoom: (roomId: string) => void
+  setActiveRoom: (roomId: string) => void
+  addItemToRoom: (roomId: string, item: BookingItem) => void
+  removeItemFromRoom: (roomId: string, itemId: string) => void
   
-  // State mutators
-  const addItemToRoom = useCallback((roomId: string, item: PricingItem) => {
-    setRoomBookings(prev => prev.map(room => 
-      room.id === roomId 
-        ? { ...room, items: [...room.items, item] }
-        : room
-    ))
-  }, [])
+  // Computed selectors
+  getRoomTotal: (roomId: string) => number
+  getRoomItemCount: (roomId: string) => number
+  getTotalPrice: () => number
+}
+
+// Performance-optimized hook wrapper
+export const useOptimizedBooking = () => {
+  // Shallow comparison for performance
+  const roomData = useBookingStore(
+    useShallow(state => ({
+      rooms: state.rooms,
+      activeRoomId: state.activeRoomId,
+      mode: state.mode
+    }))
+  )
   
-  const removeItemFromRoom = useCallback((roomId: string, itemId: string) => {
-    setRoomBookings(prev => prev.map(room =>
-      room.id === roomId
-        ? { ...room, items: room.items.filter(item => item.id !== itemId) }
-        : room
-    ))
+  // Optimistic updates with rollback capability
+  const addItemOptimistically = useCallback(async (roomId: string, item: BookingItem) => {
+    const startTime = performance.now()
+    
+    try {
+      // Immediate UI update
+      addItemToRoom(roomId, item)
+      
+      // Background validation
+      const validation = await businessRulesEngine.validate(item)
+      if (!validation.isValid) {
+        // Rollback on validation failure
+        removeItemFromRoom(roomId, item.id)
+        throw new Error(validation.errors.join(', '))
+      }
+      
+      // Performance tracking (target <50ms)
+      const duration = performance.now() - startTime
+      if (duration > 50) {
+        console.warn(`Room switching exceeded 50ms target: ${duration}ms`)
+      }
+    } catch (error) {
+      // Error handling with user feedback
+      console.error('Failed to add item:', error)
+      throw error
+    }
   }, [])
   
   return {
-    // State
-    roomBookings,
-    activeRoomId,
-    getCurrentRoom,
-    
-    // Actions
-    setActiveRoomId,
-    addItemToRoom,
-    removeItemFromRoom,
-    
-    // Computed
-    getTotalPrice: () => roomBookings.reduce((total, room) => 
-      total + room.items.reduce((sum, item) => sum + item.price, 0), 0
-    )
+    ...roomData,
+    addItemOptimistically,
+    // Other optimized operations...
   }
 }
 ```

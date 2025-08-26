@@ -1,15 +1,14 @@
 import type React from 'react'
+import { toast } from 'sonner'
 import { cn } from '../../lib/utils'
 import PriceBreakdown from './components/PriceBreakdown'
 import RoomAccordionItem from './components/RoomAccordionItem'
-import ToastContainer from './components/ToastContainer'
 import type { PricingItem } from './types'
 import { useAccordionState } from './hooks/useAccordionState'
 import { useConfirmAll } from './hooks/useConfirmAll'
-import { useCurrencyFormatter } from './hooks/useCurrencyFormatter'
+import { useCurrencyFormatter } from '../../hooks/useCurrencyFormatter'
 import { useItemManagement } from './hooks/useItemManagement'
 import { useRoomCalculations } from './hooks/useRoomCalculations'
-import { useToasts } from './hooks/useToasts'
 
 // Available item interface for upgrades and offers
 export interface AvailableItem {
@@ -108,7 +107,6 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   maxHeight = 'max-h-[600px]',
 }) => {
   // Custom hooks
-  const { toasts, showToast, removeToast } = useToasts(3000)
   const { handleAccordionToggle, isRoomActive } = useAccordionState(
     roomBookings.map(room => room.id), // Pass all room IDs
     activeRooms, // Can be undefined - accordion will manage its own state
@@ -116,18 +114,40 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
     true // Enable multiple open accordions
   )
   const { overallTotal } = useRoomCalculations(roomBookings)
-  const formatCurrency = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
+  const { format: formatCurrency } = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({
     roomBookings,
     labels,
     onRemoveItem,
-    showToast,
+    showToast: (message: string, type?: 'success' | 'error' | 'info') => {
+      switch (type) {
+        case 'success':
+          toast.success(message)
+          break
+        case 'error':
+          toast.error(message)
+          break
+        default:
+          toast.info(message)
+      }
+    },
   })
   const { confirmingAll, handleConfirmAll } = useConfirmAll({
     roomCount: roomBookings.length,
     labels,
     onConfirmAll,
-    showToast,
+    showToast: (message: string, type?: 'success' | 'error' | 'info') => {
+      switch (type) {
+        case 'success':
+          toast.success(message)
+          break
+        case 'error':
+          toast.error(message)
+          break
+        default:
+          toast.info(message)
+      }
+    },
   })
 
   return (
@@ -182,14 +202,6 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
           </div>
         )}
       </div>
-
-      {/* Toast Notifications */}
-      <ToastContainer
-        toasts={toasts}
-        removeToast={removeToast}
-        notificationsLabel={labels.notificationsLabel}
-        closeNotificationLabel={labels.closeNotificationLabel}
-      />
     </div>
   )
 }

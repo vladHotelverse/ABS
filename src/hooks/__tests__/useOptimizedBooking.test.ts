@@ -3,7 +3,7 @@
  * Tests for performance-optimized booking hook
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import { useOptimizedBooking } from '../useOptimizedBooking'
 import { useBookingStore } from '../../stores/bookingStore'
@@ -34,6 +34,11 @@ describe('useOptimizedBooking', () => {
       optimisticUpdates: new Set(),
     })
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    // Restore all mocks after each test to prevent interference
+    vi.restoreAllMocks()
   })
 
   describe('Performance Tracking', () => {
@@ -163,23 +168,21 @@ describe('useOptimizedBooking', () => {
       })
       
       // Mock an error during item addition
-      const originalAddItemToRoom = useBookingStore.getState().addItemToRoom
-      vi.spyOn(useBookingStore.getState(), 'addItemToRoom').mockImplementation(() => {
+      const addItemToRoomSpy = vi.spyOn(useBookingStore.getState(), 'addItemToRoom').mockImplementation(() => {
         throw new Error('Mock error')
       })
       
+      // Test that the function throws an error
       await expect(
-        act(async () => {
-          await result.current.addItem('room-1', {
-            name: 'Test Item',
-            price: 50,
-            type: 'customization',
-          })
+        result.current.addItem('room-1', {
+          name: 'Test Item',
+          price: 50,
+          type: 'customization',
         })
       ).rejects.toThrow('Mock error')
       
-      // Restore original implementation
-      useBookingStore.getState().addItemToRoom = originalAddItemToRoom
+      // Restore original implementation immediately
+      addItemToRoomSpy.mockRestore()
     })
   })
 

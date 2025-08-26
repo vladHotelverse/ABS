@@ -99,9 +99,9 @@ export const useOptimizedBooking = () => {
   // Memoized computed values for performance
   const currentRoom = useMemo(() => getCurrentRoom(), [getCurrentRoom])
   
-  const totalPrice = useMemo(() => getTotalPrice(), [getTotalPrice])
+  const totalPrice = useMemo(() => getTotalPrice(), [getTotalPrice, rooms])
   
-  const itemCount = useMemo(() => getItemCount(), [getItemCount])
+  const itemCount = useMemo(() => getItemCount(), [getItemCount, rooms])
 
   const shouldShowMultiBooking = useMemo(() => 
     mode === 'multi' && rooms.length > 1, 

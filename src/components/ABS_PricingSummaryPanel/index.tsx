@@ -1,15 +1,16 @@
 import clsx from 'clsx'
 import type React from 'react'
 import { useMemo, useCallback } from 'react'
+import { toast } from 'sonner'
 import EmptyState from './components/EmptyState'
 import PriceBreakdown from './components/PriceBreakdown'
-import ToastContainer from './components/ToastContainer'
-import PricingItemComponent from './components/PricingItemComponent'
+import PricingSummaryHeader from './components/PricingSummaryHeader'
+import RoomSection from './components/RoomSection'
+import BidUpgradesSection from './components/BidUpgradesSection'
 import ItemsSection from './components/ItemsSection'
-import LoadingOverlay from './components/LoadingOverlay'
+import { LoadingOverlay } from '../shared'
 import type { PricingItem, PricingSummaryPanelProps } from './types'
-import { PANEL_CONFIG, DEFAULT_ROOM_IMAGE } from './constants'
-import { useToasts } from './hooks/useToasts'
+import { DEFAULT_ROOM_IMAGE } from './constants'
 
 const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   className,
@@ -24,8 +25,6 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   onRemoveItem,
   onConfirm,
 }) => {
-  // Toast notifications using custom hook
-  const { toasts, showToast, removeToast } = useToasts(PANEL_CONFIG.TOAST_DURATION)
 
   // Memoize expensive filtering operations - now grouped by concept
   const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, bidForUpgradeItems, isEmpty } = useMemo(() => {
@@ -63,10 +62,10 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           toastMessage = `Room selection removed: ${item.name}`
         }
 
-        showToast(toastMessage, 'info')
+        toast.info(toastMessage)
       }
     },
-    [onRemoveItem, labels, showToast]
+    [onRemoveItem, labels]
   )
 
   // Enhanced safety checks for required props
@@ -100,10 +99,11 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
       )}
       aria-label={labels.pricingSummaryLabel}
     >
-      {/* Room image at the top */}
-      <div className="w-full md:h-40 bg-neutral-200 overflow-hidden">
-        <img src={roomImage} alt={labels.roomImageAltText} className="w-full h-full object-cover" />
-      </div>
+      {/* Room image header */}
+      <PricingSummaryHeader 
+        roomImage={roomImage}
+        roomImageAltText={labels.roomImageAltText}
+      />
 
       {/* Content container with padding */}
       <div className="p-4 space-y-4 relative">
@@ -125,56 +125,20 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
         )}
 
         {/* Room Section - combining all room-related items */}
-        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (
-          <section aria-labelledby="room-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="room-section-title" className="text-base font-semibold">
-                {chooseYourSuperiorRoomItems.length > 0 ? 'Superior Room Selection' : 'Room Selection'}
-              </h3>
-            </div>
-            {[...chooseYourRoomItems, ...chooseYourSuperiorRoomItems].map((item) => (
-              <PricingItemComponent
-                key={item.id}
-                item={item}
-                euroSuffix={labels.euroSuffix}
-                removeLabel={labels.removeRoomUpgradeLabel}
-                onRemove={() => {
-                  try {
-                    handleRemoveItem(item)
-                  } catch (error) {
-                    console.error('Error in remove item callback:', error)
-                  }
-                }}
-              />
-            ))}
-          </section>
-        )}
+        <RoomSection
+          chooseYourRoomItems={chooseYourRoomItems}
+          chooseYourSuperiorRoomItems={chooseYourSuperiorRoomItems}
+          euroSuffix={labels.euroSuffix}
+          removeRoomUpgradeLabel={labels.removeRoomUpgradeLabel}
+          onRemoveItem={handleRemoveItem}
+        />
 
         {/* Bid Upgrades Section */}
-        {bidForUpgradeItems.length > 0 && (
-          <section aria-labelledby="bid-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="bid-section-title" className="text-base font-semibold">
-                Bid for Upgrades
-              </h3>
-            </div>
-            {bidForUpgradeItems.map((item) => (
-              <PricingItemComponent
-                key={item.id}
-                item={item}
-                euroSuffix={labels.euroSuffix}
-                removeLabel={`Remove ${item.name}`}
-                onRemove={() => {
-                  try {
-                    handleRemoveItem(item)
-                  } catch (error) {
-                    console.error('Error in remove item callback:', error)
-                  }
-                }}
-              />
-            ))}
-          </section>
-        )}
+        <BidUpgradesSection
+          bidForUpgradeItems={bidForUpgradeItems}
+          euroSuffix={labels.euroSuffix}
+          onRemoveItem={handleRemoveItem}
+        />
 
 
         {/* Customizations Section */}
@@ -216,14 +180,6 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </div>
         )}
       </div>
-
-      {/* Toast Container */}
-      <ToastContainer
-        toasts={toasts}
-        removeToast={removeToast}
-        notificationsLabel={labels.notificationsLabel}
-        closeNotificationLabel={labels.closeNotificationLabel}
-      />
     </section>
   )
 }
@@ -231,3 +187,24 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
 export default PricingSummaryPanel
 export { PricingSummaryPanel as ABS_PricingSummaryPanel }
 export type { PricingSummaryPanelProps, PricingItem, AvailableSection, PricingLabels } from './types'
+
+// Export focused sub-components
+export { 
+  PricingSummaryHeader,
+  RoomSection,
+  BidUpgradesSection,
+  SectionRenderer
+} from './components'
+
+// Export hooks
+export { useSectionConfiguration } from './hooks'
+
+// Export additional types
+export type { 
+  PricingSummaryHeaderProps,
+  RoomSectionProps,
+  BidUpgradesSectionProps,
+  SectionConfig,
+  SectionRendererProps,
+  SectionConfigurationProps
+} from './components'

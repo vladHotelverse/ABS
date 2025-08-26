@@ -6,6 +6,7 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { useShallow } from 'zustand/react/shallow'
 import { enableMapSet } from 'immer'
 import type { RoomOption } from '../components/ABS_Landing/sections/RoomSelectionSection'
 import type { Customization, SpecialOffer, ActiveBid } from '../components/ABS_Landing/types'
@@ -43,22 +44,24 @@ export interface RoomBooking {
 }
 
 export interface BookingState {
-  // Core state
+  // Core unified state - used by both single and multi booking modes
   mode: 'single' | 'multi'
-  rooms: RoomBooking[]
+  rooms: RoomBooking[] // Primary storage for all booking data
   activeRoomId: string | null
   
-  // Single booking legacy support
-  selectedRoom: RoomOption | null
-  customizations: Record<string, Customization[]>
-  specialOffers: SpecialOffer[]
-  activeBid: ActiveBid | null
+  // Legacy single booking support - KEPT FOR BACKWARD COMPATIBILITY
+  // These are still actively used by ABS_Landing.tsx and other components
+  // that haven't been fully migrated to the unified room-based system
+  selectedRoom: RoomOption | null // Used in single booking mode only
+  customizations: Record<string, Customization[]> // Legacy customization storage
+  specialOffers: SpecialOffer[] // Legacy global offers storage
+  activeBid: ActiveBid | null // Legacy single bid storage
   
   // UI state
   showMobilePricing: boolean
   bookingStatus: 'normal' | 'loading' | 'error'
   
-  // Metadata
+  // Reservation metadata
   reservationCode?: string
   checkIn?: string
   checkOut?: string
@@ -70,15 +73,15 @@ export interface BookingState {
 }
 
 export interface BookingActions {
-  // Mode management
+  // Primary unified booking actions - preferred for new code
   setMode: (mode: 'single' | 'multi') => void
   
-  // Room management
+  // Room management - unified system
   addRoom: (room: RoomBooking) => void
   removeRoom: (roomId: string) => void
   setActiveRoom: (roomId: string) => void
   
-  // Item management
+  // Item management - unified system (works for both single and multi modes)
   addItemToRoom: (roomId: string, item: Omit<BookingItem, 'id' | 'addedAt' | 'roomId'>) => void
   removeItemFromRoom: (roomId: string, itemId: string) => void
   updateItemInRoom: (roomId: string, itemId: string, updates: Partial<BookingItem>) => void
@@ -87,7 +90,9 @@ export interface BookingActions {
   clearRoom: (roomId: string) => void
   clearAllRooms: () => void
   
-  // Legacy single booking support
+  // Legacy single booking actions - KEPT FOR BACKWARD COMPATIBILITY
+  // These are still actively used by existing components (ABS_Landing.tsx, etc.)
+  // TODO: Gradually migrate components to use the unified item-based system above
   selectRoom: (room: RoomOption | null) => void
   addCustomization: (customization: Customization, roomId: string) => void
   removeCustomization: (customizationId: string, roomId: string) => void
@@ -96,11 +101,11 @@ export interface BookingActions {
   makeOffer: (price: number, room: RoomOption) => void
   cancelBid: (roomId: string) => void
   
-  // UI state
+  // UI state management
   setShowMobilePricing: (show: boolean) => void
   setBookingStatus: (status: 'normal' | 'loading' | 'error') => void
   
-  // Metadata
+  // Reservation metadata
   setReservationDetails: (details: { 
     reservationCode?: string
     checkIn?: string
@@ -108,12 +113,12 @@ export interface BookingActions {
     occupancy?: string
   }) => void
   
-  // Optimistic updates
+  // Performance optimizations
   startOptimisticUpdate: (operationId: string) => void
   completeOptimisticUpdate: (operationId: string) => void
   rollbackOptimisticUpdate: (operationId: string) => void
   
-  // Reset
+  // Utilities
   resetState: () => void
 }
 
@@ -140,11 +145,8 @@ export interface BookingSelectors {
   getItemsByType: (roomId: string, type: BookingItem['type']) => BookingItem[]
   getItemsByCategory: (roomId: string, category: string) => BookingItem[]
   
-  // Legacy selectors for backwards compatibility
-  getSelectedRoom: () => RoomOption | null
-  getCustomizations: () => Record<string, Customization[]>
-  getSpecialOffers: () => SpecialOffer[]
-  getActiveBid: () => ActiveBid | null
+  // Note: Legacy selectors (getSelectedRoom, getCustomizations, getSpecialOffers, getActiveBid) 
+  // have been removed as they were not being used. Direct state access is used instead.
 }
 
 type BookingStore = BookingState & BookingActions & BookingSelectors
@@ -284,7 +286,8 @@ export const useBookingStore = create<BookingStore>()(
           state.lastUpdate = new Date()
         }),
         
-        // Legacy single booking support
+        // Legacy single booking support - KEPT FOR BACKWARD COMPATIBILITY
+        // These actions are still actively used by ABS_Landing.tsx and other components
         selectRoom: (room) => set((state) => {
           state.selectedRoom = room
           state.activeBid = null // Clear active bid when room is selected
@@ -406,24 +409,31 @@ export const useBookingStore = create<BookingStore>()(
           const { mode, rooms, selectedRoom, customizations, specialOffers, activeBid } = get()
           
           if (mode === 'multi') {
-            return rooms.reduce((total, room) => {
-              return total + room.items.reduce((sum, item) => sum + item.price, 0)
-            }, 0)
+            // Optimized multi-booking calculation
+            return rooms.reduce((total, room) => 
+              total + room.items.reduce((sum, item) => sum + item.price, 0), 0
+            )
           } else {
-            // Legacy single booking calculation
+            // Legacy single booking calculation - kept for backward compatibility
+            // This supports existing ABS_Landing.tsx and other components that rely on single booking mode
             let total = 0
             
             if (selectedRoom) {
               total += selectedRoom.price
             }
             
-            Object.values(customizations).forEach(roomCustomizations => {
-              roomCustomizations.forEach(c => { total += c.price })
-            })
+            // Optimized customizations calculation
+            for (const roomCustomizations of Object.values(customizations)) {
+              for (const customization of roomCustomizations) {
+                total += customization.price
+              }
+            }
             
-            specialOffers.forEach(offer => { total += offer.price })
+            // Add special offers
+            total += specialOffers.reduce((sum, offer) => sum + offer.price, 0)
             
-            if (activeBid && (activeBid.status === 'submitted' || activeBid.status === 'pending')) {
+            // Add active bid if it's in a valid state
+            if (activeBid?.status && ['submitted', 'pending'].includes(activeBid.status)) {
               total += activeBid.bidAmount
             }
             
@@ -437,13 +447,15 @@ export const useBookingStore = create<BookingStore>()(
           if (mode === 'multi') {
             return rooms.reduce((count, room) => count + room.items.length, 0)
           } else {
-            // Legacy single booking calculation
+            // Legacy single booking calculation - kept for backward compatibility
             let count = 0
+            
             if (selectedRoom) count++
             
-            Object.values(customizations).forEach(roomCustomizations => {
-              count += roomCustomizations.length
-            })
+            // Optimized customizations count
+            count += Object.values(customizations).reduce(
+              (sum, roomCustomizations) => sum + roomCustomizations.length, 0
+            )
             
             count += specialOffers.length
             if (activeBid) count++
@@ -495,22 +507,22 @@ export const useBookingStore = create<BookingStore>()(
           return room?.items.filter(item => item.category === category) || []
         },
         
-        // Legacy selectors
-        getSelectedRoom: () => get().selectedRoom,
-        getCustomizations: () => get().customizations,
-        getSpecialOffers: () => get().specialOffers,
-        getActiveBid: () => get().activeBid,
+        // Note: Legacy selector methods (getSelectedRoom, etc.) were removed as they were unused.
+        // Components now access state directly via useShallow() for better performance.
       })),
       {
         name: 'booking-storage',
+        // Only persist essential state that should survive page reloads
         partialize: (state) => ({
           mode: state.mode,
           rooms: state.rooms,
           activeRoomId: state.activeRoomId,
+          // Legacy state - kept for backward compatibility
           selectedRoom: state.selectedRoom,
           customizations: state.customizations,
           specialOffers: state.specialOffers,
           activeBid: state.activeBid,
+          // Reservation metadata
           reservationCode: state.reservationCode,
           checkIn: state.checkIn,
           checkOut: state.checkOut,
@@ -524,14 +536,23 @@ export const useBookingStore = create<BookingStore>()(
   )
 )
 
-// Performance monitoring hook
+/**
+ * Performance monitoring hook for the booking store
+ * Provides insights into store update frequency and optimistic updates
+ */
 export const useBookingPerformance = () => {
-  const lastUpdate = useBookingStore(state => state.lastUpdate)
-  const optimisticUpdates = useBookingStore(state => state.optimisticUpdates)
+  const performanceData = useBookingStore(
+    useShallow(state => ({
+      lastUpdate: state.lastUpdate,
+      optimisticUpdates: state.optimisticUpdates,
+    }))
+  )
   
   return {
-    lastUpdate,
-    hasOptimisticUpdates: optimisticUpdates.size > 0,
-    optimisticUpdateCount: optimisticUpdates.size,
+    lastUpdate: performanceData.lastUpdate,
+    hasOptimisticUpdates: performanceData.optimisticUpdates.size > 0,
+    optimisticUpdateCount: performanceData.optimisticUpdates.size,
+    // Helper to check if store has been recently updated (within last 5 seconds)
+    isRecentlyUpdated: Date.now() - performanceData.lastUpdate.getTime() < 5000,
   }
 }

@@ -28,6 +28,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import type { SectionConfig } from '@/components/ABS_RoomCustomization/types'
+import { Toaster } from '@/components/ui/sonner'
 
 // Home component (main booking flow)
 function Home() {
@@ -430,6 +431,7 @@ function App() {
           <Route path="/order" element={<ABS_OrderStatus onBackToHome={() => window.location.href = '/'} />} />
         </Routes>
       </Suspense>
+      <Toaster />
     </BrowserRouter>
   )
 }

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { CreditCard } from 'lucide-react'
 import type React from 'react'
-import { useCurrencyFormatter } from '../hooks/useCurrencyFormatter'
+import { useCurrencyFormatter } from '../../../hooks/useCurrencyFormatter'
 import { UiButton } from '../../ui/button'
 import LoadingSkeleton from './LoadingSkeleton'
 
@@ -35,7 +35,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
   onConfirm,
 }) => {
   // Use centralized currency formatting hook
-  const formatPrice = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
+  const { format: formatPrice } = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
 
   return (
     <>
