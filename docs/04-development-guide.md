@@ -450,7 +450,7 @@ const isProduction = import.meta.env.PROD
 
 // Environment-specific settings
 const config = {
-  apiUrl: isDevelopment ? 'http://localhost:3000' : 'https://api.production.com',
+  apiUrl: isDevelopment ? 'http://localhost:5173' : 'https://api.production.com',
   debug: isDevelopment,
   analytics: isProduction
 }
