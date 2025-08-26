@@ -10,7 +10,6 @@ import { cn } from '../../../lib/utils'
 import { UiButton } from '../../ui/button'
 import { Dialog, DialogContent } from '../../ui/dialog'
 import { useRoomCalculations } from '../hooks/useRoomCalculations'
-import { useCurrencyFormatter } from '../hooks/useCurrencyFormatter'
 
 export interface MobilePricingOverlayProps extends PricingSummaryPanelProps {
   isOpen: boolean
@@ -84,11 +83,6 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
   }, [isOpen, handleClose])
   // Calculate totals for multi-booking footer
   const { overallTotal, totalItemsCount } = useRoomCalculations(roomBookings || [])
-  const formatCurrency = useCurrencyFormatter({ 
-    currency: multiBookingCurrency, 
-    locale: multiBookingLocale, 
-    euroSuffix: multiBookingLabels?.euroSuffix || ''
-  })
 
   // Determine if confirm button should be enabled
   const hasSelections = isMultiBooking ? totalItemsCount > 0 : false

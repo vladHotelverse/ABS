@@ -129,6 +129,9 @@ Translations are stored in `src/i18n/locales/`.
 | Supabase | ^2.52.0 | Backend Services |
 | React Router | ^7.7.0 | Routing |
 | i18next | ^25.3.0 | Internationalization |
+| Zustand | ^5.0.8 | State Management |
+| Playwright | Latest | E2E Testing |
+| Vitest | Latest | Unit Testing |
 
 ## 📚 Documentation
 

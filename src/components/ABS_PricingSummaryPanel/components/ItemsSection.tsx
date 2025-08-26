@@ -7,7 +7,6 @@ export interface ItemsSectionProps {
   title: string
   items: PricingItem[]
   euroSuffix: string
-  emptyMessage?: string
   removingItems?: Set<string>
   // Support both single booking and multi-booking remove handlers
   onRemoveItem?: (item: PricingItem) => void
@@ -19,7 +18,6 @@ const ItemsSection: React.FC<ItemsSectionProps> = memo(({
   title,
   items,
   euroSuffix,
-  emptyMessage,
   removingItems,
   onRemoveItem,
   onRemoveItemMulti,

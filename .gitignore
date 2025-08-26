@@ -42,3 +42,12 @@ playwright/.cache/
 # Test artifacts
 *.spec.js.map
 *.test.js.map
+test-failed-*.png
+error-context.md
+
+# Documentation archives
+docs/archive/
+
+# Migration files (completed)
+*migration*.md
+*MIGRATION*.md
