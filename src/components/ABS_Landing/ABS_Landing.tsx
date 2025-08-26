@@ -822,7 +822,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           </section>
 
           {/* Room Customization Section */}
-          <section className="sm:shadow-none sm:p-0 bg-neutral-50/30 rounded-lg p-4">
+          <section className="sm:shadow-none sm:p-0 bg-neutral-50/30 rounded-lg lg:p-4">
             <CustomizationSection
             sections={sections}
             sectionOptions={sectionOptions}
@@ -900,7 +900,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           )}
 
           {/* Special Offers Section */}
-          <section className="sm:bg-transparent sm:shadow-none sm:p-0 bg-neutral-50/30 rounded-lg p-4">
+          <section className="sm:bg-transparent sm:shadow-none sm:p-0 bg-neutral-50/30 rounded-lg lg:p-4">
             <SpecialOffersSection
             specialOffers={specialOffers}
             selectedOffers={(() => {
@@ -953,7 +953,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           </section>
         </div>
 
-        <aside className="flex-shrink-0 md:max-w-md sticky top-24 self-start w-full">
+        <aside className="flex-shrink-0 md:max-w-md sticky top-24 self-start w-full ">
           {shouldShowMultiBooking ? (
             <MultiBookingPricingSummaryPanel
               roomBookings={roomBookings}
@@ -961,8 +961,8 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               currency="EUR"
               locale={language === 'en' ? 'en-US' : 'es-ES'}
               isLoading={false} // isPriceCalculating is removed from useBookingState
-              activeRooms={activeRoomId ? [activeRoomId] : []}
-              onActiveRoomsChange={(roomIds) => roomIds[0] && handleRoomTabClick(roomIds[0])}
+              // Removed activeRooms and onActiveRoomsChange to fix accordion click issue
+              // Accordion will now manage its own expansion state independently
               onRemoveItem={(roomId, itemId, itemName, itemType) =>
                 handleRemoveItem(itemId, itemName, itemType, roomId)
               }

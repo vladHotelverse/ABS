@@ -173,7 +173,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   return (
     <div
       className={clsx(
-        'relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
+        'cq-container relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
         isActive && showPriceSlider ? 'bg-gray-50 md:ring-2 ring-gray-200' : 'bg-white',
         {
           'border-2 border-green-300 bg-green-50/30': selectedRoom?.id === room.id,

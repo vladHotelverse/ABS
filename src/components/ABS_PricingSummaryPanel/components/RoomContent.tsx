@@ -2,7 +2,7 @@ import type React from 'react'
 import { memo } from 'react'
 import type { MultiBookingLabels, RoomBooking } from '../MultiBookingPricingSummaryPanel'
 import type { PricingItem } from '../types'
-import ItemSection from './ItemSection'
+import ItemsSection from './ItemsSection'
 // import PriceChangeIndicator from './PriceChangeIndicator'
 
 interface RoomContentProps {
@@ -53,69 +53,59 @@ const RoomContent: React.FC<RoomContentProps> = memo(
           ) : (
             <>
               {/* Choose Your Room Section */}
-              {chooseYourRoomItems.length > 0 && (
-                <ItemSection
-                  title="Room Selection"
-                  items={chooseYourRoomItems}
-                  emptyMessage="No room selected"
-                  removingItems={removingItems}
-                  labels={labels}
-                  roomId={room.id}
-                  onRemoveItem={onRemoveItem}
-                />
-              )}
+              <ItemsSection
+                title="Room Selection"
+                items={chooseYourRoomItems}
+                euroSuffix={labels.euroSuffix}
+                emptyMessage="No room selected"
+                removingItems={removingItems}
+                roomId={room.id}
+                onRemoveItemMulti={onRemoveItem}
+              />
 
               {/* Choose Your Superior Room Section */}
-              {chooseYourSuperiorRoomItems.length > 0 && (
-                <ItemSection
-                  title={chooseYourSuperiorRoomItems.some((item: any) => item.isUpgraded) ? "Room Upgrade" : "Superior Room Selection"}
-                  items={chooseYourSuperiorRoomItems}
-                  emptyMessage="No superior room selected"
-                  removingItems={removingItems}
-                  labels={labels}
-                  roomId={room.id}
-                  onRemoveItem={onRemoveItem}
-                />
-              )}
+              <ItemsSection
+                title={chooseYourSuperiorRoomItems.some((item: any) => item.isUpgraded) ? "Room Upgrade" : "Superior Room Selection"}
+                items={chooseYourSuperiorRoomItems}
+                euroSuffix={labels.euroSuffix}
+                emptyMessage="No superior room selected"
+                removingItems={removingItems}
+                roomId={room.id}
+                onRemoveItemMulti={onRemoveItem}
+              />
 
               {/* Customize Your Room Section */}
-              {customizeYourRoomItems.length > 0 && (
-                <ItemSection
-                  title="Room Customization"
-                  items={customizeYourRoomItems}
-                  emptyMessage="No customizations selected"
-                  removingItems={removingItems}
-                  labels={labels}
-                  roomId={room.id}
-                  onRemoveItem={onRemoveItem}
-                />
-              )}
+              <ItemsSection
+                title="Room Customization"
+                items={customizeYourRoomItems}
+                euroSuffix={labels.euroSuffix}
+                emptyMessage="No customizations selected"
+                removingItems={removingItems}
+                roomId={room.id}
+                onRemoveItemMulti={onRemoveItem}
+              />
 
               {/* Enhance Your Stay Section */}
-              {enhanceYourStayItems.length > 0 && (
-                <ItemSection
-                  title="Stay Enhancement"
-                  items={enhanceYourStayItems}
-                  emptyMessage="No enhancements selected"
-                  removingItems={removingItems}
-                  labels={labels}
-                  roomId={room.id}
-                  onRemoveItem={onRemoveItem}
-                />
-              )}
+              <ItemsSection
+                title="Stay Enhancement"
+                items={enhanceYourStayItems}
+                euroSuffix={labels.euroSuffix}
+                emptyMessage="No enhancements selected"
+                removingItems={removingItems}
+                roomId={room.id}
+                onRemoveItemMulti={onRemoveItem}
+              />
 
               {/* Bid for Upgrade Section */}
-              {bidForUpgradeItems.length > 0 && (
-                <ItemSection
-                  title="Bid for Upgrade"
-                  items={bidForUpgradeItems}
-                  emptyMessage="No bids submitted"
-                  removingItems={removingItems}
-                  labels={labels}
-                  roomId={room.id}
-                  onRemoveItem={onRemoveItem}
-                />
-              )}
+              <ItemsSection
+                title="Bid for Upgrade"
+                items={bidForUpgradeItems}
+                euroSuffix={labels.euroSuffix}
+                emptyMessage="No bids submitted"
+                removingItems={removingItems}
+                roomId={room.id}
+                onRemoveItemMulti={onRemoveItem}
+              />
 
               {/* Room Total - Only show when there are selections */}
               <div className="border-t pt-4">

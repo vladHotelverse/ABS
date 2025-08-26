@@ -37,14 +37,14 @@ export const TwoRoomLayout: React.FC<TwoRoomLayoutProps> = ({
       )}
 
       {/* Desktop: Side by side */}
-      <div className="hidden lg:grid lg:grid-cols-2 gap-6">
+      <div className="hidden xl:grid xl:grid-cols-2 gap-6">
         {roomCardPropsArray.map((roomCardProps) => (
           <RoomCard key={roomCardProps.room.id} {...roomCardProps} />
         ))}
       </div>
 
-      {/* Mobile: Carousel */}
-      <div className="lg:hidden">
+      {/* Mobile and Tablet: Carousel */}
+      <div className="xl:hidden">
         <div className="overflow-hidden px-6">
           <Carousel
             setApi={setRoomCarouselApi}

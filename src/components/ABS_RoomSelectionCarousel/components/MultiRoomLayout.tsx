@@ -64,7 +64,7 @@ export const MultiRoomLayout: React.FC<MultiRoomLayoutProps> = ({
               {roomCardPropsArray.map((roomCardProps) => (
                 <CarouselItem
                   key={roomCardProps.room.id}
-                  className="flex-shrink-0 lg:basis-[50%] lg:w-[50%] basis-full w-full flex justify-center"
+                  className="flex-shrink-0 xl:basis-[50%] xl:w-[50%] basis-full w-full flex justify-center"
                 >
                   <RoomCard {...roomCardProps} />
                 </CarouselItem>

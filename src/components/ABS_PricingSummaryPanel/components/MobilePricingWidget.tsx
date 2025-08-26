@@ -76,7 +76,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
       role="complementary"
       aria-label="Mobile pricing summary"
     >
-      <div className="flex items-center justify-between px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
+      <div className="flex items-center justify-between fluid-px-md fluid-py-sm pb-[calc(var(--space-sm)+env(safe-area-inset-bottom))]">
         <div className="flex flex-col text-left">
           <span className="text-sm sm:text-base text-neutral-500" id="pricing-label">
             {isMultiBooking && roomCount 

@@ -150,31 +150,29 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           </section>
         )}
 
-                {/* Bid Upgrades Section */}
-                {bidForUpgradeItems.length > 0 && (
-          <section aria-labelledby="bid-section-title">
+        {/* Bid Upgrades Section */}
+        {bidForUpgradeItems.length > 0 && (
+          <section aria-labelledby="bid-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
             <div className="flex justify-between items-center mb-2">
               <h3 id="bid-section-title" className="text-base font-semibold">
                 Bid for Upgrades
               </h3>
             </div>
-            <div className="space-y-2">
-              {bidForUpgradeItems.map((item) => (
-                <PricingItemComponent
-                  key={item.id}
-                  item={item}
-                  euroSuffix={labels.euroSuffix}
-                  removeLabel={`Remove ${item.name}`}
-                  onRemove={() => {
-                    try {
-                      handleRemoveItem(item)
-                    } catch (error) {
-                      console.error('Error in remove item callback:', error)
-                    }
-                  }}
-                />
-              ))}
-            </div>
+            {bidForUpgradeItems.map((item) => (
+              <PricingItemComponent
+                key={item.id}
+                item={item}
+                euroSuffix={labels.euroSuffix}
+                removeLabel={`Remove ${item.name}`}
+                onRemove={() => {
+                  try {
+                    handleRemoveItem(item)
+                  } catch (error) {
+                    console.error('Error in remove item callback:', error)
+                  }
+                }}
+              />
+            ))}
           </section>
         )}
 

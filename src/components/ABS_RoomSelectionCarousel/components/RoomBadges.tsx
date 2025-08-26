@@ -45,7 +45,7 @@ const RoomBadges: React.FC<RoomBadgesProps> = ({
 
       {/* Bid Submitted Badge */}
       {isBidActive && !isSelected && (
-        <div className="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
+        <div className="absolute bottom-3 left-2 z-10 bg-blue-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
           <Tag className="h-3 w-3" />
           <span>{bidSubmittedText}</span>
         </div>
@@ -53,7 +53,7 @@ const RoomBadges: React.FC<RoomBadgesProps> = ({
 
       {/* Selected Badge */}
       {isSelected && (
-        <div className="absolute bottom-2 left-2 z-10 bg-green-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
+        <div className="absolute bottom-3 left-2 z-10 bg-green-600 text-white text-xs flex items-center gap-1 py-1 px-2 rounded">
           <Star className="h-3 w-3" />
           <span>{selectedText}</span>
         </div>

@@ -89,6 +89,8 @@ export interface MultiBookingPricingSummaryPanelProps {
   onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
   onEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   onConfirmAll: () => Promise<void>
+  hideFooter?: boolean
+  maxHeight?: string | false
 }
 
 const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelProps> = ({
@@ -102,13 +104,15 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   onActiveRoomsChange,
   onRemoveItem,
   onConfirmAll,
+  hideFooter = false,
+  maxHeight = 'max-h-[600px]',
 }) => {
   // Custom hooks
   const { toasts, showToast, removeToast } = useToasts(3000)
   const { handleAccordionToggle, isRoomActive } = useAccordionState(
     roomBookings.map(room => room.id), // Pass all room IDs
-    activeRooms,
-    onActiveRoomsChange,
+    activeRooms, // Can be undefined - accordion will manage its own state
+    onActiveRoomsChange, // Can be undefined - accordion will manage its own state
     true // Enable multiple open accordions
   )
   const { overallTotal } = useRoomCalculations(roomBookings)
@@ -139,7 +143,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
         </div>
 
         {/* Accordion Sections */}
-        <div className="max-h-[600px] overflow-y-auto">
+        <div className={cn('overflow-y-auto', maxHeight && maxHeight)}>
           {roomBookings.map((room) => (
             <RoomAccordionItem
               key={room.id}
@@ -155,26 +159,28 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
         </div>
 
         {/* Consolidated Summary Footer */}
-        <div className="border-t bg-gray-50 p-4">
-          <PriceBreakdown
-            subtotal={overallTotal}
-            isLoading={confirmingAll || isLoading}
-            labels={{
-              subtotalLabel: labels.subtotalLabel,
-              totalLabel: labels.totalLabel,
-              payAtHotelLabel: labels.payAtHotelLabel,
-              viewTermsLabel: labels.viewTermsLabel,
-              confirmButtonLabel: confirmingAll
-                ? labels.confirmingAllLabel
-                : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
-              loadingLabel: labels.confirmingAllLabel,
-              euroSuffix: labels.euroSuffix,
-            }}
-            currency={currency}
-            locale={locale}
-            onConfirm={handleConfirmAll}
-          />
-        </div>
+        {!hideFooter && (
+          <div className="border-t bg-gray-50 p-4">
+            <PriceBreakdown
+              subtotal={overallTotal}
+              isLoading={confirmingAll || isLoading}
+              labels={{
+                subtotalLabel: labels.subtotalLabel,
+                totalLabel: labels.totalLabel,
+                payAtHotelLabel: labels.payAtHotelLabel,
+                viewTermsLabel: labels.viewTermsLabel,
+                confirmButtonLabel: confirmingAll
+                  ? labels.confirmingAllLabel
+                  : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
+                loadingLabel: labels.confirmingAllLabel,
+                euroSuffix: labels.euroSuffix,
+              }}
+              currency={currency}
+              locale={locale}
+              onConfirm={handleConfirmAll}
+            />
+          </div>
+        )}
       </div>
 
       {/* Toast Notifications */}

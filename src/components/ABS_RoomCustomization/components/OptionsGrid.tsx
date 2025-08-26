@@ -61,7 +61,7 @@ const OptionsGrid: React.FC<OptionsGridProps> = ({
   const isSpecialOfferSection = options.length > 0 && isSpecialOfferOption(options[0])
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-300 -webkit-overflow-scrolling-touch pt-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3 transition-all duration-300 -webkit-overflow-scrolling-touch pt-4">
       {options.map((option) => {
         if (!option || !option.id) {
           return null

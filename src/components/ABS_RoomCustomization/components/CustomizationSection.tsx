@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type {
   CustomizationOption,
   RoomCustomizationTexts,
@@ -50,6 +50,27 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
 }) => {
   const [showInfo, setShowInfo] = useState(false)
   const [showAllOptions, setShowAllOptions] = useState(false)
+  const [initialItemsCount, setInitialItemsCount] = useState(3)
+  
+  // Responsive logic for initial items count
+  useEffect(() => {
+    const updateItemsCount = () => {
+      const width = window.innerWidth
+      // Show 2 items on screens between 1024px and 1535px (lg to before 2xl)
+      // Show 3 items on very large screens (2xl+)
+      if (width >= 1536) {
+        setInitialItemsCount(3) // 2xl and above
+      } else if (width >= 640) {
+        setInitialItemsCount(2) // sm to xl (including 1024px)
+      } else {
+        setInitialItemsCount(1) // mobile
+      }
+    }
+
+    updateItemsCount()
+    window.addEventListener('resize', updateItemsCount)
+    return () => window.removeEventListener('resize', updateItemsCount)
+  }, [])
   
   // Filter options based on mode with defensive checks
   const filteredOptions = mode === 'consultation' 
@@ -57,9 +78,8 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
       ? (options || []).filter(option => option && option.id === selectedOptions[config.key]?.id)
       : []
     : (options || [])
-  const INITIAL_ITEMS_COUNT = 3
-  const shouldShowMoreButton = mode !== 'consultation' && filteredOptions.length > INITIAL_ITEMS_COUNT
-  const displayOptions = (mode === 'consultation' || showAllOptions) ? filteredOptions : filteredOptions.slice(0, INITIAL_ITEMS_COUNT)
+  const shouldShowMoreButton = mode !== 'consultation' && filteredOptions.length > initialItemsCount
+  const displayOptions = (mode === 'consultation' || showAllOptions) ? filteredOptions : filteredOptions.slice(0, initialItemsCount)
 
   const handleInfoToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -108,7 +128,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
             <ShowMoreButton
               showAllOptions={showAllOptions}
               totalOptionsCount={filteredOptions.length}
-              initialItemsCount={INITIAL_ITEMS_COUNT}
+              initialItemsCount={initialItemsCount}
               onToggle={handleShowMoreToggle}
               texts={texts}
             />

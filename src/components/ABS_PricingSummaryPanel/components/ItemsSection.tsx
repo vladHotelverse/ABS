@@ -1,4 +1,5 @@
 import type React from 'react'
+import { memo } from 'react'
 import PricingItemComponent from './PricingItemComponent'
 import type { PricingItem } from '../types'
 
@@ -6,15 +7,26 @@ export interface ItemsSectionProps {
   title: string
   items: PricingItem[]
   euroSuffix: string
-  onRemoveItem: (item: PricingItem) => void
+  emptyMessage?: string
+  removingItems?: Set<string>
+  // Support both single booking and multi-booking remove handlers
+  onRemoveItem?: (item: PricingItem) => void
+  onRemoveItemMulti?: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
+  roomId?: string
 }
 
-const ItemsSection: React.FC<ItemsSectionProps> = ({
+const ItemsSection: React.FC<ItemsSectionProps> = memo(({
   title,
   items,
   euroSuffix,
+  emptyMessage,
+  removingItems,
   onRemoveItem,
+  onRemoveItemMulti,
+  roomId,
 }) => {
+  // Always return null if no items - don't render empty sections
+  // This matches the original single booking behavior
   if (items.length === 0) return null
 
   return (
@@ -24,25 +36,31 @@ const ItemsSection: React.FC<ItemsSectionProps> = ({
           {title}
         </h3>
       </div>
-      <div className="space-y-2">
-        {items.map((item) => (
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className={removingItems?.has(String(item.id)) ? 'opacity-50 scale-95 transition-all duration-300' : ''}
+        >
           <PricingItemComponent
-            key={item.id}
             item={item}
             euroSuffix={euroSuffix}
             removeLabel={`Remove ${item.name}`}
             onRemove={() => {
               try {
-                onRemoveItem(item)
+                if (onRemoveItemMulti && roomId) {
+                  onRemoveItemMulti(roomId, item.id, item.name, item.type)
+                } else if (onRemoveItem) {
+                  onRemoveItem(item)
+                }
               } catch (error) {
                 console.error('Error in remove item callback:', error)
               }
             }}
           />
-        ))}
-      </div>
+        </div>
+      ))}
     </section>
   )
-}
+})
 
 export default ItemsSection
