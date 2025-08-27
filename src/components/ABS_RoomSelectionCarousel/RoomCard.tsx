@@ -173,16 +173,15 @@ const RoomCard: React.FC<RoomCardProps> = ({
   return (
     <div
       className={clsx(
-        'cq-container relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
-        isActive && showPriceSlider ? 'bg-muted md:ring-2 ring-border' : 'bg-card',
+        'cq-container bg-card relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300 ml-0.5',
         {
-          'border-2 border-primary bg-primary/10': selectedRoom?.id === room.id || (isBidActive && selectedRoom?.id !== room.id),
-          'border border-transparent': selectedRoom?.id !== room.id && !isBidActive,
+          'ring-2 ring-green-300': selectedRoom?.id === room.id,
+          'ring-2 ring-blue-300': isBidActive && selectedRoom?.id !== room.id,
         }
       )}
     >
       {/* Room Image Display with Click-to-Modal */}
-      <div className="relative h-64 bg-muted group cursor-zoom-in" onClick={handleImageClick}>
+      <div className="relative h-64 bg-muted group cursor-zoom-in rounded-t-lg" onClick={handleImageClick}>
         {/* Current image */}
         <img
           src={room.images[currentImageIndex]}
@@ -261,22 +260,25 @@ const RoomCard: React.FC<RoomCardProps> = ({
         )}
       >
         <div className={clsx(
-          "border-t border-border p-4 bg-muted rounded-b-lg",
+          "border-t border-border p-4 rounded-b-lg",
           sliderVisible ? 'opacity-100' : 'opacity-0'
         )}>
           <PriceSlider
             proposedPrice={proposedPrice}
             minPrice={minPrice}
             maxPrice={maxPrice}
-            nightText={nightText}
-            proposePriceText={proposePriceText}
-            availabilityText={availabilityText}
-            currencyText={currencyText}
+            translations={{
+              nightText,
+              makeOfferText: translations.selectText,
+              availabilityText: availabilityText || 'Subject to availability',
+              proposePriceText: proposePriceText || 'Propose your price:',
+              currencyText: currencyText || 'EUR',
+              bidSubmittedText: bidSubmittedText || 'Bid submitted',
+              updateBidText: updateBidText || 'Update bid',
+              cancelBidText: cancelBidText || 'Cancel',
+            }}
             bidStatus={bidStatus}
             submittedPrice={submittedPrice}
-            bidSubmittedText={bidSubmittedText}
-            updateBidText={updateBidText}
-            cancelBidText={cancelBidText}
             roomName={room.roomType}
             onPriceChange={setProposedPrice}
             onMakeOffer={makeOffer}

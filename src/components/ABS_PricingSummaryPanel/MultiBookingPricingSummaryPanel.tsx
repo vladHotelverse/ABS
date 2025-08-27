@@ -113,7 +113,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
     onActiveRoomsChange, // Can be undefined - accordion will manage its own state
     true // Enable multiple open accordions
   )
-  const { overallTotal } = useRoomCalculations(roomBookings)
+  const { overallTotal, totalItemsCount } = useRoomCalculations(roomBookings)
   const { format: formatCurrency } = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({
     roomBookings,
@@ -191,12 +191,13 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
                 viewTermsLabel: labels.viewTermsLabel,
                 confirmButtonLabel: confirmingAll
                   ? labels.confirmingAllLabel
-                  : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
+                  : `Confirm Selection`,
                 loadingLabel: labels.confirmingAllLabel,
                 euroSuffix: labels.euroSuffix,
               }}
               currency={currency}
               locale={locale}
+              disabled={totalItemsCount === 0}
               onConfirm={handleConfirmAll}
             />
           </div>
