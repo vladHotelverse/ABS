@@ -28,9 +28,9 @@ const RoomSection: React.FC<RoomSectionProps> = memo(({
     : 'Room Selection'
 
   return (
-    <section aria-labelledby="room-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
+    <section aria-labelledby="room-section-title" className="bg-muted/50 rounded-lg p-3 mb-4">
       <div className="flex justify-between items-center mb-2">
-        <h3 id="room-section-title" className="text-base font-semibold">
+        <h3 id="room-section-title" className="text-base font-semibold text-foreground">
           {sectionTitle}
         </h3>
       </div>

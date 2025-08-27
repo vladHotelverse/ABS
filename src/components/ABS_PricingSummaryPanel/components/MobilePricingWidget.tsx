@@ -66,7 +66,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
   return (
     <div
       className={clsx(
-        'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-100 shadow-lg',
+        'fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg',
         'lg:hidden', // Only show on mobile/tablet
         'transition-transform duration-300 ease-in-out',
         'safe-area-inset-bottom', // Handle device safe areas
@@ -78,7 +78,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
     >
       <div className="flex items-center justify-between fluid-px-md fluid-py-sm pb-[calc(var(--space-sm)+env(safe-area-inset-bottom))]">
         <div className="flex flex-col text-left">
-          <span className="text-sm sm:text-base text-neutral-500" id="pricing-label">
+          <span className="text-sm sm:text-base text-muted-foreground" id="pricing-label">
             {isMultiBooking && roomCount 
               ? `${roomCount} ${roomsLabel} • ${totalUpgradesLabel}`
               : totalUpgradesLabel
@@ -86,12 +86,12 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
           </span>
           {isLoading ? (
             <div className="animate-pulse" aria-label="Loading price">
-              <div className="h-4 w-24 bg-neutral-200 rounded mb-1" />
-              <div className="h-6 w-20 bg-neutral-100 rounded" />
+              <div className="h-4 w-24 bg-muted rounded mb-1" />
+              <div className="h-6 w-20 bg-muted/50 rounded" />
             </div>
           ) : (
             <span 
-              className="text-lg sm:text-xl font-bold text-blue-600 whitespace-nowrap"
+              className="text-lg sm:text-xl font-bold text-primary whitespace-nowrap"
               aria-labelledby="pricing-label"
             >
               {formattedTotal}
@@ -103,7 +103,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
           {itemCount > 0 && (
             <span 
               className={clsx(
-                "inline-flex items-center rounded-xl bg-green-100 px-3 py-1 text-sm sm:text-base font-medium text-green-700",
+                "inline-flex items-center rounded-xl bg-green-500/10 px-3 py-1 text-sm sm:text-base font-medium text-green-600 dark:text-green-400",
                 "transition-all duration-200 ease-in-out"
               )}
               id="item-count"
@@ -117,7 +117,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
             variant="outline"
             disabled={isDisabled}
             className={clsx(
-              "h-10 px-4 py-2 border border-neutral-200 bg-white hover:bg-neutral-50",
+              "h-10 px-4 py-2 border border-border bg-card hover:bg-muted/50",
               "transition-all duration-200 ease-in-out",
               "hover:scale-[1.02] active:scale-[0.98]",
               isDisabled && "opacity-50 cursor-not-allowed"

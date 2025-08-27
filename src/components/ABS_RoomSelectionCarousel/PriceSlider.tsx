@@ -86,20 +86,20 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
       {bidStatus === 'submitted' && submittedPrice ? (
         // Submitted bid view
         <div className="space-y-3">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
             <div className="flex items-start justify-between mb-2">
-              <span className="text-sm font-medium text-blue-800">{bidSubmittedText}</span>
+              <span className="text-sm font-medium text-primary">{bidSubmittedText}</span>
               <div className="text-right">
-                <div className="text-xl font-bold text-blue-900">{`${submittedPrice} ${currencyText} ${nightText}`}</div>
+                <div className="text-xl font-bold text-foreground">{`${submittedPrice} ${currencyText} ${nightText}`}</div>
                 {/* <div className="text-xs text-blue-600 mt-1">Total: {(submittedPrice || 0) * 5} {currencyText}</div> */}
               </div>
             </div>
-            <p className="text-xs text-blue-600">{availabilityText}</p>
+            <p className="text-xs text-muted-foreground">{availabilityText}</p>
           </div>
           
           <div className="flex gap-2">
             <button
-              className="flex-1 py-2 bg-black hover:bg-neutral-900 text-white rounded-md transition duration-200"
+              className="flex-1 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition duration-200"
               onClick={() => {
                 // Reset to allow updating the bid
                 onCancelBid?.()
@@ -108,7 +108,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               {updateBidText}
             </button>
             <button
-              className="py-2 px-4 border border-neutral-300 hover:bg-neutral-50 rounded-md transition duration-200"
+              className="py-2 px-4 border border-border hover:bg-muted text-foreground rounded-md transition duration-200"
               onClick={() => {
                 onCancelBid?.()
               }}
@@ -123,7 +123,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
           <div className="text-sm font-medium mb-2 flex justify-between items-start">
             <span>{dynamicProposeText}</span>
             <div className="text-right">
-              <div className="text-lg md:text-xl font-bold text-black">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
+              <div className="text-lg md:text-xl font-bold text-foreground">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
               {/* <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div> */}
             </div>
           </div>
@@ -147,18 +147,18 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               className="w-full transition-all"
               data-carousel-drag-disabled
             />
-            <div className="w-full flex justify-between text-xs text-neutral-500 mt-2">
+            <div className="w-full flex justify-between text-xs text-muted-foreground mt-2">
               <span>{`${minPrice} ${currencyText}/${nightText}`}</span>
               <span>{`${maxPrice} ${currencyText}/${nightText}`}</span>
             </div>
           </div>
           <button
-            className="w-full mt-3 py-2 bg-black hover:bg-neutral-900 text-white rounded-md transition duration-200"
+            className="w-full mt-3 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition duration-200"
             onClick={onMakeOffer}
           >
             {makeOfferText}
           </button>
-          <p className="text-xs text-neutral-500 mt-1 text-center">{availabilityText}</p>
+          <p className="text-xs text-muted-foreground mt-1 text-center">{availabilityText}</p>
         </>
       )}
     </div>

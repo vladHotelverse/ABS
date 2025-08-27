@@ -26,9 +26,9 @@ const MultiBookingInfo: React.FC<MultiBookingInfoProps> = ({
   return (
     <>
       {/* Header */}
-      <div className="bg-gray-50 p-4">
-        <h4 className="font-medium text-md">{title}</h4>
-        <p className="text-sm text-gray-600 mt-1">
+      <div className="bg-muted p-4">
+        <h4 className="font-medium text-md text-card-foreground">{title}</h4>
+        <p className="text-sm text-muted-foreground mt-1">
           {getRoomCountLabel(roomBookings.length, labels)} • {labels?.clickToExpandLabel || 'Haz clic para expandir'}
         </p>
       </div>
@@ -40,13 +40,13 @@ const MultiBookingInfo: React.FC<MultiBookingInfoProps> = ({
             const filteredItems = filterDuplicateRoomTypes(room)
 
             return (
-              <div key={room.id} className="border-b first:border-t border-gray-200 last:border-b-0">
+              <div key={room.id} className="border-b first:border-t border-border last:border-b-0">
                 {/* Room Header with better spacing */}
                 <div
                   data-testid={`room-header-${room.id}`}
                   data-selected={activeRoom === room.id}
                   className={clsx('w-full px-6 py-4 transition-colors flex justify-between gap-4', {
-                    'bg-blue-50': activeRoom === room.id,
+                    'bg-primary/10': activeRoom === room.id,
                   })}
                 >
                   <div className="flex items-start gap-4">
@@ -77,7 +77,7 @@ const MultiBookingInfo: React.FC<MultiBookingInfoProps> = ({
             const isSelected = activeRoom === room.id // Room selection state for editing
 
             return (
-              <div key={room.id} className="border-b border-gray-200 last:border-b-0">
+              <div key={room.id} className="border-b border-border last:border-b-0">
                 {/* Accordion Header */}
                 <button
                   type="button"
@@ -87,9 +87,9 @@ const MultiBookingInfo: React.FC<MultiBookingInfoProps> = ({
                   id={`room-header-mobile-${room.id}`}
                   data-selected={isSelected}
                   className={clsx(
-                    'w-full p-3 text-left hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors min-w-0',
+                    'w-full p-3 text-left hover:bg-muted/50 focus:outline-none focus:bg-muted/50 transition-colors min-w-0',
                     {
-                      'bg-blue-50': isSelected,
+                      'bg-primary/10': isSelected,
                     }
                   )}
                 >
@@ -106,7 +106,7 @@ const MultiBookingInfo: React.FC<MultiBookingInfoProps> = ({
                   <section
                     id={`room-content-mobile-${room.id}`}
                     aria-labelledby={`room-header-mobile-${room.id}`}
-                    className="px-3 pb-3 bg-gray-50 border-t overflow-hidden"
+                    className="px-3 pb-3 bg-muted/50 border-t border-border overflow-hidden"
                   >
                     <RoomItemsGrid items={room.items || []} roomId={room.id} isMobile={true} />
                   </section>

@@ -28,9 +28,9 @@ const ItemsSection: React.FC<ItemsSectionProps> = memo(({
   if (items.length === 0) return null
 
   return (
-    <section aria-labelledby={`${title.toLowerCase().replace(/\s+/g, '-')}-section-title`} className="bg-gray-50 rounded-lg p-3 mb-4">
+    <section aria-labelledby={`${title.toLowerCase().replace(/\s+/g, '-')}-section-title`} className="bg-muted/50 rounded-lg p-3 mb-4">
       <div className="flex justify-between items-center mb-2">
-        <h3 id={`${title.toLowerCase().replace(/\s+/g, '-')}-section-title`} className="text-base font-semibold">
+        <h3 id={`${title.toLowerCase().replace(/\s+/g, '-')}-section-title`} className="text-base font-semibold text-foreground">
           {title}
         </h3>
       </div>

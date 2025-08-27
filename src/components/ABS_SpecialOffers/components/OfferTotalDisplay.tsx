@@ -73,11 +73,11 @@ const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
   
   return (
     <div
-      className={`rounded-lg p-4 border ${isBooked ? 'bg-green-50 border-green-200' : 'bg-neutral-50/50 border-neutral-200'}`}
+      className={`rounded-lg p-4 border ${isBooked ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800' : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-border'}`}
     >
       {/* Display person count info above the total for perPerson offers */}
       {offerType === 'perPerson' && reservationPersonCount && (
-        <div className="text-sm text-neutral-600 mb-2">
+        <div className="text-sm text-muted-foreground mb-2">
           {isAllInclusive ? 
             `Entire stay for ${reservationPersonCount} ${reservationPersonCount === 1 ? labels.personSingular : labels.personPlural}` :
             `For ${reservationPersonCount} ${reservationPersonCount === 1 ? labels.personSingular : labels.personPlural}`
@@ -86,11 +86,11 @@ const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
       )}
       
       <div className="flex justify-between items-center">
-        <span className="font-medium text-base">{totalLabel}:</span>
+        <span className="font-medium text-base text-card-foreground">{totalLabel}:</span>
         <div className="flex flex-col items-end">
-          <span className="text-xl font-bold">{totalPrice}</span>
+          <span className="text-xl font-bold text-card-foreground">{totalPrice}</span>
           {showBreakdown && (
-            <span className="text-xs text-neutral-500 mt-1">
+            <span className="text-xs text-muted-foreground mt-1">
               {basePrice}
               {quantity > 1 && `, ${quantity} ${getQuantityUnit(quantity, offerType, offerTitle)}`}
               {offerType === 'perPerson' && (persons || 1) > 1 &&

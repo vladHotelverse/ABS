@@ -24,7 +24,7 @@ const RoomContent: React.FC<RoomContentProps> = memo(
     const total = room.items.reduce((sum, item) => sum + item.price, 0)
 
     return (
-      <div className="border-t border-gray-100 bg-white">
+      <div className="border-t border-border bg-card">
         {/* Room image */}
         {/* <div className="w-full h-40 overflow-hidden relative">
           <img
@@ -46,7 +46,7 @@ const RoomContent: React.FC<RoomContentProps> = memo(
         <div className="p-4 space-y-4">
           {total === 0 ? (
             /* Empty State */
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               <p className="text-sm">No selections made for this room yet.</p>
               <p className="text-xs mt-1">Add upgrades or customizations to see them here.</p>
             </div>
@@ -105,8 +105,8 @@ const RoomContent: React.FC<RoomContentProps> = memo(
               {/* Room Total - Only show when there are selections */}
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-base font-bold text-gray-900">{labels.roomTotalLabel}</span>
-                  <span className="text-base font-bold text-gray-900">{formatCurrency(total)}</span>
+                  <span className="text-base font-bold text-card-foreground">{labels.roomTotalLabel}</span>
+                  <span className="text-base font-bold text-card-foreground">{formatCurrency(total)}</span>
                 </div>
               </div>
             </>

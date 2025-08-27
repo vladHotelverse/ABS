@@ -13,7 +13,7 @@ const PricingSummaryHeader: React.FC<PricingSummaryHeaderProps> = memo(({
   className = ''
 }) => {
   return (
-    <div className={`w-full md:h-40 bg-neutral-200 overflow-hidden ${className}`}>
+    <div className={`w-full md:h-40 bg-muted overflow-hidden ${className}`}>
       <img 
         src={roomImage} 
         alt={roomImageAltText} 

@@ -174,16 +174,16 @@ const RoomCard: React.FC<RoomCardProps> = ({
     <div
       className={clsx(
         'cq-container relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
-        isActive && showPriceSlider ? 'bg-gray-50 md:ring-2 ring-gray-200' : 'bg-white',
+        isActive && showPriceSlider ? 'bg-muted md:ring-2 ring-border' : 'bg-card',
         {
-          'border-2 border-green-300 bg-green-50/30': selectedRoom?.id === room.id,
-          'border-2 border-blue-300 bg-blue-50/30': isBidActive && selectedRoom?.id !== room.id,
+          'border-2 border-green-500 bg-green-500/10 dark:border-green-400 dark:bg-green-400/10': selectedRoom?.id === room.id,
+          'border-2 border-blue-500 bg-blue-500/10 dark:border-blue-400 dark:bg-blue-400/10': isBidActive && selectedRoom?.id !== room.id,
           'border border-transparent': selectedRoom?.id !== room.id && !isBidActive,
         }
       )}
     >
       {/* Room Image Display with Click-to-Modal */}
-      <div className="relative h-64 bg-neutral-100 group cursor-zoom-in" onClick={handleImageClick}>
+      <div className="relative h-64 bg-muted group cursor-zoom-in" onClick={handleImageClick}>
         {/* Current image */}
         <img
           src={room.images[currentImageIndex]}
@@ -207,7 +207,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
             <span
               key={`${room.id}-${amenity}`}
-              className="text-xs bg-white/90 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-md text-gray-800 shadow-sm"
+              className="text-xs bg-background/90 backdrop-blur-sm border border-border px-2 py-1 rounded-md text-foreground shadow-sm"
             >
               {amenity}
             </span>
@@ -250,7 +250,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
       {/* Additional Info */}
       <div className="px-4 pb-4">
-        <p className="text-xs text-neutral-500 mt-2">{priceInfoText}</p>
+        <p className="text-xs text-muted-foreground mt-2">{priceInfoText}</p>
       </div>
 
       {/* Price Slider - integrated within the card */}
@@ -262,7 +262,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         )}
       >
         <div className={clsx(
-          "border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg",
+          "border-t border-border p-4 bg-muted rounded-b-lg",
           sliderVisible ? 'opacity-100' : 'opacity-0'
         )}>
           <PriceSlider

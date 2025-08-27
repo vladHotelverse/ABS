@@ -27,15 +27,15 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       onClick={mode !== 'consultation' ? onToggle : undefined}
     >
       <div className="flex items-center">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-medium sm:font-semibold">{config.title}</h2>
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-medium sm:font-semibold text-foreground">{config.title}</h2>
         {config.infoText && mode !== 'consultation' && (
-          <button onClick={onInfoToggle} className="ml-2 text-neutral-500 hover:text-neutral-700">
+          <button onClick={onInfoToggle} className="ml-2 text-muted-foreground hover:text-foreground">
             <Icon icon="solar:info-circle-bold" className="h-5 w-5" data-testid="info-icon" />
           </button>
         )}
       </div>
       {mode !== 'consultation' && (
-        <button className="text-neutral-400">
+        <button className="text-muted-foreground">
           {isOpen ? (
             <Icon icon="solar:alt-arrow-up-bold" className="h-6 w-6" data-testid="minus-icon" />
           ) : (

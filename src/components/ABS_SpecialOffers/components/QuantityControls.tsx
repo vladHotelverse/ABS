@@ -19,7 +19,7 @@ const QuantityControls: React.FC<QuantityControlsProps> = ({
   disabled = false,
   labels,
 }) => (
-  <div className="flex items-center bg-white border rounded-lg shadow-sm max-h-11">
+  <div className="flex items-center bg-background border border-border rounded-lg shadow-sm max-h-11">
     <UiButton
       variant="ghost"
       size="icon"
@@ -30,7 +30,7 @@ const QuantityControls: React.FC<QuantityControlsProps> = ({
     >
       <Minus className="h-4 w-4" />
     </UiButton>
-    <span className="w-10 text-center font-medium text-lg">{quantity}</span>
+    <span className="w-10 text-center font-medium text-lg text-foreground">{quantity}</span>
     <UiButton
       variant="ghost"
       size="icon"

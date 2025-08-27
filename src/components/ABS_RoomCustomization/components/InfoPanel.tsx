@@ -16,13 +16,13 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
   return (
     <div className="transition-all duration-300 ease-in-out col-span-full pt-4">
-      <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-700 flex justify-between items-start">
+      <div className="rounded-lg bg-accent p-3 text-sm text-accent-foreground flex justify-between items-start">
         {infoText}
         <button
           onClick={onClose}
-          className="ml-4 p-1 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ml-4 p-1 rounded-full hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
         >
-          <Icon icon="solar:close-circle-bold" className="h-4 w-4 text-blue-700" />
+          <Icon icon="solar:close-circle-bold" className="h-4 w-4 text-accent-foreground" />
         </button>
       </div>
     </div>

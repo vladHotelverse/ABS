@@ -39,7 +39,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
   const cardContent = (
     <div className={clsx(
-      'flex-none sm:w-auto h-full bg-white border border-neutral-200 rounded-lg overflow-hidden snap-center transition-all duration-200 shadow-sm relative',
+      'flex-none sm:w-auto h-full bg-card border border-border rounded-lg overflow-hidden snap-center transition-all duration-200 shadow-sm relative',
       {
         'opacity-50 cursor-not-allowed': isDisabled,
         'hover:shadow-md': !isDisabled,
@@ -58,7 +58,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
             <div className={clsx(
               "flex items-center justify-center w-10 h-10",
               {
-                'text-neutral-400': isDisabled,
+                'text-muted-foreground': isDisabled,
               }
             )}>
               <IconRenderer iconName={option.icon} fallbackImageUrl={fallbackImageUrl} label={option.label} />
@@ -77,8 +77,8 @@ export const OptionCard: React.FC<OptionCardProps> = ({
           <p className={clsx(
             "text-sm sm:text-base mb-1",
             {
-              'text-neutral-300': isDisabled,
-              'text-neutral-500': !isDisabled,
+              'text-muted-foreground opacity-70': isDisabled,
+              'text-muted-foreground': !isDisabled,
             }
           )}>
             {option.description}
@@ -87,7 +87,8 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         <p className={clsx(
           "text-base sm:text-lg font-bold mb-4",
           {
-            'text-neutral-400': isDisabled,
+            'text-muted-foreground': isDisabled,
+            'text-foreground': !isDisabled,
           }
         )}>
           {option.price.toFixed(2)} {texts.pricePerNightText}
@@ -102,7 +103,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
               className={clsx(
                 "w-full transition-all border min-h-[44px] touch-manipulation",
                 {
-                  "hover:bg-black hover:text-white": !isSelected,
+                  "hover:bg-primary hover:text-primary-foreground": !isSelected,
                 }
               )}
               disabled={isDisabled || readonly}

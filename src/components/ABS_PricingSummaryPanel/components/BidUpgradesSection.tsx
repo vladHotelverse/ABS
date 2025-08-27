@@ -18,9 +18,9 @@ const BidUpgradesSection: React.FC<BidUpgradesSectionProps> = memo(({
   if (bidForUpgradeItems.length === 0) return null
 
   return (
-    <section aria-labelledby="bid-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
+    <section aria-labelledby="bid-section-title" className="bg-muted/50 rounded-lg p-3 mb-4">
       <div className="flex justify-between items-center mb-2">
-        <h3 id="bid-section-title" className="text-base font-semibold">
+        <h3 id="bid-section-title" className="text-base font-semibold text-foreground">
           Bid for Upgrades
         </h3>
       </div>

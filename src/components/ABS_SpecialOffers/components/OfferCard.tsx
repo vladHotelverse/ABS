@@ -56,7 +56,7 @@ const OfferCard: React.FC<OfferCardProps> = ({
     <Card
       data-testid="offer-card"
       className={`overflow-hidden border transition-all h-full flex flex-col shadow-sm ${
-        isBooked ? 'border-green-300 bg-green-50/30' : 'border-neutral-200 hover:border-neutral-300 hover:shadow-md'
+        isBooked ? 'border-green-300 bg-green-50/30 dark:border-green-600 dark:bg-green-950/20' : 'border-border hover:border-border/70 hover:shadow-md bg-card'
       }`}
     >
       <div className="h-32 sm:h-40 overflow-hidden relative">

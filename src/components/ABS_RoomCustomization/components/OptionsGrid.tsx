@@ -50,11 +50,11 @@ const OptionsGrid: React.FC<OptionsGridProps> = ({
 }) => {
   // Add defensive checks
   if (!options || !Array.isArray(options)) {
-    return <div className="text-center text-gray-500 py-4">No options available</div>
+    return <div className="text-center text-muted-foreground py-4">No options available</div>
   }
 
   if (!config) {
-    return <div className="text-center text-gray-500 py-4">Section configuration missing</div>
+    return <div className="text-center text-muted-foreground py-4">Section configuration missing</div>
   }
 
   const isExactViewSection = options.length > 0 && isExactViewOption(options[0])

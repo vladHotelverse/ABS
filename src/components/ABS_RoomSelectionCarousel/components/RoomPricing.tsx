@@ -35,9 +35,9 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-2xl md:text-3xl font-bold">{`${currencySymbol}${price}`}</span>
           {oldPrice && (
-            <span className="text-neutral-500 line-through text-sm">{`${currencySymbol}${oldPrice}`}</span>
+            <span className="text-muted-foreground line-through text-sm">{`${currencySymbol}${oldPrice}`}</span>
           )}
-          <span className="text-base text-neutral-500">{nightText}</span>
+          <span className="text-base text-muted-foreground">{nightText}</span>
           {/* Segment Badge */}
           {segmentDiscount && (
             <SegmentBadge segmentDiscount={segmentDiscount} />
@@ -53,7 +53,7 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
           <span>{isSelected ? removeText : selectText}</span>
         </UiButton>
         {/* Instant Confirmation - positioned below the button */}
-        <span className="text-xs text-green-600 font-medium mt-2">{instantConfirmationText}</span>
+        <span className="text-xs text-green-600 dark:text-green-400 font-medium mt-2">{instantConfirmationText}</span>
       </div>
     </div>
   )

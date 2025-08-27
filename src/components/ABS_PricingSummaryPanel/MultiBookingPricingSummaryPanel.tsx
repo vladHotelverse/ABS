@@ -152,11 +152,11 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
 
   return (
     <div className={cn('sticky md:top-28 w-full', className)}>
-      <div className="min-w-[350px] w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="min-w-[350px] w-full bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
-        <div className="p-4 border-b bg-gray-50">
-          <h2 className="text-lg font-semibold text-gray-900">{labels.multiRoomBookingsTitle}</h2>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="p-4 border-b border-border bg-muted">
+          <h2 className="text-lg font-semibold text-card-foreground">{labels.multiRoomBookingsTitle}</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             {roomBookings.length} {roomBookings.length === 1 ? 'room' : labels.roomsCountLabel} •{' '}
             {labels.clickToExpandLabel}
           </p>
@@ -180,7 +180,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
 
         {/* Consolidated Summary Footer */}
         {!hideFooter && (
-          <div className="border-t bg-gray-50 p-4">
+          <div className="border-t border-border bg-muted p-4">
             <PriceBreakdown
               subtotal={overallTotal}
               isLoading={confirmingAll || isLoading}

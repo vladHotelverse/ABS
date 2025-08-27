@@ -53,12 +53,12 @@ export const ABS_RoomSelection: React.FC<RoomSelectionProps> = ({
 
   return (
     <section className={`w-full ${className}`}>
-      <div className="container mx-auto px-4 py-8 max-h-[700px] relative bg-white md:p-6 rounded-lg md:shadow md:border md:border-neutral-300 ">
+      <div className="container mx-auto px-4 py-8 max-h-[700px] relative bg-card md:p-6 rounded-lg md:shadow md:border md:border-border ">
         <div className='absolute -top-6 md:top-3 left-6'>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-card-foreground mb-2">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm md:text-base mb-0">
+          <p className="text-muted-foreground text-sm md:text-base mb-0">
             {description}
           </p>
         </div>

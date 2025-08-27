@@ -92,7 +92,7 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent 
           className={cn(
-            'z-[300] w-full max-w-none p-0 bg-neutral-50 border-none',
+            'z-[300] w-full max-w-none p-0 bg-background border-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
             'duration-300 ease-in-out',
@@ -109,10 +109,10 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
             variant="ghost"
             size="icon"
             onClick={handleClose}
-            className="absolute top-4 right-4 z-20 min-h-[44px] min-w-[44px] p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white shadow-sm transition-colors"
+            className="absolute top-4 right-4 z-20 min-h-[44px] min-w-[44px] p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-muted shadow-sm transition-colors"
             aria-label={closeButtonLabel}
           >
-            <X className="w-6 h-6 text-neutral-600" aria-hidden="true" />
+            <X className="w-6 h-6 text-foreground" aria-hidden="true" />
           </UiButton>
           
           {/* Scrollable content area */}
@@ -146,7 +146,7 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
           
           {/* Sticky footer with pricing summary */}
           {isMultiBooking && roomBookings && multiBookingLabels && (
-            <div className="fixed w-full bottom-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+            <div className="fixed w-full bottom-0 bg-card border-t border-border p-4 shadow-lg">
               <PriceBreakdown
                 subtotal={overallTotal}
                 isLoading={false}
@@ -170,7 +170,7 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
           )}
           
           {/* Safe area for devices with home indicator */}
-          <div className="h-[env(safe-area-inset-bottom)] bg-white" />
+          <div className="h-[env(safe-area-inset-bottom)] bg-card" />
         </DialogContent>
       </Dialog>
     </div>

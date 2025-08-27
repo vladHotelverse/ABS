@@ -68,13 +68,13 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
   const isBid = item.type === 'bid'
 
   return (
-    <div className="transition-all duration-300 ease-in-out border-b border-gray-100 pb-3 mb-3 last:border-b-0 last:mb-0 last:pb-0">
+    <div className="transition-all duration-300 ease-in-out border-b border-border/20 pb-3 mb-3 last:border-b-0 last:mb-0 last:pb-0">
       <div className={cn(
         "flex justify-between items-center py-2 rounded")}>
         <div className="flex items-center gap-2 flex-wrap">
           <span className={cn(
-            "text-sm max-w-[200px]",
-            isBid && "font-medium text-blue-900"
+            "text-sm max-w-[200px] text-foreground",
+            isBid && "font-medium text-blue-600 dark:text-blue-400"
           )}>{item.name}</span>
           {getBidStatusIcon()}
           {/* Segment Badge for pricing item */}
@@ -87,7 +87,7 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
             price={item.price} 
             euroSuffix={euroSuffix}
             className={cn(
-              isBid ? "text-blue-700" : "text-gray-900"
+              isBid ? "text-blue-600 dark:text-blue-400" : "text-foreground"
             )}
           />
           <UiButton
@@ -97,8 +97,8 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
             className={cn(
               'rounded-full h-6 w-6 flex items-center justify-center transition-all duration-200',
               isBid 
-                ? 'hover:bg-blue-100 hover:border-blue-300 hover:text-blue-600 border-blue-200'
-                : 'hover:bg-red-50 hover:border-red-300 hover:text-red-600'
+                ? 'hover:bg-blue-100 hover:border-blue-300 hover:text-blue-600 border-blue-200 dark:hover:bg-blue-900/30 dark:hover:border-blue-600 dark:hover:text-blue-400 dark:border-blue-700'
+                : 'hover:bg-red-50 hover:border-red-300 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:border-red-600 dark:hover:text-red-400'
             )}
             aria-label={removeLabel}
           >
@@ -114,9 +114,9 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
             {getItemStatusIcon()}
             <span className={cn(
               "text-xs px-2 py-1 rounded-full font-medium",
-              item.itemStatus === 'accepted_by_hotel' && "bg-green-100 text-green-700",
-              item.itemStatus === 'rejected_by_hotel' && "bg-red-100 text-red-700",
-              item.itemStatus === 'sent_to_hotel' && "bg-yellow-100 text-yellow-700"
+              item.itemStatus === 'accepted_by_hotel' && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+              item.itemStatus === 'rejected_by_hotel' && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+              item.itemStatus === 'sent_to_hotel' && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
             )}>
               {getStatusText()}
             </span>
@@ -124,7 +124,7 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
           {(item.itemStatus && item.statusDescription) && (
             <button
               onClick={() => setShowStatusInfo(!showStatusInfo)}
-              className="text-blue-500 hover:text-blue-700"
+              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
               aria-label="Toggle status information"
             >
               <Info className="h-4 w-4" />
@@ -135,14 +135,14 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
       
       {/* Expandable status description */}
       {showStatusInfo && item.statusDescription && (
-        <div className="mt-2 p-3 bg-blue-50 rounded-lg text-sm text-blue-700 border border-blue-200">
+        <div className="mt-2 p-3 bg-blue-50 rounded-lg text-sm text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800">
           <div className="flex justify-between items-start">
             <span>{item.statusDescription}</span>
             <button
               onClick={() => setShowStatusInfo(false)}
-              className="ml-2 p-1 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ml-2 p-1 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-blue-800/50 dark:focus:ring-blue-400"
             >
-              <X className="h-4 w-4 text-blue-700" />
+              <X className="h-4 w-4 text-blue-700 dark:text-blue-300" />
             </button>
           </div>
         </div>

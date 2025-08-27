@@ -29,7 +29,6 @@
   height: 30px;
   width: auto;
   transform-style: preserve-3d;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
 /* Full text SVG styling */
@@ -43,13 +42,11 @@
 
 /* SVG path styles */
 .text-path {
-  fill: #ffffff;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .h-path {
-  fill: #ffffff;
   opacity: 1;
 }
 

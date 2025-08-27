@@ -72,7 +72,7 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   if (!labels) {
     console.error('PricingSummaryPanel: labels prop is required')
     return (
-      <div className="p-4 text-red-500 border border-red-300 rounded-lg bg-red-50">
+      <div className="p-4 text-destructive border border-destructive rounded-lg bg-destructive/5">
         <h3 className="font-semibold mb-2">Configuration Error</h3>
         <p>Missing required labels configuration. Please provide all required labels.</p>
       </div>
@@ -94,7 +94,7 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   return (
     <section
       className={clsx(
-        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm w-full md:w-[400px] sticky top-28 ',
+        'border border-border rounded-lg overflow-hidden bg-card text-card-foreground shadow-sm w-full md:w-[400px] sticky top-28 ',
         className
       )}
       aria-label={labels.pricingSummaryLabel}

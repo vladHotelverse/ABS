@@ -38,7 +38,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({
 
   const cardContent = (
     <div className={clsx(
-      'flex-none w-[85vw] sm:w-auto border border-neutral-200 rounded-lg overflow-hidden snap-center mx-2 sm:mx-0 transition-all duration-200',
+      'flex-none w-[85vw] sm:w-auto border border-border rounded-lg overflow-hidden snap-center mx-2 sm:mx-0 transition-all duration-200',
       {
         'opacity-50 cursor-not-allowed': isDisabled,
         'hover:shadow-md': !isDisabled,
@@ -84,7 +84,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({
         {/* Disabled overlay */}
         {isDisabled && (
           <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center pointer-events-none">
-            <div className="bg-white bg-opacity-90 px-3 py-2 rounded-lg text-sm font-medium text-neutral-700">
+            <div className="bg-card/90 backdrop-blur px-3 py-2 rounded-lg text-sm font-medium text-card-foreground">
               {texts.optionDisabledText}
             </div>
           </div>

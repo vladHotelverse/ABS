@@ -42,11 +42,11 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       {/* Separator before pricing */}
       <div className="space-y-3">
         <div className="flex justify-between items-center pt-2">
-          <span className="text-lg font-bold">{labels.totalLabel}</span>
+          <span className="text-lg font-bold text-foreground">{labels.totalLabel}</span>
           {isLoading ? (
             <LoadingSkeleton width="w-20" height="h-6" />
           ) : (
-            <span className={clsx('text-lg font-bold', 'transition-all duration-500 ease-in-out', 'whitespace-nowrap')}>
+            <span className={clsx('text-lg font-bold text-foreground', 'transition-all duration-500 ease-in-out', 'whitespace-nowrap')}>
               {formatPrice(subtotal)}
             </span>
           )}
@@ -56,15 +56,15 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       {/* Payment information */}
       <div className="payment-info">
         <div className="flex items-center mb-3">
-          <CreditCard size={20} strokeWidth={2} className="h-5 w-5 text-neutral-500 mr-2" />
-          <span className="text-sm">{labels.payAtHotelLabel}</span>
+          <CreditCard size={20} strokeWidth={2} className="h-5 w-5 text-muted-foreground mr-2" />
+          <span className="text-sm text-foreground">{labels.payAtHotelLabel}</span>
         </div>
 
         <UiButton
           type="button"
           variant="link"
           size="sm"
-          className="pl-0 text-sm text-neutral-500 font-medium underline bg-transparent border-none cursor-pointer hover:text-neutral-700 transition-colors"
+          className="pl-0 text-sm text-muted-foreground font-medium underline bg-transparent border-none cursor-pointer hover:text-foreground transition-colors"
         >
           {labels.viewTermsLabel}
         </UiButton>
@@ -79,7 +79,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       >
         {isLoading ? (
           <div className="flex items-center space-x-2">
-            <div className="animate-spin w-4 h-4 border-t-2 border-b-2 border-white rounded-full" />
+            <div className="animate-spin w-4 h-4 border-t-2 border-b-2 border-current rounded-full" />
             <span>{labels.loadingLabel}</span>
           </div>
         ) : (

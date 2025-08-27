@@ -91,7 +91,7 @@ export const CustomizationSection: React.FC<CustomizationSectionProps> = ({
   }
 
   return (
-    <div className="mb-6 bg-white rounded overflow-hidden">
+    <div className="mb-6 bg-card rounded overflow-hidden">
       <SectionHeader
         config={config}
         isOpen={isOpen}

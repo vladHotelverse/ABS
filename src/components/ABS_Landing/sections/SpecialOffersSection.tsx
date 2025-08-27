@@ -134,31 +134,11 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
     return null
   }
 
-  // Create initial selections from selected offers
-  const initialSelections = useMemo(
-    () =>
-      selectedOffers.length > 0
-        ? selectedOffers.reduce(
-            (acc, offer) => {
-              acc[offer.id] = {
-                quantity: offer.quantity ?? 1,
-                persons: offer.persons,
-                nights: offer.nights,
-                selectedDate: offer.selectedDate,
-                selectedDates: offer.selectedDates,
-              }
-              return acc
-            },
-            {} as Record<string | number, OfferSelection>
-          )
-        : undefined,
-    [selectedOffers]
-  )
 
   return (
-    <section className={`bg-white md:p-6 rounded-lg md:shadow md:border md:border-neutral-300 ${className}`}>
-      <h2 className="text-3xl font-bold mb-4">{texts.offersTitle}</h2>
-      <p className="mb-6">{texts.offersSubtitle}</p>
+    <section className={`bg-card p-4 md:p-6 rounded-lg md:shadow border border-border ${className}`}>
+      <h2 className="text-3xl font-bold mb-4 text-card-foreground">{texts.offersTitle}</h2>
+      <p className="mb-6 text-muted-foreground">{texts.offersSubtitle}</p>
       <SpecialOffers
         id="special-offers-section"
         offers={specialOffers.map(convertToOfferType)}
@@ -166,7 +146,6 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
         reservationInfo={reservationInfo}
         currencySymbol={texts.currencySymbol}
         labels={texts.specialOffersLabels}
-        initialSelections={initialSelections}
         useEnhancedDateSelector={useEnhancedDateSelector}
       />
     </section>
