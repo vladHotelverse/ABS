@@ -140,7 +140,6 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
     
     selectedOffers.forEach((selectedOffer) => {
       // Find the corresponding offer to get its type and determine the correct ID
-      const offerType = specialOffers.find(offer => offer.id === selectedOffer.id)
       const offerId = typeof selectedOffer.id === 'string' 
         ? specialOffers.findIndex(offer => offer.id === selectedOffer.id) + 1 
         : selectedOffer.id

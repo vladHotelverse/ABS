@@ -122,8 +122,7 @@ export const SpecialOfferCard: React.FC<SpecialOfferCardProps> = ({
               className={clsx(
                 'px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200',
                 {
-                  'bg-primary text-primary-foreground hover:bg-primary/90': isSelected && !readonly,
-                  'bg-primary text-primary-foreground hover:bg-primary/90': !isSelected && !isDisabled && !readonly,
+                  'bg-primary text-primary-foreground hover:bg-primary/90': (isSelected || (!isSelected && !isDisabled)) && !readonly,
                   'bg-muted text-muted-foreground cursor-not-allowed': isDisabled,
                   'bg-muted text-muted-foreground cursor-default': readonly,
                 }

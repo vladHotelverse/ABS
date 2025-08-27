@@ -158,7 +158,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
           >
             {makeOfferText}
           </button>
-          <p className="text-xs text-muted-foreground mt-1 text-center">{availabilityText}</p>
+          <p className="text-xs text-muted-foreground mt-2 text-center">{availabilityText}</p>
         </>
       )}
     </div>

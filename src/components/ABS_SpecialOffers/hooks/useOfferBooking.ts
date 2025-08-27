@@ -174,8 +174,6 @@ export const useOfferBooking = ({
 
       // Reset selection to default
       const isAllInclusiveOffer = isAllInclusive(offer)
-      const isOnlineCheckinOffer = isOnlineCheckin(offer)
-      const isLateCheckoutOffer = isLateCheckout(offer)
       const nights = calculateNights(reservationInfo?.checkInDate, reservationInfo?.checkOutDate)
       
       setSelections((prev) => ({

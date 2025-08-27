@@ -176,8 +176,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         'cq-container relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
         isActive && showPriceSlider ? 'bg-muted md:ring-2 ring-border' : 'bg-card',
         {
-          'border-2 border-primary bg-primary/10': selectedRoom?.id === room.id,
-          'border-2 border-primary bg-primary/10': isBidActive && selectedRoom?.id !== room.id,
+          'border-2 border-primary bg-primary/10': selectedRoom?.id === room.id || (isBidActive && selectedRoom?.id !== room.id),
           'border border-transparent': selectedRoom?.id !== room.id && !isBidActive,
         }
       )}
