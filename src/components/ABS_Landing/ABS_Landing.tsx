@@ -438,8 +438,20 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       }
 
       if (offerData.quantity === 0) {
-        // Remove offer from the active room
-        handleMultiBookingRemoveItem(roomId, offerData.id, offerData.name, 'offer')
+        // Remove offer from the active room - find by originalOfferId instead of generated item ID
+        console.log(`[Special Offers] Attempting to remove offer: ${offerData.name} (originalId: ${offerData.id}) from room: ${roomId}`)
+        console.log(`[Special Offers] Current room offers:`, currentRoom.items.filter(item => item.type === 'offer').map(item => ({ id: item.id, name: item.name, originalOfferId: (item as any).originalOfferId })))
+        
+        const offerToRemove = currentRoom.items.find(item => 
+          item.type === 'offer' && (item as any).originalOfferId === offerData.id
+        )
+        
+        if (offerToRemove) {
+          console.log(`[Special Offers] Found offer to remove: ${offerToRemove.name} (itemId: ${offerToRemove.id})`)
+          handleMultiBookingRemoveItem(roomId, offerToRemove.id, offerData.name, 'offer')
+        } else {
+          console.error(`[Special Offers] Offer ${offerData.name} not found in room ${roomId}`)
+        }
 
         const roomContext = ` from ${currentRoom.roomName}`
         showToast(`${offerData.name} removed${roomContext}`, 'info')
@@ -800,12 +812,58 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                     showToast(`Room upgraded from ${originalRoomName} to ${room.roomType}${upgradeText}`, 'success')
                   }
                 } else {
-                  // Room deselection - remove from room-specific selections
+                  // Room deselection - remove from room-specific selections AND remove room upgrade items
                   setRoomSpecificSelections(prev => {
                     const newSelections = { ...prev }
                     delete newSelections[roomId]
                     return newSelections
                   })
+
+                  // Remove room upgrade items from the pricing summary panel
+                  const currentRoom = roomBookings.find(r => r.id === roomId)
+                  if (currentRoom) {
+                    console.log(`[Room Selection] Removing room upgrade for room ${roomId}`)
+                    console.log(`[Room Selection] Current room items:`, currentRoom.items.map(item => ({ id: item.id, name: item.name, type: item.type, isUpgraded: (item as any).isUpgraded })))
+
+                    // Remove all room upgrade items (keep original room if it exists)
+                    const updatedBookings = roomBookings.map(booking => {
+                      if (booking.id === roomId) {
+                        const originalRoomItem = booking.items.find(item => 
+                          item.type === 'room' && !(item as any).isUpgraded
+                        )
+                        
+                        const upgradedItems = booking.items.filter(item => 
+                          item.type === 'room' && (item as any).isUpgraded
+                        )
+                        
+                        console.log(`[Room Selection] Found ${upgradedItems.length} upgraded room items to remove`)
+                        
+                        // Keep only non-room items and original room (if exists)
+                        const itemsToKeep = booking.items.filter(item => {
+                          if (item.type === 'room') {
+                            return !(item as any).isUpgraded // Only keep original room, remove upgrades
+                          }
+                          return true // Keep all non-room items
+                        })
+
+                        // If we had an original room, restore the room name to original
+                        const restoredBooking = originalRoomItem 
+                          ? { ...booking, roomName: originalRoomItem.name }
+                          : booking
+
+                        console.log(`[Room Selection] Keeping ${itemsToKeep.length} items after removal`)
+
+                        return {
+                          ...restoredBooking,
+                          items: itemsToKeep
+                        }
+                      }
+                      return booking
+                    })
+
+                    setRoomBookings(updatedBookings)
+                    showToast(`Room upgrade removed for ${currentRoom.roomName}`, 'info')
+                  }
                 }
               } else {
                 // Single booking mode - use existing handler

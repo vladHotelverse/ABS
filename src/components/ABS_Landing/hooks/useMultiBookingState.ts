@@ -60,9 +60,24 @@ export const useMultiBookingState = ({
   const handleMultiBookingRemoveItem = (
     roomId: string,
     itemId: string | number,
-    _itemName: string,
-    _itemType: PricingItem['type']
+    itemName: string,
+    itemType: PricingItem['type']
   ) => {
+    console.log(`[MultiBooking] Removing item: ${itemName} (ID: ${itemId}, Type: ${itemType}) from room: ${roomId}`)
+    
+    const targetBooking = roomBookings.find(booking => booking.id === roomId)
+    if (!targetBooking) {
+      console.error(`[MultiBooking] Room ${roomId} not found`)
+      return
+    }
+
+    const itemToRemove = targetBooking.items.find(item => item.id === itemId)
+    if (!itemToRemove) {
+      console.error(`[MultiBooking] Item ${itemId} not found in room ${roomId}`)
+      console.log(`[MultiBooking] Available items in room:`, targetBooking.items.map(item => ({ id: item.id, name: item.name, type: item.type })))
+      return
+    }
+
     const updatedBookings = roomBookings.map((booking) =>
       booking.id === roomId
         ? {
@@ -71,6 +86,8 @@ export const useMultiBookingState = ({
           }
         : booking
     )
+    
+    console.log(`[MultiBooking] Successfully removed item ${itemName} from room ${roomId}`)
     handleMultiBookingChange(updatedBookings)
   }
 
