@@ -47,7 +47,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
     )}>
       {/* Selected indicator - only show in interactive mode */}
       {isSelected && !isDisabled && mode !== 'consultation' && (
-        <div className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
+        <div className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-emerald-700">
           <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
           Selected
         </div>
@@ -132,7 +132,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         )}
         {mode === 'consultation' && isSelected && (
           <div className="flex items-center justify-center mt-auto">
-            <div className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
+            <div className="text-xs text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
               {texts.selectedText}
             </div>
           </div>

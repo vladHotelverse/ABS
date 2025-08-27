@@ -76,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({
   }, [])
 
   return (
-    <header className={clsx('bg-white dark:bg-black text-foreground border-b border-border shadow-md', isSticky && 'sticky top-0 z-50', className)}>
+    <header className={clsx(' text-foreground border-b border-border shadow-md', isSticky && 'sticky bg-secondary top-0 z-50', className)}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* 3D Animated Logo Container */}

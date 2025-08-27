@@ -100,7 +100,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
         <div className="flex items-center justify-end mb-4">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-muted rounded-full transition-colors"
             aria-label="Close image modal"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -149,8 +149,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
                         className={clsx(
                           "w-16 h-16 rounded overflow-hidden border-2 transition-all duration-200",
                           index === currentImageIndex
-                            ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-primary ring-2 ring-primary/20'
+                            : 'border-border hover:border-ring'
                         )}
                         aria-label={`Go to image ${index + 1}`}
                       >

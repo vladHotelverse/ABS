@@ -89,8 +89,8 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
     <div
       ref={containerRef}
       className={clsx(
-        'bg-black text-white shadow-lg',
-        isSticky && 'sticky top-0 z-[200]',
+        'bg-secondary shadow-lg',
+        isSticky && 'sticky top-0 z-100 border-b border-b-border',
         className
       )}
       onKeyDown={handleKeyDown}
@@ -113,11 +113,7 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
                   onBlur={handleButtonBlur}
                   variant={isActive ? 'default' : 'secondary'}
                   size="sm"
-                  className={clsx(
-                    'flex-shrink-0 transition-all duration-200',
-                    isActive ? 'bg-white text-black hover:bg-gray-100' : 'bg-white/10 text-white hover:bg-white/20',
-                    focusedIndex === index && 'ring-2 ring-white/50 ring-offset-2 ring-offset-black'
-                  )}
+
                   role="tab"
                   aria-selected={isActive}
                   aria-controls={`room-panel-${room.id}`}

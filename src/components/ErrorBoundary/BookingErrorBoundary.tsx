@@ -338,8 +338,8 @@ class BookingErrorBoundary extends Component<Props, State> {
       // Component-level errors - minimal UI
       if (this.props.level === 'component') {
         return (
-          <div className="p-4 border border-red-200 rounded-lg bg-red-50">
-            <div className="flex items-center gap-2 text-red-800 text-sm">
+          <div className="p-4 border border-destructive rounded-lg bg-destructive/10">
+            <div className="flex items-center gap-2 text-destructive text-sm">
               <AlertCircle className="w-4 h-4" />
               <span>Component unavailable</span>
               {errorContext.retryable && (
@@ -347,7 +347,7 @@ class BookingErrorBoundary extends Component<Props, State> {
                   variant="ghost"
                   size="sm"
                   onClick={this.handleRetry}
-                  className="ml-auto text-red-800 hover:text-red-900"
+                  className="ml-auto text-destructive hover:text-destructive/80"
                 >
                   <RefreshCw className="w-3 h-3" />
                 </UiButton>
@@ -360,11 +360,11 @@ class BookingErrorBoundary extends Component<Props, State> {
       // Section-level errors - larger UI with more options
       if (this.props.level === 'section') {
         return (
-          <div className="p-6 border border-red-200 rounded-lg bg-red-50">
+          <div className="p-6 border border-destructive rounded-lg bg-destructive/10">
             <Alert>
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle className="text-red-800">Section Temporarily Unavailable</AlertTitle>
-              <AlertDescription className="text-red-700 mt-2">
+              <AlertTitle className="text-destructive">Section Temporarily Unavailable</AlertTitle>
+              <AlertDescription className="text-destructive/80 mt-2">
                 {errorContext.userMessage}
               </AlertDescription>
             </Alert>
@@ -375,7 +375,7 @@ class BookingErrorBoundary extends Component<Props, State> {
                   variant="outline"
                   onClick={this.handleRetry}
                   disabled={this.state.retryCount >= 3}
-                  className="text-red-800 border-red-300 hover:bg-red-100"
+                  className="text-destructive border-destructive hover:bg-destructive/10"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again ({3 - this.state.retryCount} attempts left)
@@ -385,7 +385,7 @@ class BookingErrorBoundary extends Component<Props, State> {
               <UiButton
                 variant="ghost"
                 onClick={this.handleReset}
-                className="text-red-800 hover:bg-red-100"
+                className="text-destructive hover:bg-destructive/10"
               >
                 Reset Section
               </UiButton>
@@ -393,8 +393,8 @@ class BookingErrorBoundary extends Component<Props, State> {
             
             {errorContext.suggestedActions.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-red-800 mb-2">Suggested actions:</p>
-                <ul className="text-sm text-red-700 list-disc list-inside space-y-1">
+                <p className="text-sm font-medium text-destructive mb-2">Suggested actions:</p>
+                <ul className="text-sm text-destructive/80 list-disc list-inside space-y-1">
                   {errorContext.suggestedActions.map((action, index) => (
                     <li key={index}>{action}</li>
                   ))}
@@ -407,14 +407,14 @@ class BookingErrorBoundary extends Component<Props, State> {
       
       // Page-level errors - full error page
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-card rounded-lg shadow-lg p-6">
             <div className="text-center">
               <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h1 className="text-xl font-semibold text-gray-900 mb-2">
+              <h1 className="text-xl font-semibold text-foreground mb-2">
                 Booking System Error
               </h1>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {errorContext.userMessage}
               </p>
             </div>
@@ -451,9 +451,9 @@ class BookingErrorBoundary extends Component<Props, State> {
             </div>
             
             {errorContext.suggestedActions.length > 0 && (
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-800 mb-2">What you can try:</p>
-                <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
+              <div className="mt-6 p-4 bg-muted rounded-lg">
+                <p className="text-sm font-medium text-foreground mb-2">What you can try:</p>
+                <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                   {errorContext.suggestedActions.map((action, index) => (
                     <li key={index}>{action}</li>
                   ))}
@@ -462,7 +462,7 @@ class BookingErrorBoundary extends Component<Props, State> {
             )}
             
             {process.env.NODE_ENV === 'development' && this.state.errorId && (
-              <div className="mt-4 p-3 bg-gray-100 rounded text-xs font-mono text-gray-600">
+              <div className="mt-4 p-3 bg-muted rounded text-xs font-mono text-muted-foreground">
                 Error ID: {this.state.errorId}
               </div>
             )}

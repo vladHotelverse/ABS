@@ -37,11 +37,11 @@ export const ConflictResolutionDialog: React.FC<ConflictResolutionDialogProps> =
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <h4 className="font-medium text-amber-800 mb-2">
+          <div className="p-4 bg-accent border border-border rounded-lg">
+            <h4 className="font-medium text-accent-foreground mb-2">
               {conflict.reason}
             </h4>
-            <div className="space-y-2 text-sm text-amber-700">
+            <div className="space-y-2 text-sm text-accent-foreground/80">
               <div>
                 <strong>Currently selected:</strong> {conflict.currentOption.label}
               </div>

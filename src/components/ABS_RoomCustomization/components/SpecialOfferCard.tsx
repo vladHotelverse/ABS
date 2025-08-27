@@ -68,7 +68,7 @@ export const SpecialOfferCard: React.FC<SpecialOfferCardProps> = ({
       className={clsx(
         'relative bg-card rounded-lg shadow-sm border-2 transition-all duration-200',
         {
-          'border-green-500 bg-green-100 dark:bg-green-950/50': isSelected,
+          'border-primary bg-primary/10': isSelected,
           'border-border hover:border-ring': !isSelected && !isDisabled && mode !== 'consultation',
           'border-muted opacity-60': isDisabled,
           'cursor-pointer': !readonly && !isDisabled && mode !== 'consultation',
@@ -122,7 +122,7 @@ export const SpecialOfferCard: React.FC<SpecialOfferCardProps> = ({
               className={clsx(
                 'px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200',
                 {
-                  'bg-green-600 text-white hover:bg-green-700': isSelected && !readonly,
+                  'bg-primary text-primary-foreground hover:bg-primary/90': isSelected && !readonly,
                   'bg-primary text-primary-foreground hover:bg-primary/90': !isSelected && !isDisabled && !readonly,
                   'bg-muted text-muted-foreground cursor-not-allowed': isDisabled,
                   'bg-muted text-muted-foreground cursor-default': readonly,

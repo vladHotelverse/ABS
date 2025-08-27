@@ -444,6 +444,17 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         const roomContext = ` from ${currentRoom.roomName}`
         showToast(`${offerData.name} removed${roomContext}`, 'info')
       } else {
+        // Check for duplicate offers in the current room before adding
+        const existingOffer = currentRoom.items.find(item => 
+          item.type === 'offer' && 
+          (item as any).originalOfferId === offerData.id
+        )
+
+        if (existingOffer) {
+          showToast(`${offerData.name} is already added to this room`, 'error')
+          return
+        }
+
         // Add offer to the active room
         const newOfferItem = {
           id: `offer-${offerData.id}-${Date.now()}`, // Unique ID for the room item
@@ -478,6 +489,16 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         actions.removeSpecialOffer(offerData.id.toString())
         showToast(`${offerData.name} removed from your stay.`, 'info')
       } else {
+        // Check for duplicate offers in global state before adding
+        const existingOffer = (state.specialOffers as any[])?.find(offer => 
+          offer.id === offerData.id
+        )
+
+        if (existingOffer) {
+          showToast(`${offerData.name} is already added to your stay`, 'error')
+          return
+        }
+
         const offer = {
           id: offerData.id,
           title: offerData.name,
@@ -724,7 +745,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       />
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 flex-grow pb-20 lg:pb-8">
-        <div className="flex-grow space-y-6 sm:space-y-8 w-full xl:max-w-[calc(100%-480px)]">
+        <div className="flex-grow space-y-6 sm:space-y-8 w-full xl:max-w-[calc(100%-400px)]">
           {/* Room Selection Section */}
           <RoomSelectionSection
             roomOptions={roomOptions}

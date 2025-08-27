@@ -73,7 +73,7 @@ const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
   
   return (
     <div
-      className={`rounded-lg p-4 border ${isBooked ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800' : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-border'}`}
+      className={`rounded-lg p-4 border ${isBooked ? 'border-green-200 dark:border-green-800' : 'bg-muted/30 border-border dark:bg-muted/20 dark:border-border'}`}
     >
       {/* Display person count info above the total for perPerson offers */}
       {offerType === 'perPerson' && reservationPersonCount && (

@@ -53,7 +53,7 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
           <span>{isSelected ? removeText : selectText}</span>
         </UiButton>
         {/* Instant Confirmation - positioned below the button */}
-        <span className="text-xs text-green-600 dark:text-green-400 font-medium mt-2">{instantConfirmationText}</span>
+        <span className="text-xs text-emerald-800 dark:text-emerald-400 font-medium mt-2">{instantConfirmationText}</span>
       </div>
     </div>
   )
