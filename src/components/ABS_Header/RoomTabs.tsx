@@ -99,7 +99,7 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide max-w-full">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide max-w-full py-1">
             {roomTabs.map((room, index) => {
               const isActive = activeRoomId === room.id
               return (
@@ -111,14 +111,14 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
                   onClick={() => handleButtonClick(room.id, index)}
                   onFocus={() => handleButtonFocus(index)}
                   onBlur={handleButtonBlur}
-                  variant={isActive ? 'default' : 'secondary'}
+                  variant={isActive ? 'default' : 'outline'}
                   size="sm"
-
                   role="tab"
                   aria-selected={isActive}
                   aria-controls={`room-panel-${room.id}`}
                   tabIndex={0}
                   aria-label={`Switch to Room ${index + 1}`}
+                  className='cursor-pointer'
                 >
                   <div className="flex items-center space-x-2">
                     {isActive && <Check className="w-4 h-4" />}

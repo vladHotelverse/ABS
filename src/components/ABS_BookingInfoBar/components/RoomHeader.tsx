@@ -14,17 +14,16 @@ export const RoomHeader: React.FC<RoomHeaderProps> = ({
   isSelected,
   labels,
   isMobile = false,
-  testId: _testId,
 }) => {
   const imageClassName = isMobile
     ? 'w-8 h-8 rounded-lg object-cover flex-shrink-0'
     : 'w-10 h-10 rounded-lg object-cover flex-shrink-0'
   const badgeClassName = isMobile
     ? 'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary flex-shrink-0'
-    : 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary flex-shrink-0'
+    : 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary flex-shrink-0 ml-2'
 
   return (
-    <section className='flex items-center justify-between'>
+    <section className='flex items-start justify-between'>
       <div className="flex items-center gap-3 min-w-0 w-full">
         {room.roomImage && <img src={room.roomImage} alt={`${room.roomName} room`} className={imageClassName} />}
         <div className="flex-1 min-w-0 overflow-hidden">

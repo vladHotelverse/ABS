@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import BookingInfoBar from '../ABS_BookingInfoBar'
 import Header, { RoomTabs, type RoomTab } from '../ABS_Header'
 import PricingSummaryPanel from '../ABS_PricingSummaryPanel'
@@ -24,8 +24,8 @@ import { RoomSelectionSection, CustomizationSection, SpecialOffersSection, Booki
 import type { RoomOption, SpecialOffer } from './sections'
 import { ABS_RoomSelection } from '../ABS_RoomSelection'
 
-// Import hooks and utilities
-import { useBookingState, useMultiBookingState } from './hooks'
+// Import hooks and utilities  
+import { useBookingStore } from '../../stores/bookingStore'
 import {
   convertRoomToPricingItem,
   convertCustomizationsToPricingItems,
@@ -41,6 +41,9 @@ import type { Customization } from './types'
 
 // Re-export types from sections for compatibility
 export type { RoomOption, SpecialOffer } from './sections'
+
+// Import safe type conversion utilities
+import { convertToStoreRoomBooking, convertFromStoreRoomBooking } from '../../types/shared'
 
 export interface Translations extends RoomCustomizationTexts {
   // Room section
@@ -215,7 +218,6 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Multi-booking support
   isMultiBooking = false,
   initialRoomBookings = [],
-  onMultiBookingChange,
   // Compatibility rules
   compatibilityRules,
 }) => {
@@ -232,16 +234,52 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     personCount: occupancy ? parseInt(occupancy.match(/\d+/)?.[0] || '1', 10) : 1
   } : undefined
 
-  // Use custom hooks for state management
-  const { state, actions, showMobilePricing, bookingStatus } = useBookingState({
-    selectedRoom: initialSelectedRoom || null,
-    customizations: {},
-    specialOffers: [],
-    activeBid: null,
-    status: initialState,
-    texts: translations as any,
-  })
-
+  // Use unified Zustand store for state management
+  const bookingStore = useBookingStore()
+  
+  // Initialize store with provided values if needed with proper cleanup
+  React.useEffect(() => {
+    if (initialSelectedRoom && !bookingStore.selectedRoom) {
+      bookingStore.selectRoom(initialSelectedRoom)
+    }
+    if (initialState && bookingStore.bookingStatus !== initialState) {
+      bookingStore.setBookingStatus(initialState)
+    }
+    
+    // Cleanup function to prevent memory leaks on unmount
+    return () => {
+      // Reset booking state if component unmounts to prevent memory leaks
+      // Only reset if this was the component that set the initial state
+      if (initialSelectedRoom || initialState) {
+        // Note: We don't call resetState() here as it might interfere with other components
+        // Instead, we rely on the store's persistence mechanism to handle cleanup
+      }
+    }
+  }, [])
+  
+  // Extract state and actions for compatibility
+  const state = {
+    selectedRoom: bookingStore.selectedRoom,
+    customizations: bookingStore.customizations,
+    specialOffers: bookingStore.specialOffers,
+    activeBid: bookingStore.activeBid,
+  }
+  
+  const actions = {
+    selectRoom: bookingStore.selectRoom,
+    addCustomization: bookingStore.addCustomization,
+    removeCustomization: bookingStore.removeCustomization,
+    addSpecialOffer: bookingStore.addSpecialOffer,
+    removeSpecialOffer: bookingStore.removeSpecialOffer,
+    makeOffer: bookingStore.makeOffer,
+    cancelBid: bookingStore.cancelBid,
+    setShowMobilePricing: bookingStore.setShowMobilePricing,
+    resetState: bookingStore.resetState,
+    showToast: bookingStore.showToast,
+  }
+  
+  const showMobilePricing = bookingStore.showMobilePricing
+  const bookingStatus = bookingStore.bookingStatus
   const { showToast } = actions
 
   // Calculate cart item count
@@ -261,59 +299,161 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     nights
   )
 
-  const multiBookingState = useMultiBookingState({
-    initialRoomBookings,
-    onMultiBookingChange,
-    onConfirmBooking,
-  })
+
+  // Initialize multibooking in store if needed
+  React.useEffect(() => {
+    if (isMultiBooking && initialRoomBookings && initialRoomBookings.length > 0) {
+      bookingStore.setMode('multi')
+      
+      // The store's addRoom already checks for duplicates, so we don't need to track them here
+      initialRoomBookings.forEach(room => {
+        try {
+          const storeRoom = convertToStoreRoomBooking(room)
+          bookingStore.addRoom(storeRoom)
+        } catch (error) {
+          console.error(`Failed to initialize room ${room.id}:`, error)
+          bookingStore.showToast(`Failed to load room ${room.roomName}. Please try again.`, 'error')
+        }
+      })
+    }
+  }, []) // Empty dependency to run only once on mount
 
   // Use translations based on language
   const t = translations
 
-  // Determine if we should show multi-booking UI (only if more than 1 room)
-  const shouldShowMultiBooking = isMultiBooking && multiBookingState.roomBookings.length > 1
+  // Extract multibooking state from unified store
+  const storeRoomBookings = bookingStore.rooms
+  const activeRoomId = bookingStore.activeRoomId
+  const isMobilePricingOverlayOpen = bookingStore.isMobilePricingOverlayOpen
+  
+  // Convert store room bookings to component room bookings for UI consumption
+  const roomBookings = useMemo(() => {
+    return storeRoomBookings.map(room => {
+      try {
+        return convertFromStoreRoomBooking(room)
+      } catch (error) {
+        console.error(`Failed to convert room ${room.id} for UI:`, error instanceof Error ? error.message : String(error))
+        // Return room as-is if conversion fails (for graceful degradation)
+        return room as any
+      }
+    })
+  }, [storeRoomBookings])
+  
+  // Memoize expensive calculations with stable dependencies and proper cleanup
+  const roomBookingsLength = useMemo(() => storeRoomBookings.length, [storeRoomBookings])
+  const multiBookingTotalPrice = useMemo(() => bookingStore.getTotalPrice(), [roomBookingsLength])
+  // Use direct store selector for totalItemCount to ensure reactivity to room item changes
+  const totalItemCount = useBookingStore(state => state.getTotalItemCount())
+  
+  // Cleanup memoized calculations on unmount to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      // Memoized values will be automatically garbage collected
+      // This cleanup is mainly for consistency and future-proofing
+    }
+  }, [])
+  
+  // Memoize shouldShowMultiBooking to prevent cascading re-renders
+  const shouldShowMultiBooking = useMemo(() => 
+    isMultiBooking && storeRoomBookings.length > 1, 
+    [isMultiBooking, roomBookingsLength]
+  )
 
-  // Generate available sections if not provided
-  const computedAvailableSections =
+  // Generate available sections if not provided with memoization
+  const computedAvailableSections = useMemo(() =>
     availableSections ||
-    generateAvailableSections(roomOptions.length > 0, sections.length > 0, specialOffers.length > 0, language)
-
-  // Extract state from hooks for easier access
-  const {
-    roomBookings,
-    activeRoomId,
-    totalPrice: multiBookingTotalPrice,
-    totalItemCount,
-    setRoomBookings,
-    setIsMobilePricingOverlayOpen,
-    isMobilePricingOverlayOpen,
-    handleMultiBookingRemoveItem,
-    handleMultiBookingEditSection,
-    handleMultiBookingConfirmAll,
-    handleRoomTabClick,
-    handleRoomUpgrade,
-    handleRoomBid,
-  } = multiBookingState
+    generateAvailableSections(roomOptions.length > 0, sections.length > 0, specialOffers.length > 0, language),
+    [availableSections, roomOptions.length, sections.length, specialOffers.length, language]
+  )
 
   // Room-specific selection tracking for multibooking room upgrade isolation
   const [roomSpecificSelections, setRoomSpecificSelections] = useState<Record<string, string>>({})
 
+  // Note: setRoomBookings is no longer needed as we use store methods directly
+  const setIsMobilePricingOverlayOpen = bookingStore.setMobilePricingOverlayOpen
+  // Wrapper to match the expected signature for onMultiBookingRemoveItem
+  const handleMultiBookingRemoveItemWrapper = useCallback((roomId: string, itemId: string | number, _itemName: string, _itemType: string) => {
+    // Check if we're removing a room upgrade
+    const room = bookingStore.rooms.find(r => r.id === roomId)
+    const itemToRemove = room?.items.find(item => item.id === String(itemId))
+    
+    if (itemToRemove?.type === 'room') {
+      // Clear the room-specific selection when removing a room upgrade
+      setRoomSpecificSelections(prev => {
+        const newSelections = { ...prev }
+        delete newSelections[roomId]
+        return newSelections
+      })
+    }
+    
+    bookingStore.removeItemFromRoom(roomId, String(itemId))
+  }, [bookingStore, setRoomSpecificSelections])
+  
+  // Enhanced remove handler that also clears room selections when needed
+  const handleMultiBookingRemoveItem = useCallback((roomId: string, itemId: string) => {
+    // Check if we're removing a room upgrade
+    const room = bookingStore.rooms.find(r => r.id === roomId)
+    const itemToRemove = room?.items.find(item => item.id === itemId)
+    
+    if (itemToRemove?.type === 'room') {
+      // Clear the room-specific selection when removing a room upgrade
+      setRoomSpecificSelections(prev => {
+        const newSelections = { ...prev }
+        delete newSelections[roomId]
+        return newSelections
+      })
+    }
+    
+    bookingStore.removeItemFromRoom(roomId, itemId)
+  }, [bookingStore, setRoomSpecificSelections])
+  const handleMultiBookingEditSection = useCallback((roomId: string, _sectionName: string) => {
+    // Implementation depends on section editing requirements
+    bookingStore.handleRoomTabClick(roomId)
+  }, [bookingStore])
+  const handleMultiBookingConfirmAll = useCallback(async () => {
+    if (onConfirmBooking) {
+      // onConfirmBooking is synchronous (returns void), so we wrap it in a Promise
+      return new Promise<void>((resolve) => {
+        onConfirmBooking(roomBookings)
+        resolve()
+      })
+    }
+  }, [onConfirmBooking, roomBookings])
+  const handleRoomTabClick = bookingStore.handleRoomTabClick
+  const handleRoomUpgrade = bookingStore.handleRoomUpgrade
+  const handleRoomBid = bookingStore.handleRoomBid
+  
+  // Cleanup room-specific selections on unmount to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      // Clear room-specific selections on component unmount
+      setRoomSpecificSelections({})
+    }
+  }, [])
+
   // Clear room-specific selections when switching rooms to avoid showing stale selections
-  // This ensures each room tab starts with clean upgrade selections
+  // This ensures each room tab starts with clean upgrade selections  
+  const stableActiveRoomId = useMemo(() => activeRoomId, [activeRoomId])
+  
   useEffect(() => {
-    if (shouldShowMultiBooking && activeRoomId) {
+    if (shouldShowMultiBooking && stableActiveRoomId) {
       // Only clear if the room doesn't already have a selection
-      if (!roomSpecificSelections[activeRoomId]) {
+      if (!roomSpecificSelections[stableActiveRoomId]) {
         // Room is already clean, no action needed
       }
     }
-  }, [activeRoomId, shouldShowMultiBooking, roomSpecificSelections])
+    
+    // Cleanup function for this effect
+    return () => {
+      // No specific cleanup needed for this effect as it only reads state
+    }
+  }, [stableActiveRoomId, shouldShowMultiBooking, roomSpecificSelections])
 
   // Use subtotal for header to match pricing panel (taxes removed)
   const totalPrice = shouldShowMultiBooking ? multiBookingTotalPrice : subtotal
 
   // Helper function to get the correct room ID based on booking mode
-  const getCurrentRoomId = (): string => {
+  const getCurrentRoomId = useCallback((): string => {
     if (shouldShowMultiBooking) {
       // In multibooking mode, use the active room from room tabs
       return activeRoomId || roomBookings[0]?.id || 'default-room'
@@ -321,14 +461,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       // In single booking mode, use the selected room from state
       return state.selectedRoom?.id || 'default-room'
     }
-  }
+  }, [shouldShowMultiBooking, activeRoomId, roomBookings, state.selectedRoom?.id])
 
   // Handlers for user interactions
-  const handleRoomSelect = (room: RoomOption) => {
+  const handleRoomSelect = useCallback((room: RoomOption) => {
     actions.selectRoom(room)
-  }
+  }, [actions.selectRoom])
 
-  const handleCustomizationChange = (
+  const handleCustomizationChange = useCallback((
     category: string,
     optionId: string,
     optionLabel: string,
@@ -337,8 +477,9 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     const roomId = getCurrentRoomId()
 
     if (shouldShowMultiBooking) {
-      // MULTIBOOKING MODE: Add/remove directly to roomBookings[].items
-      const currentRoom = roomBookings.find(r => r.id === roomId)
+      // MULTIBOOKING MODE: Add/remove directly using store methods
+      // Get the room directly from the store for most up-to-date state
+      const currentRoom = bookingStore.rooms.find(r => r.id === roomId)
 
       if (!currentRoom) {
         showToast('Please select a room first', 'error')
@@ -346,7 +487,15 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       }
 
       if (optionId) {
-        // Add customization item
+        // First remove any existing customization in the same category
+        const existingCustomization = currentRoom.items.find(item =>
+          item.type === 'customization' && item.category === category
+        )
+        if (existingCustomization) {
+          bookingStore.removeItemFromRoom(roomId, String(existingCustomization.id))
+        }
+
+        // Add customization item directly to store
         const newCustomizationItem = {
           id: `customization-${optionId}-${Date.now()}`,
           name: optionLabel,
@@ -354,51 +503,24 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           type: 'customization' as const,
           concept: 'customize-your-room' as const,
           category: category,
-          // Store original option ID for UI state matching
-          originalOptionId: optionId,
+          roomId: roomId,
+          addedAt: new Date(),
+          // Store original option ID for UI state matching in metadata
+          metadata: { originalOptionId: optionId },
         }
 
-        // Remove existing customization in same category first, then add new one
-        const updatedBookings = roomBookings.map(booking => {
-          if (booking.id === roomId) {
-            const itemsWithoutCategory = booking.items.filter(item =>
-              !(item.type === 'customization' && item.category === category)
-            )
-            return { ...booking, items: [...itemsWithoutCategory, newCustomizationItem] }
-          }
-          return booking
-        })
-        setRoomBookings(updatedBookings)
+        bookingStore.addItemToRoom(roomId, newCustomizationItem)
 
         const roomContext = ` to ${currentRoom.roomName}`
         showToast(`${optionLabel} added${roomContext}`, 'success')
       } else {
-        // Remove customization
-        const updatedBookings = roomBookings.map(booking => {
-          if (booking.id === roomId) {
-            const existingCustomization = booking.items.find(item =>
-              item.type === 'customization' && item.category === category
-            )
-
-            if (existingCustomization) {
-              return {
-                ...booking,
-                items: booking.items.filter(item =>
-                  !(item.type === 'customization' && item.category === category)
-                )
-              }
-            }
-          }
-          return booking
-        })
-        setRoomBookings(updatedBookings)
-
-        // Find the existing customization for toast message
+        // Remove customization - find and remove directly from store
         const existingCustomization = currentRoom.items.find(item =>
           item.type === 'customization' && item.category === category
         )
 
         if (existingCustomization) {
+          bookingStore.removeItemFromRoom(roomId, String(existingCustomization.id))
           const roomContext = ` from ${currentRoom.roomName}`
           showToast(`${existingCustomization.name} removed${roomContext}`, 'info')
         }
@@ -424,13 +546,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         }
       }
     }
-  }
+  }, [getCurrentRoomId, shouldShowMultiBooking, roomBookings, bookingStore, showToast, state.customizations, actions.addCustomization, actions.removeCustomization])
 
-  const handleBookOffer = (offerData: OfferData) => {
+  const handleBookOffer = useCallback((offerData: OfferData) => {
     if (shouldShowMultiBooking) {
       // In multibooking mode, add/remove offers to/from the active room
       const roomId = getCurrentRoomId()
-      const currentRoom = roomBookings.find(r => r.id === roomId)
+      // Get the room directly from the store for most up-to-date state
+      const currentRoom = bookingStore.rooms.find(r => r.id === roomId)
 
       if (!currentRoom) {
         showToast('Please select a room first', 'error')
@@ -440,15 +563,15 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       if (offerData.quantity === 0) {
         // Remove offer from the active room - find by originalOfferId instead of generated item ID
         console.log(`[Special Offers] Attempting to remove offer: ${offerData.name} (originalId: ${offerData.id}) from room: ${roomId}`)
-        console.log(`[Special Offers] Current room offers:`, currentRoom.items.filter(item => item.type === 'offer').map(item => ({ id: item.id, name: item.name, originalOfferId: (item as any).originalOfferId })))
+        console.log(`[Special Offers] Current room offers:`, currentRoom.items.filter(item => item.type === 'offer').map(item => ({ id: item.id, name: item.name, originalOfferId: item.metadata?.originalOfferId })))
         
         const offerToRemove = currentRoom.items.find(item => 
-          item.type === 'offer' && (item as any).originalOfferId === offerData.id
+          item.type === 'offer' && item.metadata?.originalOfferId === offerData.id
         )
         
         if (offerToRemove) {
           console.log(`[Special Offers] Found offer to remove: ${offerToRemove.name} (itemId: ${offerToRemove.id})`)
-          handleMultiBookingRemoveItem(roomId, offerToRemove.id, offerData.name, 'offer')
+          handleMultiBookingRemoveItem(roomId, String(offerToRemove.id))
         } else {
           console.error(`[Special Offers] Offer ${offerData.name} not found in room ${roomId}`)
         }
@@ -459,7 +582,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         // Check for duplicate offers in the current room before adding
         const existingOffer = currentRoom.items.find(item => 
           item.type === 'offer' && 
-          (item as any).originalOfferId === offerData.id
+          item.metadata?.originalOfferId === offerData.id
         )
 
         if (existingOffer) {
@@ -467,43 +590,68 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           return
         }
 
-        // Add offer to the active room
+        // Add offer to the active room using store method
         const newOfferItem = {
-          id: `offer-${offerData.id}-${Date.now()}`, // Unique ID for the room item
           name: offerData.name,
           price: offerData.price,
           type: 'offer' as const,
           concept: 'enhance-your-stay' as const,
-          // Store offer-specific data
-          originalOfferId: offerData.id,
-          quantity: offerData.quantity,
-          offerType: offerData.type,
-          persons: offerData.persons,
-          nights: offerData.nights,
-          selectedDate: offerData.selectedDate,
-          selectedDates: offerData.selectedDates,
+          metadata: {
+            originalOfferId: offerData.id,
+            quantity: offerData.quantity,
+            offerType: offerData.type,
+            persons: offerData.persons,
+            nights: offerData.nights,
+            selectedDate: offerData.selectedDate,
+            selectedDates: offerData.selectedDates,
+          }
         }
 
-        // Add the offer to the current room's items
-        const updatedBookings = roomBookings.map(booking =>
-          booking.id === roomId
-            ? { ...booking, items: [...booking.items, newOfferItem] }
-            : booking
-        )
-        setRoomBookings(updatedBookings)
+        // Add the offer directly to the store
+        bookingStore.addItemToRoom(roomId, newOfferItem)
 
         const roomContext = ` to ${currentRoom.roomName}`
         showToast(`${offerData.name} added${roomContext}`, 'success')
       }
     } else {
-      // Single booking mode - use existing global logic
+      // Single booking mode - use unified store approach for consistency
+      // Get or create default room for single booking
+      let defaultRoomId = bookingStore.rooms[0]?.id
+      
+      if (!defaultRoomId) {
+        // Create a default room for single booking mode if none exists
+        const defaultRoom = {
+          id: 'single-booking-room',
+          roomName: 'Your Stay',
+          roomNumber: '1',
+          guestName: 'Guest',
+          nights: nights,
+          items: [],
+          isActive: true,
+          payAtHotel: false,
+        }
+        bookingStore.addRoom(defaultRoom as any)
+        defaultRoomId = defaultRoom.id
+      }
+      
       if (offerData.quantity === 0) {
-        actions.removeSpecialOffer(offerData.id.toString())
+        // Find and remove the offer from the default room
+        const room = bookingStore.rooms.find(r => r.id === defaultRoomId)
+        const offerToRemove = room?.items.find(item => 
+          item.type === 'offer' && 
+          (item.metadata?.originalOfferId === offerData.id || item.name === offerData.name)
+        )
+        
+        if (offerToRemove) {
+          bookingStore.removeItemFromRoom(defaultRoomId, offerToRemove.id)
+        }
         showToast(`${offerData.name} removed from your stay.`, 'info')
       } else {
-        // Check for duplicate offers in global state before adding
-        const existingOffer = (state.specialOffers as any[])?.find(offer => 
-          offer.id === offerData.id
+        // Check for duplicates in the room
+        const room = bookingStore.rooms.find(r => r.id === defaultRoomId)
+        const existingOffer = room?.items.find(item => 
+          item.type === 'offer' && 
+          (item.metadata?.originalOfferId === offerData.id || item.name === offerData.name)
         )
 
         if (existingOffer) {
@@ -511,33 +659,34 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           return
         }
 
-        const offer = {
-          id: offerData.id,
-          title: offerData.name,
-          description: '',
-          image: '',
-          price: offerData.price, // Use calculated total for price summary
-          basePrice: offerData.basePrice, // Store base price separately
+        // Add offer using unified store method
+        const newOfferItem = {
           name: offerData.name,
-          // Store selection data to preserve state
-          quantity: offerData.quantity,
-          type: offerData.type,
-          persons: offerData.persons,
-          nights: offerData.nights,
-          selectedDate: offerData.selectedDate,
-          selectedDates: offerData.selectedDates,
-        } as any
-        actions.addSpecialOffer(offer)
-        showToast(`${offer.title} added to your stay.`, 'success')
+          price: offerData.price,
+          type: 'offer' as const,
+          concept: 'enhance-your-stay' as const,
+          metadata: {
+            originalOfferId: offerData.id,
+            quantity: offerData.quantity,
+            offerType: offerData.type,
+            persons: offerData.persons,
+            nights: offerData.nights,
+            selectedDate: offerData.selectedDate,
+            selectedDates: offerData.selectedDates,
+          }
+        }
+        
+        bookingStore.addItemToRoom(defaultRoomId, newOfferItem)
+        showToast(`${offerData.name} added to your stay.`, 'success')
       }
     }
-  }
+  }, [shouldShowMultiBooking, getCurrentRoomId, roomBookings, handleMultiBookingRemoveItem, bookingStore, showToast, state.specialOffers, actions.removeSpecialOffer, actions.addSpecialOffer])
 
-  const handleLearnMore = (_room: RoomOption) => {
+  const handleLearnMore = useCallback((_room: RoomOption) => {
     console.log('Learn more about:', _room);
-  }
+  }, [])
 
-  const handleMakeOffer = (price: number, room: RoomOption) => {
+  const handleMakeOffer = useCallback((price: number, room: RoomOption) => {
     if (isMultiBooking && activeRoomId) {
       // Use multibooking bid handler
       handleRoomBid(activeRoomId, price, room.roomType)
@@ -547,27 +696,27 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       actions.makeOffer(price, room)
       showToast(`Bid of ${translations.currencySymbol}${price} submitted for ${room.title || room.roomType}.`, 'success')
     }
-  }
+  }, [isMultiBooking, activeRoomId, handleRoomBid, showToast, translations.currencySymbol, actions.makeOffer])
 
-  const handleCancelBid = (roomId: string) => {
+  const handleCancelBid = useCallback((roomId: string) => {
     actions.cancelBid(roomId)
     showToast(`Bid for room ${roomId} cancelled.`, 'info')
-  }
+  }, [actions.cancelBid, showToast])
 
-  const handleEditSection = (_section: 'room' | 'customizations' | 'offer') => {
+  const handleEditSection = useCallback((_section: 'room' | 'customizations' | 'offers') => {
     // This function can be used to navigate the user to the relevant section
-  }
+  }, [])
 
-  const handleShowMobilePricing = () => {
+  const handleShowMobilePricing = useCallback(() => {
     actions.setShowMobilePricing(true);
-  }
+  }, [actions.setShowMobilePricing])
 
-  const handleCloseMobilePricing = () => {
+  const handleCloseMobilePricing = useCallback(() => {
     actions.setShowMobilePricing(false);
-  }
+  }, [actions.setShowMobilePricing])
 
   // Handlers for booking state transitions
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (onConfirmBooking) {
       // Create booking data from current state
       const bookingData = {
@@ -580,27 +729,27 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       };
       onConfirmBooking(bookingData);
     }
-  };
+  }, [onConfirmBooking, state.selectedRoom, state.customizations, state.specialOffers, state.activeBid, subtotal, nights]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     actions.resetState();
-  };
+  }, [actions.resetState]);
 
-  const handleBackToNormal = () => {
+  const handleBackToNormal = useCallback(() => {
     actions.resetState();
-  };
+  }, [actions.resetState]);
 
   // Unified handler for removing items from both single and multi-booking panels
-  const handleRemoveItem = (
+  const handleRemoveItem = useCallback((
     itemId: string | number,
     itemName: string,
-    itemType: PricingItem['type'],
+    itemType: 'room' | 'customization' | 'offer' | 'bid',
     _roomId?: string
   ) => {
     if (itemType === 'customization') {
       if (shouldShowMultiBooking && _roomId) {
         // In multibooking mode, remove from specific room's items array
-        handleMultiBookingRemoveItem(_roomId, itemId, itemName, 'customization');
+        handleMultiBookingRemoveItem(_roomId, String(itemId));
         const roomContext = ` from ${roomBookings.find(r => r.id === _roomId)?.roomName || 'room'}`
         showToast(`Customization "${itemName}" removed${roomContext}`, 'info');
       } else {
@@ -616,7 +765,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     } else if (itemType === 'offer') {
       if (shouldShowMultiBooking && _roomId) {
         // In multibooking mode, remove from specific room
-        handleMultiBookingRemoveItem(_roomId, itemId, itemName, 'offer');
+        handleMultiBookingRemoveItem(_roomId, String(itemId));
         const roomContext = ` from ${roomBookings.find(r => r.id === _roomId)?.roomName || 'room'}`
         showToast(`Special offer "${itemName}" removed${roomContext}`, 'info');
       } else {
@@ -625,24 +774,49 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         showToast(`Special offer "${itemName}" removed`, 'info');
       }
     } else if (itemType === 'room') {
-      actions.selectRoom(null);
-      showToast(translations.roomRemovedMessage, 'info');
+      if (shouldShowMultiBooking && _roomId) {
+        // In multibooking mode, handle room upgrade removal using store methods
+        const roomId = _roomId
+        
+        // Clear room-specific selection to deselect upgrade
+        setRoomSpecificSelections(prev => {
+          const newSelections = { ...prev }
+          delete newSelections[roomId]
+          return newSelections
+        })
+        
+        // Simply use the store's removeItem method with the itemId passed from the pricing panel
+        handleMultiBookingRemoveItem(roomId, String(itemId))
+        
+        const roomName = roomBookings.find(r => r.id === roomId)?.roomName || 'room'
+        showToast(`Room upgrade removed for ${roomName}`, 'info')
+      } else {
+        // Single booking mode
+        actions.selectRoom(null);
+        showToast(translations.roomRemovedMessage, 'info');
+      }
     } else if (itemType === 'bid') {
       actions.cancelBid(itemId as string);
       showToast(`Bid removed for ${itemName}`, 'info');
     }
-  };
+  }, [shouldShowMultiBooking, handleMultiBookingRemoveItem, roomBookings, showToast, translations.roomRemovedMessage, getCurrentRoomId, state.customizations, actions.removeCustomization, actions.removeSpecialOffer, actions.selectRoom, actions.cancelBid, setRoomSpecificSelections]);
 
-  // Convert state to pricing items
-  const pricingItems: PricingItem[] = [
+  // Convert state to pricing items with memoization
+  const pricingItems: PricingItem[] = useMemo(() => [
     convertRoomToPricingItem(state.selectedRoom || undefined, nights),
     ...convertCustomizationsToPricingItems(state.customizations, nights),
     ...convertOffersToPricingItems(state.specialOffers as any || []),
     ...convertBidsToPricingItems(state.activeBid ? [state.activeBid as any] : [], nights),
-  ].filter((item): item is PricingItem => item !== null)
+  ].filter((item): item is PricingItem => item !== null), [
+    state.selectedRoom,
+    state.customizations,
+    state.specialOffers,
+    state.activeBid,
+    nights
+  ])
 
-  // Create section texts for subcomponents
-  const roomTexts = {
+  // Create section texts for subcomponents with memoization
+  const roomTexts = useMemo(() => ({
     roomTitle: t.roomTitle,
     roomSubtitle: t.roomSubtitle,
     selectText: t.selectText,
@@ -657,35 +831,49 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     bidSubmittedText: t.bidSubmittedText,
     updateBidText: t.updateBidText,
     cancelBidText: t.cancelBidText,
-  }
+  }), [t])
 
-  const customizationTexts = {
+  const customizationTexts = useMemo(() => ({
     ...t,
     customizeTitle: t.customizeTitle,
     customizeSubtitle: t.customizeSubtitle,
-  }
+  }), [t])
 
-  const offersTexts = {
+  const offersTexts = useMemo(() => ({
     offersTitle: t.offersTitle,
     offersSubtitle: t.offersSubtitle,
     currencySymbol: t.currencySymbol,
     specialOffersLabels: t.specialOffersLabels,
-  }
+  }), [t])
 
-  const selectionStateTexts = {
+  const selectionStateTexts = useMemo(() => ({
     loadingLabel: t.loadingLabel,
     errorTitle: t.errorTitle,
     errorMessage: t.errorMessage,
     tryAgainLabel: t.tryAgainLabel,
-  }
+  }), [t])
 
-  // Create room tabs data from room bookings
-  const roomTabs: RoomTab[] = roomBookings.map((booking) => ({
+  // Create room tabs data from room bookings with memoization and cleanup
+  const roomTabs: RoomTab[] = useMemo(() => roomBookings.map((booking) => ({
     id: booking.id,
     roomName: booking.roomName,
     roomNumber: booking.roomNumber,
     guestName: booking.guestName,
-  }))
+  })), [roomBookings])
+  
+  // Master cleanup effect for all multibooking state on unmount
+  React.useEffect(() => {
+    return () => {
+      // Comprehensive cleanup on component unmount to prevent memory leaks
+      if (isMultiBooking) {
+        // Clear room-specific selections
+        setRoomSpecificSelections({})
+        
+        // Note: We don't reset the entire booking store here as it might be used by other components
+        // The store's persistence mechanism and garbage collection will handle memory cleanup
+      }
+    }
+  }, [isMultiBooking])
 
   // Return early for non-normal states
   if (bookingStatus !== 'normal') {
@@ -713,7 +901,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       {shouldShowMultiBooking && (
         <RoomTabs
           roomTabs={roomTabs}
-          activeRoomId={activeRoomId}
+          activeRoomId={activeRoomId || undefined}
           onRoomTabClick={handleRoomTabClick}
         />
       )}
@@ -734,7 +922,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                 { label: t.occupancyLabel || 'Occupancy', value: occupancy || 'N/A', icon: 'Users' },
               ],
             })),
-            activeRoom: activeRoomId,
+            activeRoom: activeRoomId || undefined,
             onRoomActiveChange: handleRoomTabClick,
             labels: {
               multiRoomBookingsTitle: t.multiBookingLabels.multiRoomBookingsTitle,
@@ -763,18 +951,34 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
             roomOptions={roomOptions}
             selectedRoom={(() => {
               if (shouldShowMultiBooking) {
-                // In multibooking mode, show the current room from active room booking
+                // In multibooking mode, check if this room has a selection
                 const roomId = getCurrentRoomId()
+                const selectedRoomId = roomSpecificSelections[roomId]
+                
+                if (selectedRoomId) {
+                  // Find the room option that matches the selected room ID
+                  const selectedRoomOption = roomOptions.find(option => option.id === selectedRoomId)
+                  return selectedRoomOption
+                }
+                
+                // Check if there's a room upgrade item in the current booking
                 const currentRoom = roomBookings.find(r => r.id === roomId)
                 if (currentRoom) {
-                  // Find the room option that matches the current room
-                  const matchingRoomOption = roomOptions.find(option =>
-                    option.roomType === currentRoom.roomName ||
-                    (option.title && option.title.includes(currentRoom.roomName)) ||
-                    option.roomType.includes(currentRoom.roomName.toUpperCase())
+                  const roomItem = currentRoom.items.find((item: any) => 
+                    item.type === 'room'
                   )
-                  return matchingRoomOption
+                  
+                  if (roomItem && roomItem.metadata?.roomId) {
+                    // Find the room option that matches the upgraded room
+                    const matchingRoomOption = roomOptions.find(option =>
+                      option.id === roomItem.metadata.roomId ||
+                      option.roomType === roomItem.name ||
+                      option.title === roomItem.name
+                    )
+                    return matchingRoomOption
+                  }
                 }
+                
                 return undefined
               } else {
                 // Single booking mode - use selected room from state
@@ -796,7 +1000,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
 
                   if (currentRoom) {
                     // Get current room price for upgrade calculation
-                    const currentRoomPrice = currentRoom.items.find(item => item.type === 'room')?.price || 129.99
+                    const currentRoomPrice = currentRoom.items.find((item: any) => item.type === 'room')?.price || 129.99
                     const originalRoomName = currentRoom.roomName
 
                     // Use the new room upgrade handler
@@ -819,49 +1023,23 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                     return newSelections
                   })
 
-                  // Remove room upgrade items from the pricing summary panel
+                  // Remove room upgrade - simplified logic
                   const currentRoom = roomBookings.find(r => r.id === roomId)
                   if (currentRoom) {
-                    console.log(`[Room Selection] Removing room upgrade for room ${roomId}`)
-                    console.log(`[Room Selection] Current room items:`, currentRoom.items.map(item => ({ id: item.id, name: item.name, type: item.type, isUpgraded: (item as any).isUpgraded })))
-
-                    // Remove all room upgrade items (keep original room if it exists)
-                    const updatedBookings = roomBookings.map(booking => {
-                      if (booking.id === roomId) {
-                        const originalRoomItem = booking.items.find(item => 
-                          item.type === 'room' && !(item as any).isUpgraded
-                        )
-                        
-                        const upgradedItems = booking.items.filter(item => 
-                          item.type === 'room' && (item as any).isUpgraded
-                        )
-                        
-                        console.log(`[Room Selection] Found ${upgradedItems.length} upgraded room items to remove`)
-                        
-                        // Keep only non-room items and original room (if exists)
-                        const itemsToKeep = booking.items.filter(item => {
-                          if (item.type === 'room') {
-                            return !(item as any).isUpgraded // Only keep original room, remove upgrades
-                          }
-                          return true // Keep all non-room items
-                        })
-
-                        // If we had an original room, restore the room name to original
-                        const restoredBooking = originalRoomItem 
-                          ? { ...booking, roomName: originalRoomItem.name }
-                          : booking
-
-                        console.log(`[Room Selection] Keeping ${itemsToKeep.length} items after removal`)
-
-                        return {
-                          ...restoredBooking,
-                          items: itemsToKeep
-                        }
-                      }
-                      return booking
+                    // Find and remove all room items
+                    const roomItems = currentRoom.items.filter((item: any) => item.type === 'room')
+                    
+                    roomItems.forEach((item: any) => {
+                      bookingStore.removeItemFromRoom(roomId, String(item.id))
                     })
 
-                    setRoomBookings(updatedBookings)
+                    // Restore original room name if we have baseRoom info
+                    if (currentRoom.baseRoom) {
+                      bookingStore.updateRoom(roomId, { 
+                        roomName: currentRoom.baseRoom.title || currentRoom.baseRoom.roomType 
+                      })
+                    }
+
                     showToast(`Room upgrade removed for ${currentRoom.roomName}`, 'info')
                   }
                 }
@@ -894,7 +1072,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               bidAmount: state.activeBid.bidAmount,
               status: state.activeBid.status
             } : undefined}
-            contextRoomId={shouldShowMultiBooking ? activeRoomId : undefined}
+            contextRoomId={shouldShowMultiBooking ? activeRoomId || undefined : undefined}
             roomSpecificSelections={shouldShowMultiBooking ? roomSpecificSelections : undefined}
           />
 
@@ -909,12 +1087,12 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
               if (shouldShowMultiBooking) {
                 // READ FROM MULTIBOOKING STATE
                 const currentRoom = roomBookings.find(r => r.id === roomId)
-                const customizationItems = currentRoom?.items.filter(item => item.type === 'customization') || []
+                const customizationItems = currentRoom?.items.filter((item: any) => item.type === 'customization') || []
 
-                customizationItems.forEach((item) => {
+                customizationItems.forEach((item: any) => {
                   if (item.category) {
                     converted[item.category] = {
-                      id: item.originalOptionId || item.id.toString(),
+                      id: String(item.metadata?.originalOptionId || item.id),
                       label: item.name,
                       price: item.price,
                     }
@@ -981,20 +1159,20 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                   // In multibooking mode, get offers from the active room's items
                   const roomId = getCurrentRoomId()
                   const currentRoom = roomBookings.find(r => r.id === roomId)
-                  const roomOffers = currentRoom?.items?.filter(item => item.type === 'offer') || []
+                  const roomOffers = currentRoom?.items?.filter((item: any) => item.type === 'offer') || []
 
                   // Convert room offer items to the format expected by SpecialOffersSection
-                  return roomOffers.map(item => ({
-                    id: (item as any).originalOfferId || item.id,
+                  return roomOffers.map((item: any) => ({
+                    id: item.metadata?.originalOfferId || item.id,
                     title: item.name,
                     name: item.name,
                     price: item.price,
-                    quantity: (item as any).quantity || 1,
-                    type: (item as any).offerType || 'perStay',
-                    persons: (item as any).persons,
-                    nights: (item as any).nights,
-                    selectedDate: (item as any).selectedDate,
-                    selectedDates: (item as any).selectedDates,
+                    quantity: item.metadata?.quantity || 1,
+                    type: item.metadata?.offerType || 'perStay',
+                    persons: item.metadata?.persons,
+                    nights: item.metadata?.nights,
+                    selectedDate: item.metadata?.selectedDate,
+                    selectedDates: item.metadata?.selectedDates,
                   }))
                 } else {
                   // In single booking mode, use global special offers
@@ -1103,7 +1281,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                 onEditSection={(section) => {
                   if (section === 'room') handleEditSection('room')
                   else if (section === 'customizations') handleEditSection('customizations')
-                  else if (section === 'offers') handleEditSection('offer')
+                  else if (section === 'offers') handleEditSection('offers')
                 }}
               />
             </div>
@@ -1144,10 +1322,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           // Multibooking props
           isMultiBooking: true,
           roomBookings: roomBookings,
-          activeRoom: activeRoomId,
+          activeRoom: activeRoomId || undefined,
           onActiveRoomChange: handleRoomTabClick,
           multiBookingLabels: t.multiBookingLabels,
-          onMultiBookingRemoveItem: handleMultiBookingRemoveItem,
+          onMultiBookingRemoveItem: handleMultiBookingRemoveItemWrapper,
           onMultiBookingEditSection: handleMultiBookingEditSection,
           onMultiBookingConfirmAll: handleMultiBookingConfirmAll,
           multiBookingCurrency: "EUR",
@@ -1247,14 +1425,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           },
           currency: "EUR",
           locale: language === 'en' ? 'en-US' : 'es-ES',
-          onRemoveItem: (id: string | number, name: string, type: PricingItem['type']) => {
+          onRemoveItem: (id: string | number, name: string, type: 'room' | 'customization' | 'offer' | 'bid') => {
             handleRemoveItem(id, name, type)
           },
           onConfirm: handleConfirm,
           onEditSection: (section: 'room' | 'customizations' | 'offers') => {
             if (section === 'room') handleEditSection('room')
             else if (section === 'customizations') handleEditSection('customizations')
-            else if (section === 'offers') handleEditSection('offer')
+            else if (section === 'offers') handleEditSection('offers')
           }
         })}
       />

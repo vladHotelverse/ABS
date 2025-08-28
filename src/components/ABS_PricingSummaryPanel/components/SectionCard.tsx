@@ -83,17 +83,6 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, fromLabel, euroSuffi
               )}
             </div>
           </div>
-
-          {/* <UiButton
-            variant="ghost"
-            size="sm"
-            className={`text-blue-600 font-medium hover:bg-blue-50 transition-colors duration-200 ${
-              isHovered ? 'bg-blue-50' : ''
-            }`}
-          >
-            <span className="text-xs">{exploreLabel}</span>
-            <ChevronRight className="h-3 w-3 ml-1" />
-          </UiButton> */}
         </div>
 
         {/* Show description on hover */}

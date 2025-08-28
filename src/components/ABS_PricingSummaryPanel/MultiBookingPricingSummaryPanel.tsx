@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { cn } from '../../lib/utils'
 import PriceBreakdown from './components/PriceBreakdown'
 import RoomAccordionItem from './components/RoomAccordionItem'
-import type { PricingItem } from './types'
+import type { ExtendedPricingItem, ComponentRoomBooking } from '../../types/shared'
 import { useAccordionState } from './hooks/useAccordionState'
 import { useConfirmAll } from './hooks/useConfirmAll'
 import { useCurrencyFormatter } from '../../hooks/useCurrencyFormatter'
@@ -19,19 +19,14 @@ export interface AvailableItem {
 }
 
 // Extended interface for room booking data
-export interface RoomBooking {
-  id: string
-  roomName: string
-  roomNumber: string
-  guestName: string
-  checkIn?: string
-  checkOut?: string
-  guests?: number
-  nights: number
-  items: PricingItem[]
-  payAtHotel: boolean
-  roomImage?: string
+// Using ComponentRoomBooking for type safety in UI components
+export interface RoomBooking extends ComponentRoomBooking {
+  // This interface now inherits from ComponentRoomBooking
+  // All fields are already defined in the parent interface
 }
+
+// Type alias for backward compatibility
+export type { ComponentRoomBooking as SafeRoomBooking }
 
 // Multi-booking labels interface
 export interface MultiBookingLabels {
@@ -85,7 +80,7 @@ export interface MultiBookingPricingSummaryPanelProps {
   isLoading?: boolean
   activeRooms?: string[]
   onActiveRoomsChange?: (roomIds: string[]) => void
-  onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
+  onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: ExtendedPricingItem['type']) => void
   onEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   onConfirmAll: () => Promise<void>
   hideFooter?: boolean

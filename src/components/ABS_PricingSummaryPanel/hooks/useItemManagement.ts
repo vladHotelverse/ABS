@@ -15,7 +15,12 @@ export const useItemManagement = ({ roomBookings, labels, onRemoveItem, showToas
   const handleRemoveItem = useCallback(
     async (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => {
       const room = roomBookings.find((r) => r.id === roomId)
-      if (room?.items.find((item) => item.id === itemId)?.type === 'room') {
+      const itemToRemove = room?.items.find((item) => item.id === itemId)
+      
+      // Room upgrades can always be removed - they have category 'room-upgrade'
+      // Only prevent removal if it's a base room (no category or category is 'room')
+      if (itemToRemove?.type === 'room' && itemToRemove?.category !== 'room-upgrade') {
+        // This is a base room, not an upgrade - don't allow removal
         showToast(labels.cannotRemoveRoom, 'error')
         return
       }

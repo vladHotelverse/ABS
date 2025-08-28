@@ -1,7 +1,15 @@
 import type { SegmentDiscount } from '../ABS_RoomSelectionCarousel/types'
+import type { ExtendedPricingItem } from '../../types/shared'
 
 // Unified pricing item interface to reduce conversion complexity
-export interface PricingItem {
+// Now extends ExtendedPricingItem for full compatibility
+export interface PricingItem extends ExtendedPricingItem {
+  // This interface now inherits all fields from ExtendedPricingItem
+  // Maintaining backward compatibility while ensuring type safety
+}
+
+// Legacy PricingItem for components that haven't been migrated yet
+export interface LegacyPricingItem {
   id: string | number
   name: string
   price: number

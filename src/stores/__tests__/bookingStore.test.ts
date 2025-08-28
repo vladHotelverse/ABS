@@ -211,7 +211,7 @@ describe('BookingStore', () => {
       const itemId = room.items[0].id
       
       act(() => {
-        result.current.removeItemFromRoom('room-1', itemId)
+        result.current.removeItemFromRoom('room-1', String(itemId))
       })
       
       expect(result.current.rooms[0].items).toHaveLength(0)
@@ -228,7 +228,7 @@ describe('BookingStore', () => {
       const itemId = room.items[0].id
       
       act(() => {
-        result.current.updateItemInRoom('room-1', itemId, { price: 75 })
+        result.current.updateItemInRoom('room-1', String(itemId), { price: 75 })
       })
       
       expect(result.current.rooms[0].items[0].price).toBe(75)

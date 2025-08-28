@@ -247,7 +247,6 @@ function Home() {
   const roomType = bookingInfo?.roomType || "DELUXE SILVER"
   const occupancy = bookingInfo?.occupancy || "2 Adults, 0 Children"
   const reservationCode = bookingInfo?.reservationCode || "1003066AU"
-  // const guestName = bookingInfo?.guestName || "Demo Guest"
 
   return (
     <main className="min-h-screen bg-background">
