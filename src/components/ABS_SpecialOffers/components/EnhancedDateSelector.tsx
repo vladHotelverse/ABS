@@ -47,7 +47,7 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
 
   // Convert dates to string keys for list picker
   const selectedDateKeys = useMemo(() => {
-    return new Set(selectedDates.map(dateToKey))
+    return new Set(selectedDates.map(dateToKey).filter(key => key !== ''))
   }, [selectedDates])
 
   const formatSelectedDates = (): string => {

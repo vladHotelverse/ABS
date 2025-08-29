@@ -5,7 +5,16 @@ export const useRoomCalculations = (roomBookings: RoomBooking[]) => {
   const roomTotals = useMemo(() => {
     return roomBookings.reduce(
       (acc, room) => {
-        const total = room.items.reduce((sum, item) => sum + item.price, 0)
+        const nights = Math.max(room.nights || 0, 0)
+        const total = room.items.reduce((sum, item) => {
+          // Only multiply per-night items by nights
+          // Special offers (type: 'offer') should not be multiplied by nights
+          if (item.type === 'offer') {
+            return sum + item.price
+          }
+          // All other items (room upgrades, customizations) are per-night
+          return sum + (item.price * nights)
+        }, 0)
         acc[room.id] = total
         return acc
       },

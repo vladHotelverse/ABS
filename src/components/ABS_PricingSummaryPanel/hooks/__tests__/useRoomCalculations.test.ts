@@ -206,6 +206,73 @@ describe('useRoomCalculations', () => {
     })
   })
 
+  describe('Nights Multiplication', () => {
+    it('should multiply room prices by number of nights', () => {
+      const mockRoom = createMockRoomBooking('room1', [
+        { name: 'Standard Room', price: 100 }
+      ])
+      mockRoom.nights = 3
+
+      const { result } = renderHook(() => useRoomCalculations([mockRoom]))
+
+      expect(result.current.roomTotals['room1']).toBe(300) // 100 * 3 nights
+      expect(result.current.overallTotal).toBe(300)
+    })
+
+    it('should multiply all item prices by number of nights', () => {
+      const mockRoom = createMockRoomBooking('room1', [
+        { name: 'Deluxe Room', price: 200 },
+        { name: 'Breakfast', price: 25 },
+        { name: 'Parking', price: 15 }
+      ])
+      mockRoom.nights = 4
+
+      const { result } = renderHook(() => useRoomCalculations([mockRoom]))
+
+      // (200 + 25 + 15) * 4 nights = 960
+      expect(result.current.roomTotals['room1']).toBe(960) 
+      expect(result.current.overallTotal).toBe(960)
+    })
+
+    it('should handle different nights per room in multi-booking', () => {
+      const room1 = createMockRoomBooking('room1', [{ name: 'Room', price: 100 }])
+      room1.nights = 2
+
+      const room2 = createMockRoomBooking('room2', [{ name: 'Suite', price: 300 }])
+      room2.nights = 3
+
+      const { result } = renderHook(() => useRoomCalculations([room1, room2]))
+
+      expect(result.current.roomTotals['room1']).toBe(200) // 100 * 2
+      expect(result.current.roomTotals['room2']).toBe(900) // 300 * 3
+      expect(result.current.overallTotal).toBe(1100) // 200 + 900
+    })
+
+    it('should handle single night bookings (nights = 1)', () => {
+      const mockRoom = createMockRoomBooking('room1', [
+        { name: 'Room', price: 150 }
+      ])
+      mockRoom.nights = 1
+
+      const { result } = renderHook(() => useRoomCalculations([mockRoom]))
+
+      expect(result.current.roomTotals['room1']).toBe(150) // 150 * 1 = 150
+      expect(result.current.overallTotal).toBe(150)
+    })
+
+    it('should handle zero nights gracefully', () => {
+      const mockRoom = createMockRoomBooking('room1', [
+        { name: 'Room', price: 100 }
+      ])
+      mockRoom.nights = 0
+
+      const { result } = renderHook(() => useRoomCalculations([mockRoom]))
+
+      expect(result.current.roomTotals['room1']).toBe(0) // 100 * 0 = 0
+      expect(result.current.overallTotal).toBe(0)
+    })
+  })
+
   describe('Performance with Large Datasets', () => {
     it('should handle large number of rooms efficiently', () => {
       const roomBookings = Array.from({ length: 100 }, (_, i) =>

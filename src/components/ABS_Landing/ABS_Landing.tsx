@@ -290,7 +290,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     activeBid: state.activeBid,
   })
 
-  const { subtotal, tax, total } = calculateTotalPrice(
+  const { subtotal, tax } = calculateTotalPrice(
     state.selectedRoom || undefined,
     state.customizations,
     state.specialOffers as any || [],
@@ -866,7 +866,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     roomName: booking.roomName,
     roomNumber: booking.roomNumber,
     guestName: booking.guestName,
-    baseRoomRoomType: booking.baseRoom.roomType, // Show upgrade indicator if baseRoom is available
+    baseRoomRoomType: booking.baseRoom?.roomType, // Show upgrade indicator if baseRoom is available
   })), [roomBookings])
   
   // Master cleanup effect for all multibooking state on unmount
@@ -1305,7 +1305,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           )} */}
       {/* Mobile Pricing Widget */}
       <MobilePricingWidget
-        total={shouldShowMultiBooking ? totalPrice : total}
+        total={shouldShowMultiBooking ? totalPrice : subtotal}
         currencySymbol={translations.currencySymbol}
         itemCount={shouldShowMultiBooking ? totalItemCount : cartItemCount}
         onShowPricing={shouldShowMultiBooking

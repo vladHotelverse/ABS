@@ -453,22 +453,11 @@ export const useBookingStore = create<BookingStore>()(
         }),
         
         // Multibooking operations - enhanced from useMultiBookingState
-        handleRoomUpgrade: (roomId, newRoom, currentRoomPrice) => set((state) => {
+        handleRoomUpgrade: (roomId, newRoom) => set((state) => {
           const roomIndex = state.rooms.findIndex(room => room.id === roomId)
           if (roomIndex === -1) return
           
           const room = state.rooms[roomIndex]
-          
-          // Get the base room price - either from passed param, baseRoom, or existing room item
-          let basePrice = currentRoomPrice
-          if (!basePrice && room.baseRoom) {
-            basePrice = room.baseRoom.price
-          }
-          if (!basePrice) {
-            // Try to find existing room item price
-            const existingRoomItem = room.items.find(item => item.type === 'room')
-            basePrice = (existingRoomItem?.metadata?.originalRoom as any)?.price || 0
-          }
           
           // Remove all existing room items and bids - only one room selection allowed
           room.items = room.items.filter(item => 
@@ -477,14 +466,12 @@ export const useBookingStore = create<BookingStore>()(
             !(item.type === 'customization' && item.category?.startsWith('room-upgrade'))
           )
           
-          // Calculate the upgrade price difference
-          const upgradePrice = newRoom.price - (basePrice || 0)
-          
-          // Add the room upgrade as an item with the price difference
+          // SIMPLIFIED FOR DEMO: Use absolute room price instead of complex upgrade difference logic
+          // This prevents negative prices and makes the demo much cleaner
           const newRoomItem: BookingItem = {
             id: `room-upgrade-${roomId}-${Date.now()}`,
-            name: `${newRoom.title || newRoom.roomType} (Upgrade)`,
-            price: upgradePrice, // Use upgrade difference price
+            name: `${newRoom.title || newRoom.roomType}`,  // Removed "(Upgrade)" suffix
+            price: newRoom.price, // Use absolute room price
             type: 'room',
             concept: 'choose-your-superior-room',
             category: 'room-upgrade',
@@ -494,9 +481,7 @@ export const useBookingStore = create<BookingStore>()(
               roomId: newRoom.id,
               roomType: newRoom.roomType,
               fullPrice: newRoom.price,
-              basePrice: basePrice || 0,
-              upgradePrice: upgradePrice,
-              originalRoom: room.baseRoom || { roomType: room.roomName, price: basePrice || 0 },
+              originalRoom: room.baseRoom || { roomType: room.roomName, price: 0 },
             }
           }
           
@@ -621,17 +606,38 @@ export const useBookingStore = create<BookingStore>()(
         getRoomTotal: (roomId) => {
           const { rooms } = get()
           const room = rooms.find(r => r.id === roomId)
-          return room?.items.reduce((sum, item) => sum + item.price, 0) || 0
+          if (!room) return 0
+          
+          const nights = Math.max(room.nights || 0, 0)
+          return room.items.reduce((sum, item) => {
+            // Only multiply per-night items by nights
+            // Special offers (type: 'offer') should not be multiplied by nights
+            if (item.type === 'offer') {
+              return sum + item.price
+            }
+            // All other items (room upgrades, customizations) are per-night
+            return sum + (item.price * nights)
+          }, 0)
         },
         
         getTotalPrice: () => {
           const { mode, rooms, selectedRoom, customizations, specialOffers, activeBid } = get()
           
           if (mode === 'multi') {
-            // Optimized multi-booking calculation
-            return rooms.reduce((total, room) => 
-              total + room.items.reduce((sum, item) => sum + item.price, 0), 0
-            )
+            // Multi-booking calculation with nights multiplication
+            return rooms.reduce((total, room) => {
+              const nights = Math.max(room.nights || 0, 0)
+              const roomTotal = room.items.reduce((sum, item) => {
+                // Only multiply per-night items by nights
+                // Special offers (type: 'offer') should not be multiplied by nights
+                if (item.type === 'offer') {
+                  return sum + item.price
+                }
+                // All other items (room upgrades, customizations) are per-night
+                return sum + (item.price * nights)
+              }, 0)
+              return total + roomTotal
+            }, 0)
           } else {
             // Legacy single booking calculation - kept for backward compatibility
             // This supports existing ABS_Landing.tsx and other components that rely on single booking mode
@@ -735,7 +741,16 @@ export const useBookingStore = create<BookingStore>()(
         getMultiBookingTotalPrice: () => {
           const { rooms } = get()
           return rooms.reduce((sum, room) => {
-            const roomTotal = room.items.reduce((itemSum, item) => itemSum + item.price, 0)
+            const nights = Math.max(room.nights || 0, 0)
+            const roomTotal = room.items.reduce((itemSum, item) => {
+              // Only multiply per-night items by nights
+              // Special offers (type: 'offer') should not be multiplied by nights
+              if (item.type === 'offer') {
+                return itemSum + item.price
+              }
+              // All other items (room upgrades, customizations) are per-night
+              return itemSum + (item.price * nights)
+            }, 0)
             return sum + roomTotal
           }, 0)
         },

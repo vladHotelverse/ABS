@@ -80,7 +80,7 @@ const OfferPriceDisplay: React.FC<OfferPriceDisplayProps> = ({
       <EnhancedDateSelector
         id={`enhanced-date-${offerId}`}
         label=""
-        selectedDates={selectedDates || (selectedDate ? [selectedDate] : [])}
+        selectedDates={selectedDates || (selectedDate && selectedDate instanceof Date ? [selectedDate] : [])}
         onChange={(dates) => {
           if (onMultipleDatesChange) {
             onMultipleDatesChange(dates)
