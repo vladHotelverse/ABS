@@ -291,6 +291,154 @@ export const countCartItems = (
 }
 
 /**
+ * Get detailed counts for mobile pricing badges
+ */
+export const getDetailedCartCounts = (
+  state: {
+    selectedRoom?: RoomOption
+    selectedCustomizations?: Record<string, any[]> | SelectedCustomizations
+    selectedOffers?: SelectedOffer[]
+    activeBid?: { roomId: string; bidAmount: number; status: string } | null
+  }
+): {
+  upgradeCount: number
+  customizationCount: number
+  offerCount: number
+} => {
+  if (!state) return { upgradeCount: 0, customizationCount: 0, offerCount: 0 }
+  
+  let upgradeCount = 0
+  let customizationCount = 0
+  
+  // Count upgrades vs regular customizations
+  if (state.selectedCustomizations && typeof state.selectedCustomizations === 'object') {
+    Object.entries(state.selectedCustomizations).forEach(([_key, value]) => {
+      if (Array.isArray(value)) {
+        // Handle Record<string, Customization[]> format
+        value.forEach((c) => {
+          const isUpgrade = c.name?.toLowerCase().includes('upgrade') || 
+                           c.name?.toLowerCase().includes('superior') ||
+                           c.name?.toLowerCase().includes('suite') ||
+                           c.name?.toLowerCase().includes('deluxe')
+          if (isUpgrade) {
+            upgradeCount++
+          } else {
+            customizationCount++
+          }
+        })
+      } else if (value && typeof value === 'object' && 'id' in value) {
+        // Handle SelectedCustomizations format
+        const c = value as { id: string; label: string; price: number }
+        const isUpgrade = c.label.toLowerCase().includes('upgrade') || 
+                         c.label.toLowerCase().includes('superior') ||
+                         c.label.toLowerCase().includes('suite') ||
+                         c.label.toLowerCase().includes('deluxe')
+        if (isUpgrade) {
+          upgradeCount++
+        } else {
+          customizationCount++
+        }
+      }
+    })
+  }
+  
+  // Add room as upgrade if it's a superior/premium room
+  if (state.selectedRoom) {
+    const room = state.selectedRoom
+    const isRoomUpgrade = room.roomType?.toLowerCase().includes('suite') ||
+                         room.roomType?.toLowerCase().includes('deluxe') ||
+                         room.roomType?.toLowerCase().includes('superior') ||
+                         room.title?.toLowerCase().includes('luxury') ||
+                         room.title?.toLowerCase().includes('premium')
+    if (isRoomUpgrade) {
+      upgradeCount++
+    }
+  }
+  
+  // Add bid as upgrade
+  if (state.activeBid) {
+    upgradeCount++
+  }
+  
+  const offerCount = state.selectedOffers ? state.selectedOffers.length : 0
+  
+  return {
+    upgradeCount,
+    customizationCount, 
+    offerCount
+  }
+}
+
+/**
+ * Get detailed counts for multibooking mobile pricing badges
+ */
+export const getMultiBookingDetailedCounts = (
+  roomBookings: Array<{
+    items: Array<{
+      type: 'room' | 'customization' | 'offer' | 'bid'
+      name?: string
+      category?: string
+      concept?: string
+    }>
+  }>
+): {
+  upgradeCount: number
+  customizationCount: number
+  offerCount: number
+} => {
+  if (!roomBookings || roomBookings.length === 0) {
+    return { upgradeCount: 0, customizationCount: 0, offerCount: 0 }
+  }
+  
+  let upgradeCount = 0
+  let customizationCount = 0
+  let offerCount = 0
+  
+  roomBookings.forEach(room => {
+    if (!room.items) return
+    
+    room.items.forEach(item => {
+      switch (item.type) {
+        case 'offer':
+          offerCount++
+          break
+        case 'bid':
+          upgradeCount++
+          break
+        case 'room':
+          // Rooms with upgrade-related concepts or categories are upgrades
+          if (item.concept === 'choose-your-superior-room' || 
+              item.category?.includes('upgrade')) {
+            upgradeCount++
+          }
+          break
+        case 'customization':
+          // Check if customization is an upgrade
+          const isUpgrade = item.name?.toLowerCase().includes('upgrade') ||
+                           item.name?.toLowerCase().includes('superior') ||
+                           item.name?.toLowerCase().includes('suite') ||
+                           item.name?.toLowerCase().includes('deluxe') ||
+                           item.concept === 'choose-your-superior-room' ||
+                           item.category?.includes('upgrade')
+          
+          if (isUpgrade) {
+            upgradeCount++
+          } else {
+            customizationCount++
+          }
+          break
+      }
+    })
+  })
+  
+  return {
+    upgradeCount,
+    customizationCount,
+    offerCount
+  }
+}
+
+/**
  * Determines if a section should be visible based on availability
  */
 export const shouldShowSection = (

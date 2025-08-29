@@ -33,6 +33,8 @@ import {
   convertBidsToPricingItems,
   generateAvailableSections,
   countCartItems,
+  getDetailedCartCounts,
+  getMultiBookingDetailedCounts,
   shouldShowSection,
   calculateNights,
   calculateTotalPrice,
@@ -290,6 +292,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     activeBid: state.activeBid,
   })
 
+  // Calculate detailed counts for mobile pricing badges
+  const detailedCounts = getDetailedCartCounts({
+    selectedRoom: state.selectedRoom || undefined,
+    selectedCustomizations: state.customizations,
+    selectedOffers: state.specialOffers as any,
+    activeBid: state.activeBid,
+  })
+
   const { subtotal, tax } = calculateTotalPrice(
     state.selectedRoom || undefined,
     state.customizations,
@@ -338,6 +348,12 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
       }
     })
   }, [storeRoomBookings])
+
+  // Calculate detailed counts for multibooking mode
+  const multiBookingDetailedCounts = useMemo(() => 
+    getMultiBookingDetailedCounts(roomBookings), 
+    [roomBookings]
+  )
   
   // Memoize expensive calculations with stable dependencies and proper cleanup
   const roomBookingsLength = useMemo(() => storeRoomBookings.length, [storeRoomBookings])
@@ -1319,6 +1335,14 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         isMultiBooking={shouldShowMultiBooking}
         roomCount={shouldShowMultiBooking ? roomBookings.length : undefined}
         roomsLabel={shouldShowMultiBooking ? "rooms" : undefined}
+        
+        // Detailed badge counts - works for both single and multi booking modes
+        upgradeCount={shouldShowMultiBooking ? multiBookingDetailedCounts.upgradeCount : detailedCounts.upgradeCount}
+        customizationCount={shouldShowMultiBooking ? multiBookingDetailedCounts.customizationCount : detailedCounts.customizationCount}
+        offerCount={shouldShowMultiBooking ? multiBookingDetailedCounts.offerCount : detailedCounts.offerCount}
+        upgradesLabel="upgrades"
+        customizationsLabel="customizations"
+        offersLabel="offers"
       />
 
       {/* Mobile Pricing Overlay */}
