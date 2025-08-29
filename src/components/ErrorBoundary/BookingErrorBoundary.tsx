@@ -248,14 +248,32 @@ class BookingErrorBoundary extends Component<Props, State> {
       // Only import when needed to avoid circular dependencies
       const { useBookingStore } = require('../../stores/bookingStore')
       const state = useBookingStore.getState()
+      
+      // Calculate unified statistics from room-based system
+      const hasSelectedRoom = state.rooms.length > 0 && state.rooms.some((room: any) => 
+        room.items.some((item: any) => item.type === 'room')
+      )
+      
+      const customizationCount = state.rooms.reduce((total: number, room: any) => 
+        total + room.items.filter((item: any) => item.type === 'customization').length, 0
+      )
+      
+      const specialOffersCount = state.rooms.reduce((total: number, room: any) => 
+        total + room.items.filter((item: any) => item.type === 'offer').length, 0
+      )
+      
+      const hasActiveBid = state.rooms.some((room: any) => 
+        room.items.some((item: any) => item.type === 'bid')
+      )
+      
       return {
         mode: state.mode,
         roomCount: state.rooms.length,
         activeRoomId: state.activeRoomId,
-        hasSelectedRoom: !!state.selectedRoom,
-        customizationCount: Object.keys(state.customizations).length,
-        specialOffersCount: state.specialOffers.length,
-        hasActiveBid: !!state.activeBid,
+        hasSelectedRoom,
+        customizationCount,
+        specialOffersCount,
+        hasActiveBid,
         lastUpdate: state.lastUpdate,
         optimisticUpdatesCount: state.optimisticUpdates.size,
       }

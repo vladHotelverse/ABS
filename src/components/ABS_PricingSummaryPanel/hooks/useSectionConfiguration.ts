@@ -7,7 +7,6 @@ export interface SectionConfigurationProps {
   customizeYourRoomItems: PricingItem[]
   chooseYourRoomItems: PricingItem[]
   enhanceYourStayItems: PricingItem[]
-  bidForUpgradeItems: PricingItem[]
 }
 
 export const useSectionConfiguration = ({
@@ -15,7 +14,6 @@ export const useSectionConfiguration = ({
   customizeYourRoomItems,
   chooseYourRoomItems,
   enhanceYourStayItems,
-  bidForUpgradeItems,
 }: SectionConfigurationProps): SectionConfig[] => {
   return useMemo(() => {
     const configurations: SectionConfig[] = [
@@ -26,14 +24,6 @@ export const useSectionConfiguration = ({
         shouldRender: chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0,
         className: "bg-gray-50 rounded-lg p-3 mb-4",
         ariaLabelledBy: "room-section-title"
-      },
-      {
-        id: 'bid-upgrades',
-        title: 'Bid for Upgrades',
-        items: bidForUpgradeItems,
-        shouldRender: bidForUpgradeItems.length > 0,
-        className: "bg-gray-50 rounded-lg p-3 mb-4",
-        ariaLabelledBy: "bid-section-title"
       },
       {
         id: 'room-customization',
@@ -57,6 +47,5 @@ export const useSectionConfiguration = ({
     customizeYourRoomItems,
     chooseYourRoomItems,
     enhanceYourStayItems,
-    bidForUpgradeItems,
   ])
 }

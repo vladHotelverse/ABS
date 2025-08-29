@@ -1,35 +1,4 @@
-import { useCallback } from 'react'
 
-/**
- * Legacy currency formatter - kept for backward compatibility
- * @deprecated Use the new useCurrencyFormatter function instead
- */
-export const useCurrencyFormatterLegacy = (currency = 'EUR', locale?: string) => {
-  return useCallback(
-    (amount: number): string => {
-      // Handle browser environment check
-      if (typeof window === 'undefined' && !locale) {
-        // Fallback for SSR - basic formatting
-        return `${amount.toFixed(2)} ${currency}`
-      }
-
-      try {
-        return new Intl.NumberFormat(locale ?? navigator.language, {
-          style: 'currency',
-          currency,
-          // Let Intl.NumberFormat handle decimal places based on currency
-          minimumFractionDigits: undefined,
-          maximumFractionDigits: undefined,
-        }).format(amount)
-      } catch (error) {
-        // Fallback if currency or locale is invalid
-        console.warn(`Invalid currency or locale: ${currency}, ${locale}`, error)
-        return `${amount.toFixed(2)} ${currency}`
-      }
-    },
-    [currency, locale]
-  )
-}
 
 /**
  * Simple price formatter for cases where we need basic formatting

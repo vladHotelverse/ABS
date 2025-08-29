@@ -18,7 +18,7 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = (props) => {
     onLearnMore,
     onCancelBid,
     minPrice = 10,
-    showPriceSlider = true,
+    showPriceSlider = false,
     variant = 'basic',
     translations,
     currentRoomType = 'DELUXE SILVER',
@@ -28,48 +28,12 @@ const RoomSelectionCarousel: React.FC<RoomSelectionCarouselProps> = (props) => {
     activeBid,
     contextRoomId,
     roomSpecificSelections,
-    // Deprecated props for backward compatibility
-    learnMoreText,
-    nightText,
-    priceInfoText,
-    makeOfferText,
-    availabilityText,
-    selectedText,
-    selectText,
-    proposePriceText,
-    currencyText,
-    currencySymbol,
-    offerMadeText,
-    discountBadgeText,
-    bidSubmittedText,
-    updateBidText,
-    cancelBidText,
-    upgradeNowText,
-    removeText,
   } = props
 
   // Use custom hooks for state management and translations
   const resolvedTexts = useTranslations({
     translations,
-    fallbackProps: {
-      learnMoreText,
-      nightText,
-      priceInfoText,
-      makeOfferText,
-      availabilityText,
-      selectedText,
-      selectText,
-      proposePriceText,
-      currencyText,
-      currencySymbol,
-      offerMadeText,
-      discountBadgeText,
-      bidSubmittedText,
-      updateBidText,
-      cancelBidText,
-      upgradeNowText,
-      removeText,
-    },
+    fallbackProps: {},
   })
 
   // Use custom hooks for state management

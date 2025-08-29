@@ -8,7 +8,6 @@ import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { enableMapSet } from 'immer'
 import type { RoomOption } from '../components/ABS_Landing/sections/RoomSelectionSection'
-import type { Customization, SpecialOffer, ActiveBid } from '../components/ABS_Landing/types'
 import type { EnhancedBookingItem, StoreRoomBooking } from '../types/shared'
 
 // Enable Immer MapSet plugin for Set support
@@ -33,13 +32,9 @@ export interface BookingState {
   rooms: RoomBooking[] // Primary storage for all booking data
   activeRoomId: string | null
   
-  // Legacy single booking support - KEPT FOR BACKWARD COMPATIBILITY
-  // These are still actively used by ABS_Landing.tsx and other components
-  // that haven't been fully migrated to the unified room-based system
-  selectedRoom: RoomOption | null // Used in single booking mode only
-  customizations: Record<string, Customization[]> // Legacy customization storage
-  specialOffers: SpecialOffer[] // Legacy global offers storage
-  activeBid: ActiveBid | null // Legacy single bid storage
+  
+  // Feature flags
+  biddingEnabled: boolean
   
   // UI state
   showMobilePricing: boolean
@@ -96,11 +91,6 @@ export interface BookingActions {
   clearRoom: (roomId: string) => void
   clearAllRooms: () => void
   
-  // DEPRECATED LEGACY ACTIONS - REMOVED
-  // Components now use unified item-based system:
-  // - addItemToRoom() instead of addCustomization/addSpecialOffer
-  // - removeItemFromRoom() instead of removeCustomization/removeSpecialOffer  
-  // - handleRoomBid() instead of makeOffer/cancelBid
   
   // UI state management
   setShowMobilePricing: (show: boolean) => void
@@ -164,8 +154,6 @@ export interface BookingSelectors {
     timestamp: Date
   }>
   
-  // Note: Legacy selectors (getSelectedRoom, getCustomizations, getSpecialOffers, getActiveBid) 
-  // have been removed as they were not being used. Direct state access is used instead.
 }
 
 type BookingStore = BookingState & BookingActions & BookingSelectors
@@ -195,10 +183,7 @@ const initialState: BookingState = {
   mode: 'single',
   rooms: [], // Start with empty rooms array - will be initialized when needed
   activeRoomId: null,
-  selectedRoom: null, // DEPRECATED - will be removed
-  customizations: {}, // DEPRECATED - will be removed  
-  specialOffers: [], // DEPRECATED - will be removed
-  activeBid: null, // DEPRECATED - will be removed
+  biddingEnabled: false, // Bidding is disabled by default
   showMobilePricing: false,
   bookingStatus: 'normal',
   isMobilePricingOverlayOpen: false,
@@ -308,6 +293,12 @@ export const useBookingStore = create<BookingStore>()(
         
         // Item management with optimistic updates
         addItemToRoom: (roomId, itemData) => set((state) => {
+          // Prevent adding bid items if bidding is disabled
+          if (itemData.type === 'bid' && !state.biddingEnabled) {
+            console.warn('Bidding is disabled, cannot add bid item')
+            return
+          }
+          
           const room = state.rooms.find((r: RoomBooking) => r.id === roomId)
           if (room) {
             const item: BookingItem = {
@@ -397,8 +388,6 @@ export const useBookingStore = create<BookingStore>()(
           state.lastUpdate = new Date()
         }),
         
-        // LEGACY ACTIONS REMOVED - Components now use unified store methods
-        // Use addItemToRoom/removeItemFromRoom instead
         
         // UI state
         setShowMobilePricing: (show) => set((state) => {
@@ -637,12 +626,13 @@ export const useBookingStore = create<BookingStore>()(
         },
         
         isValidBooking: () => {
-          const { mode, rooms, selectedRoom } = get()
+          const { mode, rooms } = get()
           
           if (mode === 'multi') {
             return rooms.length > 0 && rooms.every(room => room.items.length > 0)
           } else {
-            return selectedRoom !== null
+            // For single mode, check if there are any items in the first room
+            return rooms.length > 0 && rooms[0].items.length > 0
           }
         },
         
@@ -671,6 +661,18 @@ export const useBookingStore = create<BookingStore>()(
           const { rooms } = get()
           const room = rooms.find(r => r.id === roomId)
           return room?.items.filter(item => item.category === category) || []
+        },
+        
+        // Get all items for pricing display, filtering out bids if bidding is disabled
+        getFilteredPricingItems: () => {
+          const { rooms, biddingEnabled } = get()
+          const allItems = rooms.flatMap(room => room.items)
+          
+          if (!biddingEnabled) {
+            return allItems.filter(item => item.type !== 'bid')
+          }
+          
+          return allItems
         },
         
         // Multibooking totals (enhanced from useMultiBookingState)
@@ -702,8 +704,6 @@ export const useBookingStore = create<BookingStore>()(
           return toastQueue
         },
         
-        // Note: Legacy selector methods (getSelectedRoom, etc.) were removed as they were unused.
-        // Components now access state directly via useShallow() for better performance.
       })),
     {
       name: 'booking-store',

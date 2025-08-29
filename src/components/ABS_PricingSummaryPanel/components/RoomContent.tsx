@@ -20,7 +20,6 @@ const RoomContent: React.FC<RoomContentProps> = memo(
     const chooseYourSuperiorRoomItems = room.items.filter((item) => item.concept === 'choose-your-superior-room')
     const customizeYourRoomItems = room.items.filter((item) => item.concept === 'customize-your-room')
     const enhanceYourStayItems = room.items.filter((item) => item.concept === 'enhance-your-stay')
-    const bidForUpgradeItems = room.items.filter((item) => item.concept === 'bid-for-upgrade')
     const total = room.items.reduce((sum, item) => sum + item.price, 0)
 
     return (
@@ -92,15 +91,6 @@ const RoomContent: React.FC<RoomContentProps> = memo(
                 onRemoveItemMulti={onRemoveItem}
               />
 
-              {/* Bid for Upgrade Section */}
-              <ItemsSection
-                title="Bid for Upgrade"
-                items={bidForUpgradeItems}
-                euroSuffix={labels.euroSuffix}
-                removingItems={removingItems}
-                roomId={room.id}
-                onRemoveItemMulti={onRemoveItem}
-              />
 
               {/* Room Total - Only show when there are selections */}
               <div className="border-t pt-4">

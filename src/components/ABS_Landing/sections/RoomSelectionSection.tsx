@@ -134,25 +134,14 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
         roomOptions={carouselRoomOptions}
         onRoomSelected={handleRoomSelect}
         initialSelectedRoom={selectedRoom ? convertToCarouselRoomOption(selectedRoom) : null}
-        selectText={texts.selectText}
-        selectedText={texts.selectedText}
-        nightText={texts.nightText}
-        learnMoreText={texts.learnMoreText}
-        priceInfoText={texts.priceInfoText}
         onLearnMore={handleLearnMore}
         onMakeOffer={handleMakeOffer}
         onCancelBid={onCancelBid}
         showPriceSlider={showPriceSlider}
-        makeOfferText={texts.makeOfferText}
-        proposePriceText={texts.proposePriceText}
-        availabilityText={texts.availabilityText}
-        offerMadeText={texts.offerMadeText}
-        bidSubmittedText={texts.bidSubmittedText}
-        updateBidText={texts.updateBidText}
-        cancelBidText={texts.cancelBidText}
         activeBid={activeBid}
         contextRoomId={contextRoomId}
         roomSpecificSelections={roomSpecificSelections}
+        translations={undefined}
       />
     </section>
   )

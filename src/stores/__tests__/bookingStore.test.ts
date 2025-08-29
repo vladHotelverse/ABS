@@ -54,7 +54,6 @@ describe('BookingStore', () => {
       expect(result.current.mode).toBe('single')
       expect(result.current.rooms).toEqual([])
       expect(result.current.activeRoomId).toBeNull()
-      expect(result.current.selectedRoom).toBeNull()
       expect(result.current.bookingStatus).toBe('normal')
     })
   })

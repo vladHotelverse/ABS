@@ -6,7 +6,6 @@ import EmptyState from './components/EmptyState'
 import PriceBreakdown from './components/PriceBreakdown'
 import PricingSummaryHeader from './components/PricingSummaryHeader'
 import RoomSection from './components/RoomSection'
-import BidUpgradesSection from './components/BidUpgradesSection'
 import ItemsSection from './components/ItemsSection'
 import { LoadingOverlay } from '../shared'
 import type { PricingItem, PricingSummaryPanelProps } from './types'
@@ -27,14 +26,13 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
 }) => {
 
   // Memoize expensive filtering operations - now grouped by concept
-  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, bidForUpgradeItems, isEmpty } = useMemo(() => {
+  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, isEmpty } = useMemo(() => {
     const safeItems = items || []
     return {
       chooseYourSuperiorRoomItems: safeItems.filter((item) => item.concept === 'choose-your-superior-room'),
       customizeYourRoomItems: safeItems.filter((item) => item.concept === 'customize-your-room'),
       chooseYourRoomItems: safeItems.filter((item) => item.concept === 'choose-your-room'),
       enhanceYourStayItems: safeItems.filter((item) => item.concept === 'enhance-your-stay'),
-      bidForUpgradeItems: safeItems.filter((item) => item.concept === 'bid-for-upgrade'),
       isEmpty: safeItems.length === 0,
     }
   }, [items])
@@ -133,14 +131,6 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           onRemoveItem={handleRemoveItem}
         />
 
-        {/* Bid Upgrades Section */}
-        <BidUpgradesSection
-          bidForUpgradeItems={bidForUpgradeItems}
-          euroSuffix={labels.euroSuffix}
-          onRemoveItem={handleRemoveItem}
-        />
-
-
         {/* Customizations Section */}
         <ItemsSection
           title="Room Customization"
@@ -190,7 +180,6 @@ export type { PricingSummaryPanelProps, PricingItem, AvailableSection, PricingLa
 export { 
   PricingSummaryHeader,
   RoomSection,
-  BidUpgradesSection,
   SectionRenderer
 } from './components'
 
@@ -201,7 +190,6 @@ export { useSectionConfiguration } from './hooks'
 export type { 
   PricingSummaryHeaderProps,
   RoomSectionProps,
-  BidUpgradesSectionProps,
   SectionConfig,
   SectionRendererProps,
   SectionConfigurationProps

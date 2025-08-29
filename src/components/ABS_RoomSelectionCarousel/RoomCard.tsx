@@ -251,46 +251,48 @@ const RoomCard: React.FC<RoomCardProps> = ({
         <p className="text-xs text-muted-foreground mt-2">{priceInfoText}</p>
       </div>
 
-      {/* Price Slider - integrated within the card */}
-      <div
-        className={clsx(
-          'overflow-hidden',
-          // Apply transition only when expanding to make it smooth
-          sliderVisible ? 'transition-all duration-500 ease-in-out max-h-96 opacity-100' : 'transition-none max-h-0 opacity-0'
-        )}
-      >
-        <div className={clsx(
-          "border-t border-border p-4 rounded-b-lg",
-          sliderVisible ? 'opacity-100' : 'opacity-0'
-        )}>
-          <PriceSlider
-            proposedPrice={proposedPrice}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            translations={{
-              nightText,
-              makeOfferText: translations.selectText,
-              availabilityText: availabilityText || 'Subject to availability',
-              proposePriceText: proposePriceText || 'Propose your price:',
-              currencyText: currencyText || 'EUR',
-              bidSubmittedText: bidSubmittedText || 'Bid submitted',
-              updateBidText: updateBidText || 'Update bid',
-              cancelBidText: cancelBidText || 'Cancel',
-            }}
-            bidStatus={bidStatus}
-            submittedPrice={submittedPrice}
-            roomName={room.roomType}
-            onPriceChange={setProposedPrice}
-            onMakeOffer={makeOffer}
-            onCancelBid={() => {
-              if (onCancelBid) {
-                onCancelBid(room.id)
-              }
-              resetBid()
-            }}
-          />
+      {/* Price Slider - integrated within the card (only show if bidding is enabled) */}
+      {showPriceSlider && (
+        <div
+          className={clsx(
+            'overflow-hidden',
+            // Apply transition only when expanding to make it smooth
+            sliderVisible ? 'transition-all duration-500 ease-in-out max-h-96 opacity-100' : 'transition-none max-h-0 opacity-0'
+          )}
+        >
+          <div className={clsx(
+            "border-t border-border p-4 rounded-b-lg",
+            sliderVisible ? 'opacity-100' : 'opacity-0'
+          )}>
+            <PriceSlider
+              proposedPrice={proposedPrice}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              translations={{
+                nightText,
+                makeOfferText: translations.selectText,
+                availabilityText: availabilityText || 'Subject to availability',
+                proposePriceText: proposePriceText || 'Propose your price:',
+                currencyText: currencyText || 'EUR',
+                bidSubmittedText: bidSubmittedText || 'Bid submitted',
+                updateBidText: updateBidText || 'Update bid',
+                cancelBidText: cancelBidText || 'Cancel',
+              }}
+              bidStatus={bidStatus}
+              submittedPrice={submittedPrice}
+              roomName={room.roomType}
+              onPriceChange={setProposedPrice}
+              onMakeOffer={makeOffer}
+              onCancelBid={() => {
+                if (onCancelBid) {
+                  onCancelBid(room.id)
+                }
+                resetBid()
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Image Modal */}
       <ImageModal

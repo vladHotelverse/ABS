@@ -316,15 +316,10 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
   // Calculate cart item count using unified store (after shouldShowMultiBooking is defined)
   const cartItemCount = bookingStore.getItemCount()
 
-  // Calculate detailed counts for mobile pricing badges
+  // Calculate detailed counts for mobile pricing badges using unified system
   const detailedCounts = shouldShowMultiBooking ?
     getMultiBookingDetailedCounts(bookingStore.rooms) :
-    getDetailedCartCounts({
-      selectedRoom: undefined, // Items are now in store
-      selectedCustomizations: {}, // Items are now in store
-      selectedOffers: [], // Items are now in store
-      activeBid: null, // Items are now in store
-    })
+    getDetailedCartCounts(bookingStore.rooms)
 
   // Calculate subtotal using unified store
   const subtotal = bookingStore.getTotalPrice()
@@ -1014,7 +1009,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
                 : roomTexts.roomSubtitle,
             }}
             isVisible={shouldShowSection('room', computedAvailableSections)}
-            showPriceSlider={true}
+            showPriceSlider={false}
             activeBid={(() => {
               const roomId = getCurrentRoomId()
               const currentRoom = bookingStore.rooms.find(r => r.id === roomId)
