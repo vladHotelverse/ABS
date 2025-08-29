@@ -11,16 +11,11 @@ export interface MobilePricingWidgetProps {
   isLoading?: boolean
   className?: string
   summaryButtonLabel: string
-  totalUpgradesLabel?: string
   itemsLabel?: string
   locale?: string
   disabled?: boolean
   testId?: string
   
-  // Multibooking support
-  isMultiBooking?: boolean
-  roomCount?: number
-  roomsLabel?: string
   
   // Detailed badge counts
   upgradeCount?: number
@@ -39,16 +34,11 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
   isLoading = false,
   className,
   summaryButtonLabel,
-  totalUpgradesLabel = 'Total Upgrades',
   itemsLabel = 'items',
   locale = 'en-US',
   disabled = false,
   testId = 'mobile-pricing-widget',
   
-  // Multibooking props
-  isMultiBooking = false,
-  roomCount,
-  roomsLabel = 'rooms',
   
   // Detailed badge props
   upgradeCount,

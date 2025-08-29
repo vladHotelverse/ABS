@@ -158,27 +158,25 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           onRemoveItem={handleRemoveItem}
         />
 
-        {/* Price Breakdown - Only show when not empty */}
-        {!isEmpty && (
-          <div className="border-t pt-4">
-            <PriceBreakdown
-              subtotal={safePricing.subtotal}
-              isLoading={isLoading}
-              labels={{
-                subtotalLabel: labels.subtotalLabel,
-                totalLabel: labels.totalLabel,
-                payAtHotelLabel: labels.payAtHotelLabel,
-                viewTermsLabel: labels.viewTermsLabel,
-                confirmButtonLabel: labels.confirmButtonLabel,
-                loadingLabel: labels.loadingLabel,
-                euroSuffix: labels.euroSuffix,
-              }}
-              currency={currency}
-              locale={locale}
-              onConfirm={onConfirm}
-            />
-          </div>
-        )}
+        {/* Price Breakdown - Always show to display totals and confirm button */}
+        <div className="border-t pt-4">
+          <PriceBreakdown
+            subtotal={safePricing.subtotal}
+            isLoading={isLoading}
+            labels={{
+              subtotalLabel: labels.subtotalLabel,
+              totalLabel: labels.totalLabel,
+              payAtHotelLabel: labels.payAtHotelLabel,
+              viewTermsLabel: labels.viewTermsLabel,
+              confirmButtonLabel: labels.confirmButtonLabel,
+              loadingLabel: labels.loadingLabel,
+              euroSuffix: labels.euroSuffix,
+            }}
+            currency={currency}
+            locale={locale}
+            onConfirm={onConfirm}
+          />
+        </div>
       </div>
     </section>
   )

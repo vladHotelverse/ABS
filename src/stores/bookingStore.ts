@@ -4,9 +4,8 @@
  */
 
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { useShallow } from 'zustand/react/shallow'
 import { enableMapSet } from 'immer'
 import type { RoomOption } from '../components/ABS_Landing/sections/RoomSelectionSection'
 import type { Customization, SpecialOffer, ActiveBid } from '../components/ABS_Landing/types'
@@ -97,16 +96,11 @@ export interface BookingActions {
   clearRoom: (roomId: string) => void
   clearAllRooms: () => void
   
-  // Legacy single booking actions - KEPT FOR BACKWARD COMPATIBILITY
-  // These are still actively used by existing components (ABS_Landing.tsx, etc.)
-  // TODO: Gradually migrate components to use the unified item-based system above
-  selectRoom: (room: RoomOption | null) => void
-  addCustomization: (customization: Customization, roomId: string) => void
-  removeCustomization: (customizationId: string, roomId: string) => void
-  addSpecialOffer: (offer: SpecialOffer) => void
-  removeSpecialOffer: (offerId: string) => void
-  makeOffer: (price: number, room: RoomOption) => void
-  cancelBid: (roomId: string) => void
+  // DEPRECATED LEGACY ACTIONS - REMOVED
+  // Components now use unified item-based system:
+  // - addItemToRoom() instead of addCustomization/addSpecialOffer
+  // - removeItemFromRoom() instead of removeCustomization/removeSpecialOffer  
+  // - handleRoomBid() instead of makeOffer/cancelBid
   
   // UI state management
   setShowMobilePricing: (show: boolean) => void
@@ -176,14 +170,35 @@ export interface BookingSelectors {
 
 type BookingStore = BookingState & BookingActions & BookingSelectors
 
+// Create default room for single booking mode
+const createDefaultSingleBookingRoom = (): RoomBooking => ({
+  id: 'single-booking-default',
+  roomName: 'Your Stay',
+  roomNumber: '1',
+  guestName: 'Guest',
+  nights: 1,
+  items: [],
+  isActive: true,
+  payAtHotel: false,
+  baseRoom: {
+    id: 'single-booking-default',
+    roomType: 'Your Stay',
+    title: 'Your Stay',
+    price: 0,
+    description: '',
+    image: '',
+    amenities: []
+  }
+})
+
 const initialState: BookingState = {
   mode: 'single',
-  rooms: [],
+  rooms: [], // Start with empty rooms array - will be initialized when needed
   activeRoomId: null,
-  selectedRoom: null,
-  customizations: {},
-  specialOffers: [],
-  activeBid: null,
+  selectedRoom: null, // DEPRECATED - will be removed
+  customizations: {}, // DEPRECATED - will be removed  
+  specialOffers: [], // DEPRECATED - will be removed
+  activeBid: null, // DEPRECATED - will be removed
   showMobilePricing: false,
   bookingStatus: 'normal',
   isMobilePricingOverlayOpen: false,
@@ -195,13 +210,32 @@ const initialState: BookingState = {
 
 export const useBookingStore = create<BookingStore>()(
   devtools(
-    persist(
-      immer<BookingStore>((set, get) => ({
+    immer<BookingStore>((set, get) => ({
         ...initialState,
         
         // Mode management
         setMode: (mode: 'single' | 'multi') => set((state: BookingState) => {
           state.mode = mode
+          
+          if (mode === 'single') {
+            // For single mode, ensure we have exactly one room
+            if (state.rooms.length === 0) {
+              // Create default room only if no rooms exist
+              state.rooms = [createDefaultSingleBookingRoom()]
+              state.activeRoomId = 'single-booking-default'
+            } else if (state.rooms.length > 1) {
+              // If multiple rooms exist, keep only the first one for single mode
+              const firstRoom = state.rooms[0]
+              state.rooms = [firstRoom]
+              state.activeRoomId = firstRoom.id
+            }
+          } else if (mode === 'multi') {
+            // Clear the default single booking room when switching to multi mode
+            state.rooms = state.rooms.filter(r => r.id !== 'single-booking-default')
+            // Reset activeRoomId, it will be set by the first room added via addRoom
+            state.activeRoomId = state.rooms.length > 0 ? state.rooms[0].id : null
+          }
+          
           state.lastUpdate = new Date()
         }),
         
@@ -363,65 +397,8 @@ export const useBookingStore = create<BookingStore>()(
           state.lastUpdate = new Date()
         }),
         
-        // Legacy single booking support - KEPT FOR BACKWARD COMPATIBILITY
-        // These actions are still actively used by ABS_Landing.tsx and other components
-        selectRoom: (room) => set((state) => {
-          state.selectedRoom = room
-          state.activeBid = null // Clear active bid when room is selected
-          state.lastUpdate = new Date()
-        }),
-        
-        addCustomization: (customization, roomId) => set((state) => {
-          if (!state.customizations[roomId]) {
-            state.customizations[roomId] = []
-          }
-          // Remove existing customization in same category
-          state.customizations[roomId] = state.customizations[roomId].filter(
-            (c: Customization) => c.category !== customization.category
-          )
-          state.customizations[roomId].push(customization)
-          state.lastUpdate = new Date()
-        }),
-        
-        removeCustomization: (customizationId, roomId) => set((state) => {
-          if (state.customizations[roomId]) {
-            state.customizations[roomId] = state.customizations[roomId].filter(
-              (c: Customization) => c.id !== customizationId
-            )
-          }
-          state.lastUpdate = new Date()
-        }),
-        
-        addSpecialOffer: (offer) => set((state) => {
-          state.specialOffers.push(offer)
-          state.lastUpdate = new Date()
-        }),
-        
-        removeSpecialOffer: (offerId) => set((state) => {
-          state.specialOffers = state.specialOffers.filter(
-            (o: SpecialOffer) => o.id.toString() !== offerId
-          )
-          state.lastUpdate = new Date()
-        }),
-        
-        makeOffer: (price, room) => set((state) => {
-          state.selectedRoom = null // Clear selected room when bid is made
-          state.activeBid = {
-            id: room.id,
-            roomId: room.id,
-            bidAmount: price,
-            status: 'submitted',
-            roomName: room.title || room.roomType,
-          }
-          state.lastUpdate = new Date()
-        }),
-        
-        cancelBid: (roomId) => set((state) => {
-          if (state.activeBid?.roomId === roomId) {
-            state.activeBid = null
-          }
-          state.lastUpdate = new Date()
-        }),
+        // LEGACY ACTIONS REMOVED - Components now use unified store methods
+        // Use addItemToRoom/removeItemFromRoom instead
         
         // UI state
         setShowMobilePricing: (show) => set((state) => {
@@ -595,11 +572,18 @@ export const useBookingStore = create<BookingStore>()(
         },
         
         getCurrentRoomId: () => {
-          const { mode, activeRoomId, selectedRoom } = get()
+          const { mode, activeRoomId, rooms } = get()
           if (mode === 'multi') {
-            return activeRoomId || 'default-room'
+            return activeRoomId || (rooms.length > 0 ? rooms[0].id : 'default-room')
           } else {
-            return selectedRoom?.id || 'default-room'
+            // In single mode, ensure we have a room and return its ID
+            if (rooms.length === 0) {
+              // Initialize single booking room if not exists
+              const store = get()
+              store.setMode('single')
+              return 'single-booking-default'
+            }
+            return rooms[0].id
           }
         },
         
@@ -621,72 +605,29 @@ export const useBookingStore = create<BookingStore>()(
         },
         
         getTotalPrice: () => {
-          const { mode, rooms, selectedRoom, customizations, specialOffers, activeBid } = get()
+          const { rooms } = get()
           
-          if (mode === 'multi') {
-            // Multi-booking calculation with nights multiplication
-            return rooms.reduce((total, room) => {
-              const nights = Math.max(room.nights || 0, 0)
-              const roomTotal = room.items.reduce((sum, item) => {
-                // Only multiply per-night items by nights
-                // Special offers (type: 'offer') should not be multiplied by nights
-                if (item.type === 'offer') {
-                  return sum + item.price
-                }
-                // All other items (room upgrades, customizations) are per-night
-                return sum + (item.price * nights)
-              }, 0)
-              return total + roomTotal
-            }, 0)
-          } else {
-            // Legacy single booking calculation - kept for backward compatibility
-            // This supports existing ABS_Landing.tsx and other components that rely on single booking mode
-            let total = 0
-            
-            if (selectedRoom) {
-              total += selectedRoom.price
-            }
-            
-            // Optimized customizations calculation
-            for (const roomCustomizations of Object.values(customizations)) {
-              for (const customization of roomCustomizations) {
-                total += customization.price
+          // Unified calculation for both single and multi modes
+          return rooms.reduce((total, room) => {
+            const nights = Math.max(room.nights || 1, 1)
+            const roomTotal = room.items.reduce((sum, item) => {
+              // Only multiply per-night items by nights
+              // Special offers (type: 'offer') should not be multiplied by nights
+              if (item.type === 'offer') {
+                return sum + item.price
               }
-            }
-            
-            // Add special offers
-            total += specialOffers.reduce((sum, offer) => sum + offer.price, 0)
-            
-            // Add active bid if it's in a valid state
-            if (activeBid?.status && ['submitted', 'pending'].includes(activeBid.status)) {
-              total += activeBid.bidAmount
-            }
-            
-            return total
-          }
+              // All other items (room upgrades, customizations) are per-night
+              return sum + (item.price * nights)
+            }, 0)
+            return total + roomTotal
+          }, 0)
         },
         
         getItemCount: () => {
-          const { mode, rooms, selectedRoom, customizations, specialOffers, activeBid } = get()
+          const { rooms } = get()
           
-          if (mode === 'multi') {
-            return rooms.reduce((count, room) => count + room.items.length, 0)
-          } else {
-            // Legacy single booking calculation - kept for backward compatibility
-            let count = 0
-            
-            if (selectedRoom) count++
-            
-            // Optimized customizations count
-            count += Object.values(customizations).reduce(
-              (sum, roomCustomizations) => sum + roomCustomizations.length, 0
-            )
-            
-            count += specialOffers.length
-            if (activeBid) count++
-            
-            return count
-          }
+          // Unified calculation for both single and multi modes
+          return rooms.reduce((count, room) => count + room.items.length, 0)
         },
         
         getRoomItemCount: (roomId) => {
@@ -764,27 +705,6 @@ export const useBookingStore = create<BookingStore>()(
         // Note: Legacy selector methods (getSelectedRoom, etc.) were removed as they were unused.
         // Components now access state directly via useShallow() for better performance.
       })),
-      {
-        name: 'booking-storage',
-        // Only persist essential state that should survive page reloads
-        partialize: (state) => ({
-          mode: state.mode,
-          rooms: state.rooms,
-          activeRoomId: state.activeRoomId,
-          roomSpecificSelections: state.roomSpecificSelections,
-          // Legacy state - kept for backward compatibility
-          selectedRoom: state.selectedRoom,
-          customizations: state.customizations,
-          specialOffers: state.specialOffers,
-          activeBid: state.activeBid,
-          // Reservation metadata
-          reservationCode: state.reservationCode,
-          checkIn: state.checkIn,
-          checkOut: state.checkOut,
-          occupancy: state.occupancy,
-        }),
-      }
-    ),
     {
       name: 'booking-store',
     }
@@ -793,106 +713,12 @@ export const useBookingStore = create<BookingStore>()(
 
 
 /**
- * Migration compatibility hooks - these provide the same interface as legacy hooks
- * to make migration easier for components that haven't been fully updated yet
+ * LEGACY COMPATIBILITY HOOKS REMOVED
+ * Components now use unified store directly via useBookingStore()
+ * 
+ * Migration completed:
+ * - All components use addItemToRoom/removeItemFromRoom instead of legacy actions
+ * - State is accessed directly from bookingStore.rooms[].items
+ * - No more dual state management between legacy and unified systems
  */
-
-// Compatibility hook that mimics useBookingState interface
-export const useBookingStateCompat = () => {
-  const store = useBookingStore(
-    useShallow(state => ({
-      selectedRoom: state.selectedRoom,
-      customizations: state.customizations,
-      specialOffers: state.specialOffers,
-      activeBid: state.activeBid,
-      showMobilePricing: state.showMobilePricing,
-      bookingStatus: state.bookingStatus,
-    }))
-  )
-  
-  const actions = useBookingStore(
-    useShallow(state => ({
-      selectRoom: state.selectRoom,
-      addCustomization: state.addCustomization,
-      removeCustomization: state.removeCustomization,
-      addSpecialOffer: state.addSpecialOffer,
-      removeSpecialOffer: state.removeSpecialOffer,
-      makeOffer: state.makeOffer,
-      cancelBid: state.cancelBid,
-      setShowMobilePricing: state.setShowMobilePricing,
-      showToast: state.showToast,
-      resetState: state.resetState,
-    }))
-  )
-  
-  return {
-    state: store,
-    showMobilePricing: store.showMobilePricing,
-    bookingStatus: store.bookingStatus,
-    actions,
-  }
-}
-
-// Compatibility hook that mimics useMultiBookingState interface
-export const useMultiBookingStateCompat = () => {
-  const store = useBookingStore(
-    useShallow(state => ({
-      rooms: state.rooms,
-      activeRoomId: state.activeRoomId,
-      isMobilePricingOverlayOpen: state.isMobilePricingOverlayOpen,
-      roomSpecificSelections: state.roomSpecificSelections,
-    }))
-  )
-  
-  const actions = useBookingStore(
-    useShallow(state => ({
-      handleRoomUpgrade: state.handleRoomUpgrade,
-      handleRoomBid: state.handleRoomBid,
-      handleRoomTabClick: state.handleRoomTabClick,
-      removeItemFromRoom: state.removeItemFromRoom,
-      setMobilePricingOverlayOpen: state.setMobilePricingOverlayOpen,
-      getTotalItemCount: state.getTotalItemCount,
-      getMultiBookingTotalPrice: state.getMultiBookingTotalPrice,
-      getCurrentRoomId: state.getCurrentRoomId,
-    }))
-  )
-  
-  return {
-    // State
-    roomBookings: store.rooms,
-    activeRoomId: store.activeRoomId,
-    isMobilePricingOverlayOpen: store.isMobilePricingOverlayOpen,
-    roomSpecificSelections: store.roomSpecificSelections,
-    
-    // Actions
-    setRoomBookings: (_bookings: RoomBooking[]) => {
-      // TODO: Implement room bookings setter
-      console.warn('setRoomBookings not yet implemented in unified store')
-    },
-    setActiveRoomId: (roomId: string | undefined) => {
-      if (roomId) actions.handleRoomTabClick(roomId)
-    },
-    setIsMobilePricingOverlayOpen: actions.setMobilePricingOverlayOpen,
-    
-    // Handlers
-    handleMultiBookingChange: (_bookings: RoomBooking[]) => {
-      console.warn('handleMultiBookingChange not yet implemented in unified store')
-    },
-    handleMultiBookingRemoveItem: actions.removeItemFromRoom,
-    handleMultiBookingEditSection: (roomId: string, sectionType: string) => {
-      console.log('Edit section:', roomId, sectionType)
-    },
-    handleMultiBookingConfirmAll: async () => {
-      console.log('Confirm all bookings')
-    },
-    handleRoomTabClick: actions.handleRoomTabClick,
-    handleRoomUpgrade: actions.handleRoomUpgrade,
-    handleRoomBid: actions.handleRoomBid,
-    
-    // Computed values
-    totalItemCount: actions.getTotalItemCount(),
-    totalPrice: actions.getMultiBookingTotalPrice(),
-    getCurrentRoomId: actions.getCurrentRoomId,
-  }
-}
 

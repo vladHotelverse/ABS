@@ -297,15 +297,15 @@ describe('BookingStore', () => {
       const room1Total = result.current.getRoomTotal('room-1')
       const room2Total = result.current.getRoomTotal('room-2')
       
-      expect(room1Total).toBe(150) // 50 + 100
-      expect(room2Total).toBe(100)
+      expect(room1Total).toBe(250) // (50 * 3 nights) + 100 = 150 + 100 = 250
+      expect(room2Total).toBe(100) // 100 (offers not multiplied by nights)
     })
 
     it('should calculate total price', () => {
       const { result } = renderHook(() => useBookingStore())
       
       const totalPrice = result.current.getTotalPrice()
-      expect(totalPrice).toBe(250) // 150 + 100
+      expect(totalPrice).toBe(350) // 250 (room-1) + 100 (room-2) = 350
     })
 
     it('should count items correctly', () => {
@@ -367,78 +367,133 @@ describe('BookingStore', () => {
         amenities: [],
       }
       
+      // Initialize single booking mode first
       act(() => {
-        result.current.selectRoom(mockRoomOption)
+        result.current.setMode('single')
       })
       
-      expect(result.current.selectedRoom).toEqual(mockRoomOption)
-      expect(result.current.activeBid).toBeNull()
+      // Now add room item to the first room
+      act(() => {
+        const roomId = result.current.rooms[0]?.id
+        if (roomId) {
+          result.current.addItemToRoom(roomId, {
+            name: mockRoomOption.title,
+            price: mockRoomOption.price,
+            type: 'room',
+            concept: 'choose-your-room',
+            metadata: {
+              roomId: mockRoomOption.id,
+              roomType: mockRoomOption.roomType,
+              image: mockRoomOption.image
+            }
+          })
+        }
+      })
+      
+      const room = result.current.rooms[0]
+      const roomItem = room?.items.find(item => item.type === 'room')
+      expect(roomItem?.name).toBe(mockRoomOption.title)
+      expect(roomItem?.price).toBe(mockRoomOption.price)
     })
 
-    it('should support legacy customizations', () => {
+    it('should support customizations via unified store', () => {
       const { result } = renderHook(() => useBookingStore())
+      
+      // Initialize single booking mode first
+      act(() => {
+        result.current.setMode('single')
+      })
       
       const customization = {
-        id: 'ocean-view',
         name: 'Ocean View',
         price: 50,
+        type: 'customization' as const,
+        concept: 'customize-your-room' as const,
         category: 'view',
+        metadata: {
+          category: 'view'
+        }
       }
       
       act(() => {
-        result.current.addCustomization(customization, 'default-room')
+        const roomId = result.current.rooms[0]?.id
+        if (roomId) {
+          result.current.addItemToRoom(roomId, customization)
+        }
       })
       
-      expect(result.current.customizations['default-room']).toHaveLength(1)
-      expect(result.current.customizations['default-room'][0]).toEqual(customization)
+      const room = result.current.rooms[0]
+      const customizationItem = room?.items.find(item => item.type === 'customization')
+      expect(customizationItem?.name).toBe('Ocean View')
+      expect(customizationItem?.price).toBe(50)
     })
 
-    it('should support legacy special offers', () => {
+    it('should support special offers via unified store', () => {
       const { result } = renderHook(() => useBookingStore())
+      
+      // Initialize single booking mode first
+      act(() => {
+        result.current.setMode('single')
+      })
       
       const offer = {
-        id: 1,
-        title: 'Spa Package',
         name: 'Spa Package',
-        description: 'Relaxing spa experience',
-        image: 'spa.jpg',
         price: 100,
-        type: 'perStay' as const,
+        type: 'offer' as const,
+        concept: 'enhance-your-stay' as const,
+        metadata: {
+          description: 'Relaxing spa experience',
+          image: 'spa.jpg',
+          offerType: 'perStay'
+        }
       }
       
       act(() => {
-        result.current.addSpecialOffer(offer)
+        const roomId = result.current.rooms[0]?.id
+        if (roomId) {
+          result.current.addItemToRoom(roomId, offer)
+        }
       })
       
-      expect(result.current.specialOffers).toHaveLength(1)
-      expect(result.current.specialOffers[0]).toEqual(offer)
+      const room = result.current.rooms[0]
+      const offerItem = room?.items.find(item => item.type === 'offer')
+      expect(offerItem?.name).toBe('Spa Package')
+      expect(offerItem?.price).toBe(100)
     })
 
-    it('should support legacy bidding', () => {
+    it('should support bidding via unified store', () => {
       const { result } = renderHook(() => useBookingStore())
       
-      const room = {
-        id: 'premium',
-        title: 'Premium Suite',
-        roomType: 'PREMIUM',
-        price: 300,
-        image: 'premium.jpg',
-        description: 'Premium room',
-        amenities: [],
+      // Initialize single booking mode first
+      act(() => {
+        result.current.setMode('single')
+      })
+      
+      const bidItem = {
+        name: 'Premium Suite Bid',
+        price: 250,
+        type: 'bid' as const,
+        concept: 'bid-for-upgrade' as const,
+        metadata: {
+          roomId: 'premium',
+          bidAmount: 250,
+          status: 'submitted',
+          roomName: 'Premium Suite'
+        }
       }
       
       act(() => {
-        result.current.makeOffer(250, room)
+        const roomId = result.current.rooms[0]?.id
+        if (roomId) {
+          result.current.addItemToRoom(roomId, bidItem)
+        }
       })
       
-      expect(result.current.selectedRoom).toBeNull()
-      expect(result.current.activeBid).toEqual({
-        id: 'premium',
-        roomId: 'premium',
-        bidAmount: 250,
-        status: 'submitted',
-        roomName: 'Premium Suite',
-      })
+      const room = result.current.rooms[0]
+      const bidEntry = room?.items.find(item => item.type === 'bid')
+      expect(bidEntry?.name).toBe('Premium Suite Bid')
+      expect(bidEntry?.price).toBe(250)
+      expect(bidEntry?.metadata?.status).toBe('submitted')
     })
   })
 
