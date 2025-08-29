@@ -384,6 +384,13 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         delete newSelections[roomId]
         return newSelections
       })
+      
+      // Restore original room name from baseRoom if available
+      if (room?.baseRoom) {
+        bookingStore.updateRoom(roomId, { 
+          roomName: room.baseRoom.title || room.baseRoom.roomType 
+        })
+      }
     }
     
     bookingStore.removeItemFromRoom(roomId, String(itemId))
@@ -402,6 +409,13 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         delete newSelections[roomId]
         return newSelections
       })
+      
+      // Restore original room name from baseRoom if available
+      if (room?.baseRoom) {
+        bookingStore.updateRoom(roomId, { 
+          roomName: room.baseRoom.title || room.baseRoom.roomType 
+        })
+      }
     }
     
     bookingStore.removeItemFromRoom(roomId, itemId)
@@ -778,14 +792,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
         // In multibooking mode, handle room upgrade removal using store methods
         const roomId = _roomId
         
-        // Clear room-specific selection to deselect upgrade
-        setRoomSpecificSelections(prev => {
-          const newSelections = { ...prev }
-          delete newSelections[roomId]
-          return newSelections
-        })
-        
-        // Simply use the store's removeItem method with the itemId passed from the pricing panel
+        // Use the enhanced remove handler that handles room-specific selections and name restoration
         handleMultiBookingRemoveItem(roomId, String(itemId))
         
         const roomName = roomBookings.find(r => r.id === roomId)?.roomName || 'room'
@@ -859,6 +866,7 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
     roomName: booking.roomName,
     roomNumber: booking.roomNumber,
     guestName: booking.guestName,
+    baseRoomRoomType: booking.baseRoom.roomType, // Show upgrade indicator if baseRoom is available
   })), [roomBookings])
   
   // Master cleanup effect for all multibooking state on unmount

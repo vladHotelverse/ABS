@@ -217,7 +217,17 @@ export const useBookingStore = create<BookingStore>()(
           const roomWithDefaults = { 
             ...room, 
             isActive: false,
-            payAtHotel: room.payAtHotel ?? false 
+            payAtHotel: room.payAtHotel ?? false,
+            // Ensure baseRoom is set for upgrade reset functionality
+            baseRoom: room.baseRoom || {
+              id: room.id,
+              roomType: room.roomName,
+              title: room.roomName,
+              price: 0,
+              description: '',
+              image: room.roomImage || '',
+              amenities: []
+            }
           }
           state.rooms.push(roomWithDefaults)
           if (!state.activeRoomId) {
@@ -300,7 +310,28 @@ export const useBookingStore = create<BookingStore>()(
         removeItemFromRoom: (roomId, itemId) => set((state) => {
           const room = state.rooms.find((r: RoomBooking) => r.id === roomId)
           if (room) {
+            // Find the item being removed to check if it's a room upgrade
+            const itemToRemove = room.items.find((item) => String(item.id) === itemId)
+            
+            // Remove the item
             room.items = room.items.filter((item) => String(item.id) !== itemId)
+            
+            // If we removed a room upgrade, check if this was the last room upgrade and restore original name
+            if (itemToRemove?.type === 'room' && itemToRemove?.category === 'room-upgrade') {
+              // Check if there are any remaining room upgrade items
+              const hasRemainingRoomUpgrades = room.items.some(item => 
+                item.type === 'room' && item.category === 'room-upgrade'
+              )
+              
+              // If no more room upgrades, restore original room name from baseRoom
+              if (!hasRemainingRoomUpgrades && room.baseRoom) {
+                const originalName = room.baseRoom.title || room.baseRoom.roomType
+                console.log(`[BookingStore] Restoring room name from "${room.roomName}" to "${originalName}" for room ${roomId}`)
+                room.roomName = originalName
+              } else {
+                console.log(`[BookingStore] Room upgrade removed but ${hasRemainingRoomUpgrades ? 'other upgrades remain' : 'no baseRoom available'} for room ${roomId}`)
+              }
+            }
           }
           state.lastUpdate = new Date()
         }),

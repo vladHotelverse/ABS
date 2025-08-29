@@ -146,7 +146,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   })
 
   return (
-    <div className={cn('sticky md:top-28 w-full', className)}>
+    <div className={cn('sticky md:top-28 w-full', className)} data-testid="multi-booking-pricing-panel">
       <div className="min-w-[350px] w-full bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
         <div className="p-4 border-b border-border bg-muted">

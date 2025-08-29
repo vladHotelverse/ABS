@@ -101,6 +101,7 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({ item, euroS
                 : 'hover:bg-red-50 hover:border-red-300 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:border-red-600 dark:hover:text-red-400'
             )}
             aria-label={removeLabel}
+            data-testid="pricing-item-remove-button"
           >
             <X size={12} strokeWidth={2} className="h-3 w-3" />
           </UiButton>

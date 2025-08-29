@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import React, { useState, useCallback, useRef } from 'react'
-import { Check } from 'lucide-react'
+import { Check, ArrowUpCircle } from 'lucide-react'
 import { UiButton } from '../ui/button'
 
 export interface RoomTab {
@@ -8,6 +8,7 @@ export interface RoomTab {
   roomName: string
   roomNumber: string
   guestName: string
+  baseRoomRoomType?: string
 }
 
 export interface RoomTabsProps {
@@ -128,6 +129,9 @@ const RoomTabs: React.FC<RoomTabsProps> = ({
                           Room {index + 1}
                           <span className="hidden md:inline font-normal opacity-75"> ({room.roomName})</span>
                         </span>
+                        {room.baseRoomRoomType && room.roomName !== room.baseRoomRoomType && (
+                          <ArrowUpCircle className="w-4 h-4 text-blue-500" aria-label="Room upgrade available" />
+                        )}
                       </div>
                     </div>
                   </div>
