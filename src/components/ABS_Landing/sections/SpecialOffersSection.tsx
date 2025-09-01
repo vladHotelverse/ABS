@@ -134,39 +134,42 @@ export const SpecialOffersSection: React.FC<SpecialOffersSectionProps> = ({
     return null
   }
 
-  // Create initial selections from selected offers
-  const initialSelections = useMemo(
-    () =>
-      selectedOffers.length > 0
-        ? selectedOffers.reduce(
-            (acc, offer) => {
-              acc[offer.id] = {
-                quantity: offer.quantity ?? 1,
-                persons: offer.persons,
-                nights: offer.nights,
-                selectedDate: offer.selectedDate,
-                selectedDates: offer.selectedDates,
-              }
-              return acc
-            },
-            {} as Record<string | number, OfferSelection>
-          )
-        : undefined,
-    [selectedOffers]
-  )
+  // Convert selectedOffers to initialSelections format for ABS_SpecialOffers
+  const initialSelections = useMemo(() => {
+    const selections: Record<number, OfferSelection> = {}
+    
+    selectedOffers.forEach((selectedOffer) => {
+      // Find the corresponding offer to get its type and determine the correct ID
+      const offerId = typeof selectedOffer.id === 'string' 
+        ? specialOffers.findIndex(offer => offer.id === selectedOffer.id) + 1 
+        : selectedOffer.id
+      
+      selections[Number(offerId)] = {
+        quantity: selectedOffer.quantity || 1,
+        persons: selectedOffer.persons || 1,
+        nights: selectedOffer.nights || 1,
+        selectedDate: selectedOffer.selectedDate,
+        selectedDates: selectedOffer.selectedDates,
+        startDate: undefined,
+        endDate: undefined,
+      }
+    })
+    
+    return selections
+  }, [selectedOffers, specialOffers])
 
   return (
-    <section className={`bg-white md:p-6 rounded-lg md:shadow md:border md:border-neutral-300 ${className}`}>
-      <h2 className="text-3xl font-bold mb-4">{texts.offersTitle}</h2>
-      <p className="mb-6">{texts.offersSubtitle}</p>
+    <section className={`bg-card p-4 md:p-6 rounded-lg md:shadow border border-border ${className}`}>
+      <h2 className="text-3xl font-bold mb-4 text-card-foreground">{texts.offersTitle}</h2>
+      <p className="mb-6 text-muted-foreground">{texts.offersSubtitle}</p>
       <SpecialOffers
         id="special-offers-section"
         offers={specialOffers.map(convertToOfferType)}
+        initialSelections={initialSelections}
         onBookOffer={onBookOffer}
         reservationInfo={reservationInfo}
         currencySymbol={texts.currencySymbol}
         labels={texts.specialOffersLabels}
-        initialSelections={initialSelections}
         useEnhancedDateSelector={useEnhancedDateSelector}
       />
     </section>

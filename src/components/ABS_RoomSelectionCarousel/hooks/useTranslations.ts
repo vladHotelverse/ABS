@@ -3,28 +3,10 @@ import type { RoomSelectionCarouselTranslations } from '../types'
 
 interface UseTranslationsParams {
   translations?: RoomSelectionCarouselTranslations
-  fallbackProps: {
-    learnMoreText?: string
-    nightText?: string
-    priceInfoText?: string
-    makeOfferText?: string
-    availabilityText?: string
-    selectedText?: string
-    selectText?: string
-    proposePriceText?: string
-    currencyText?: string
-    currencySymbol?: string
-    offerMadeText?: string
-    discountBadgeText?: string
-    bidSubmittedText?: string
-    updateBidText?: string
-    cancelBidText?: string
-    upgradeNowText?: string
-    removeText?: string
-  }
+  fallbackProps?: Record<string, never> // Keep for backward compatibility but unused
 }
 
-export const useTranslations = ({ translations, fallbackProps }: UseTranslationsParams) => {
+export const useTranslations = ({ translations }: UseTranslationsParams) => {
   return useMemo(() => {
     // Helper function to resolve text values (new translations object takes precedence)
     const getTranslation = (
@@ -51,24 +33,24 @@ export const useTranslations = ({ translations, fallbackProps }: UseTranslations
     }
 
     return {
-      learnMoreText: getTranslation('learnMoreText', fallbackProps.learnMoreText, 'Descubre más detalles'),
-      nightText: getTranslation('nightText', fallbackProps.nightText, '/noche'),
-      priceInfoText: getTranslation('priceInfoText', fallbackProps.priceInfoText, 'Información sobre tarifas e impuestos.'),
-      makeOfferText: getTranslation('makeOfferText', fallbackProps.makeOfferText, 'Hacer oferta'),
-      availabilityText: getTranslation('availabilityText', fallbackProps.availabilityText, 'Sujeto a disponibilidad'),
-      selectedText: getTranslation('selectedText', fallbackProps.selectedText, 'SELECCIONADO'),
-      selectText: getTranslation('selectText', fallbackProps.selectText, 'SELECCIONAR'),
-      proposePriceText: getTranslation('proposePriceText', fallbackProps.proposePriceText, 'Propon tu precio:'),
-      currencyText: getTranslation('currencyText', fallbackProps.currencyText, 'EUR'),
-      currencySymbol: getTranslation('currencySymbol', fallbackProps.currencySymbol, '€'),
-      upgradeNowText: getTranslation('upgradeNowText', fallbackProps.upgradeNowText, 'Upgrade now'),
-      removeText: getTranslation('removeText', fallbackProps.removeText, 'Remove'),
-      offerMadeText: getTranslation('offerMadeText', fallbackProps.offerMadeText, 'Has propuesto {price} EUR por noche'),
-      discountBadgeText: getTranslation('discountBadgeText', fallbackProps.discountBadgeText, '-{percentage}%'),
+      learnMoreText: getTranslation('learnMoreText', undefined, 'Descubre más detalles'),
+      nightText: getTranslation('nightText', undefined, '/noche'),
+      priceInfoText: getTranslation('priceInfoText', undefined, 'Información sobre tarifas e impuestos.'),
+      makeOfferText: getTranslation('makeOfferText', undefined, 'Hacer oferta'),
+      availabilityText: getTranslation('availabilityText', undefined, 'Sujeto a disponibilidad'),
+      selectedText: getTranslation('selectedText', undefined, 'SELECCIONADO'),
+      selectText: getTranslation('selectText', undefined, 'SELECCIONAR'),
+      proposePriceText: getTranslation('proposePriceText', undefined, 'Propon tu precio:'),
+      currencyText: getTranslation('currencyText', undefined, 'EUR'),
+      currencySymbol: getTranslation('currencySymbol', undefined, '€'),
+      upgradeNowText: getTranslation('upgradeNowText', undefined, 'Upgrade now'),
+      removeText: getTranslation('removeText', undefined, 'Remove'),
+      offerMadeText: getTranslation('offerMadeText', undefined, 'Has propuesto {price} EUR por noche'),
+      discountBadgeText: getTranslation('discountBadgeText', undefined, '-{percentage}%'),
       noRoomsAvailableText: getTranslation('noRoomsAvailableText', undefined, 'No hay habitaciones disponibles.'),
-      bidSubmittedText: getTranslation('bidSubmittedText', fallbackProps.bidSubmittedText, 'Bid submitted'),
-      updateBidText: getTranslation('updateBidText', fallbackProps.updateBidText, 'Update bid'),
-      cancelBidText: getTranslation('cancelBidText', fallbackProps.cancelBidText, 'Cancel'),
+      bidSubmittedText: getTranslation('bidSubmittedText', undefined, 'Bid submitted'),
+      updateBidText: getTranslation('updateBidText', undefined, 'Update bid'),
+      cancelBidText: getTranslation('cancelBidText', undefined, 'Cancel'),
       // Navigation labels
       previousRoom: getNavigationLabel('previousRoom', undefined, 'Previous room'),
       nextRoom: getNavigationLabel('nextRoom', undefined, 'Next room'),
@@ -79,5 +61,5 @@ export const useTranslations = ({ translations, fallbackProps }: UseTranslations
       nextImage: getNavigationLabel('nextImage', undefined, 'Next image'),
       viewImage: getNavigationLabel('viewImage', undefined, 'View image {index}'),
     }
-  }, [translations, fallbackProps])
+  }, [translations])
 }

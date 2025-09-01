@@ -34,8 +34,8 @@ export const MultiRoomLayout: React.FC<MultiRoomLayoutProps> = ({
       {/* Title and Subtitle */}
       {(title || subtitle) && (
         <div className="mb-6 text-center">
-          {title && <h2 className="text-2xl font-bold mb-2">{title}</h2>}
-          {subtitle && <p className="text-neutral-600">{subtitle}</p>}
+          {title && <h2 className="text-2xl font-bold mb-2 text-foreground">{title}</h2>}
+          {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
         </div>
       )}
 
@@ -64,7 +64,7 @@ export const MultiRoomLayout: React.FC<MultiRoomLayoutProps> = ({
               {roomCardPropsArray.map((roomCardProps) => (
                 <CarouselItem
                   key={roomCardProps.room.id}
-                  className="flex-shrink-0 lg:basis-[50%] lg:w-[50%] basis-full w-full flex justify-center"
+                  className="flex-shrink-0 xl:basis-[50%] xl:w-[50%] basis-full w-full flex justify-center pt-1"
                 >
                   <RoomCard {...roomCardProps} />
                 </CarouselItem>
@@ -76,23 +76,21 @@ export const MultiRoomLayout: React.FC<MultiRoomLayoutProps> = ({
                 <CarouselNext className={cn('relative -right-4  -bottom-4 z-30')} />
               </div>
               {/* Dots indicator for mobile */}
-              <div className="flex justify-center">
-                <div className="flex items-center">
-                  {Array.from({ length: count }, (_, index) => (
-                    <button
-                      key={index}
-                      className={cn(
-                        "w-8 h-10 flex items-center justify-center rounded-full relative transition-colors",
-                        "after:content-[''] after:w-[14px] after:h-[14px] after:rounded-full after:flex after:items-center after:border-2",
-                        current === index + 1
-                          ? "after:border-gray-800"
-                          : "after:border-gray-400"
-                      )}
-                      onClick={() => roomCarouselApi?.scrollTo(index)}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
+              <div className="flex items-center justify-center mr-2">
+                {Array.from({ length: count }, (_, index) => (
+                  <button
+                    key={index}
+                    className={cn(
+                      "w-8 h-10 flex items-center justify-center rounded-full relative transition-colors",
+                      "after:content-[''] after:w-[14px] after:h-[14px] after:rounded-full after:flex after:items-center after:border-2",
+                      current === index + 1
+                        ? "after:border-foreground"
+                        : "after:border-muted-foreground"
+                    )}
+                    onClick={() => roomCarouselApi?.scrollTo(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </Carousel>

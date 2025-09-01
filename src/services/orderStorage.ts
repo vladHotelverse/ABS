@@ -530,18 +530,3 @@ export async function getOrdersByStatus(status: OrderStatus): Promise<OrderData[
   }
 }
 
-// Legacy functions for backwards compatibility (now no-ops or return defaults)
-export function addProposalToOrder(_orderId: string, _proposal: ProposalItem): boolean {
-  // addProposalToOrder is deprecated - proposals are managed by the hotel reception system
-  return false
-}
-
-export function deleteOrder(_orderId: string): boolean {
-  // deleteOrder is not supported in production - orders are permanent records
-  return false
-}
-
-export function clearAllOrders(): boolean {
-  // clearAllOrders is not supported in production - orders are permanent records
-  return false
-}

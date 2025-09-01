@@ -174,14 +174,12 @@ export const useOfferBooking = ({
 
       // Reset selection to default
       const isAllInclusiveOffer = isAllInclusive(offer)
-      const isOnlineCheckinOffer = isOnlineCheckin(offer)
-      const isLateCheckoutOffer = isLateCheckout(offer)
       const nights = calculateNights(reservationInfo?.checkInDate, reservationInfo?.checkOutDate)
       
       setSelections((prev) => ({
         ...prev,
         [id]: {
-          quantity: (isAllInclusiveOffer || isOnlineCheckinOffer || isLateCheckoutOffer) ? 1 : 0, // Special offers reset to 1, others to 0
+          quantity: 0, // Always set to 0 when removing an offer
           persons: offer.type === 'perPerson' ? reservationInfo?.personCount || 1 : 1,
           nights: isAllInclusiveOffer ? nights : 1, // All inclusive uses full stay duration
           selectedDate: undefined,

@@ -135,44 +135,109 @@ export async function createSampleOrder(): Promise<string | null> {
 }
 
 /**
- * Convert booking data from ABS_Landing format to order format
+ * Convert unified room booking data to order format
  */
 export function convertBookingDataToOrder(
-  bookingData: any,
+  rooms: Array<{
+    id: string
+    roomName: string
+    nights: number
+    items: Array<{
+      type: 'room' | 'customization' | 'offer' | 'bid'
+      name: string
+      price: number
+    }>
+  }>,
   userInfo: UserInfo
 ): CreateOrderParams | null {
   try {
-    // Extract selections from booking data
+    // For single booking mode, use the first room or create empty selections
+    const primaryRoom = rooms[0]
+    
+    if (!primaryRoom) {
+      return {
+        userInfo,
+        selections: {
+          room: undefined,
+          customizations: [],
+          offers: [],
+          activeBids: []
+        },
+        totalPrice: 0,
+        notes: 'Order created from booking flow'
+      }
+    }
+    
+    // Extract room item (should be first room-type item)
+    const roomItem = primaryRoom.items.find(item => item.type === 'room')
+    const room = roomItem ? {
+      id: roomItem.name,
+      roomType: roomItem.name,
+      title: roomItem.name,
+      description: 'Room from unified booking system',
+      image: '',
+      amenities: [],
+      price: roomItem.price,
+      perNight: true
+    } : undefined
+    
+    // Extract customizations
+    const customizations = primaryRoom.items
+      .filter(item => item.type === 'customization')
+      .map(item => ({
+        id: item.name,
+        name: item.name,
+        price: item.price
+      }))
+    
+    // Extract offers
+    const offers = primaryRoom.items
+      .filter(item => item.type === 'offer')
+      .map(item => ({
+        id: item.name,
+        name: item.name,
+        title: item.name,
+        description: 'Offer from unified booking system',
+        image: '',
+        price: item.price
+      }))
+    
+    // Extract bids
+    const activeBids = primaryRoom.items
+      .filter(item => item.type === 'bid')
+      .map(item => ({
+        id: item.name,
+        roomId: primaryRoom.id,
+        roomName: primaryRoom.roomName,
+        bidAmount: item.price,
+        status: 'pending' as const
+      }))
+    
     const selections: OrderSelections = {
-      room: bookingData.selectedRoom || undefined,
-      customizations: bookingData.customizations || [],
-      offers: bookingData.selectedOffers || [],
-      activeBids: bookingData.activeBids || []
+      room,
+      customizations,
+      offers,
+      activeBids
     }
     
-    // Calculate total price (this would be more sophisticated in real implementation)
+    // Calculate total price
     let totalPrice = 0
+    const nights = primaryRoom.nights || 1
     
-    if (selections.room) {
-      // Calculate nights
-      const checkIn = new Date(userInfo.checkIn)
-      const checkOut = new Date(userInfo.checkOut)
-      const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
-      
-      totalPrice += selections.room.price * nights
-    }
-    
-    // Add customization prices
-    totalPrice += selections.customizations.reduce((sum, c) => sum + (c.price || 0), 0)
-    
-    // Add offer prices
-    totalPrice += selections.offers.reduce((sum, o) => sum + (o.price || 0), 0)
+    // Add all item prices with night calculations
+    primaryRoom.items.forEach(item => {
+      if (item.type === 'room' || item.type === 'customization' || item.type === 'bid') {
+        totalPrice += item.price * nights
+      } else {
+        totalPrice += item.price
+      }
+    })
     
     return {
       userInfo,
       selections,
       totalPrice,
-      notes: 'Order created from booking flow'
+      notes: 'Order created from unified booking system'
     }
   } catch (error) {
     console.error('Error converting booking data to order:', error)

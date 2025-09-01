@@ -1,22 +1,27 @@
 import clsx from 'clsx'
 import type React from 'react'
 import { Slider } from '@/components/ui/slider'
+import { UiButton } from '../ui/button'
+
+export interface PriceSliderTranslations {
+  nightText: string
+  makeOfferText: string
+  availabilityText: string
+  proposePriceText: string
+  currencyText: string
+  bidSubmittedText: string
+  updateBidText: string
+  cancelBidText: string
+}
 
 export interface PriceSliderProps {
   className?: string
   proposedPrice: number
   minPrice: number
   maxPrice: number
-  nightText?: string
-  makeOfferText?: string
-  availabilityText?: string
-  proposePriceText?: string
-  currencyText?: string
+  translations?: PriceSliderTranslations
   bidStatus?: 'idle' | 'submitted'
   submittedPrice?: number | null
-  bidSubmittedText?: string
-  updateBidText?: string
-  cancelBidText?: string
   roomName?: string
   nights?: number
   onPriceChange: (price: number) => void
@@ -24,34 +29,39 @@ export interface PriceSliderProps {
   onCancelBid?: () => void
 }
 
+const defaultTranslations: PriceSliderTranslations = {
+  nightText: '/night',
+  makeOfferText: 'Place a bid',
+  availabilityText: 'Subject to availability',
+  proposePriceText: 'Propose your price:',
+  currencyText: 'EUR',
+  bidSubmittedText: 'Bid submitted',
+  updateBidText: 'Update bid',
+  cancelBidText: 'Cancel',
+}
+
 const PriceSlider: React.FC<PriceSliderProps> = ({
   className,
   proposedPrice,
   minPrice,
   maxPrice,
-  nightText = '/noche',
-  makeOfferText = 'Place a bid',
-  availabilityText = 'Sujeto a disponibilidad',
-  proposePriceText = 'Propon tu precio:',
-  currencyText = 'EUR',
+  translations = defaultTranslations,
   bidStatus = 'idle',
   submittedPrice = null,
-  bidSubmittedText = 'Bid submitted',
-  updateBidText = 'Update bid',
-  cancelBidText = 'Cancel',
   roomName,
   nights: _nights = 1,
   onPriceChange,
   onMakeOffer,
   onCancelBid,
 }) => {
+  const t = { ...defaultTranslations, ...translations }
   // Temporarily removed @use-gesture implementation to fix infinite loop
   // Will re-implement once core functionality is stable
 
   // Generate dynamic propose text
   const dynamicProposeText = roomName
-    ? `${proposePriceText.replace(':', '')} for ${roomName}:`
-    : proposePriceText
+    ? `${t.proposePriceText.replace(':', '')} for ${roomName}:`
+    : t.proposePriceText
 
   const handlePointerEvent = (e: React.PointerEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation()
@@ -69,8 +79,8 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   }
 
   return (
-    <div 
-      className={clsx('w-full select-none', className)}
+    <div
+      className={clsx('w-full h-full select-none', className)}
       onPointerDown={handlePointerEvent}
       onMouseDown={handlePointerEvent}
       onTouchStart={handleTouchEvent}
@@ -86,35 +96,35 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
       {bidStatus === 'submitted' && submittedPrice ? (
         // Submitted bid view
         <div className="space-y-3">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
             <div className="flex items-start justify-between mb-2">
-              <span className="text-sm font-medium text-blue-800">{bidSubmittedText}</span>
+              <span className="text-sm font-medium text-primary">{t.bidSubmittedText}</span>
               <div className="text-right">
-                <div className="text-xl font-bold text-blue-900">{`${submittedPrice} ${currencyText} ${nightText}`}</div>
+                <div className="text-xl font-bold text-foreground">{`${submittedPrice} ${t.currencyText} ${t.nightText}`}</div>
                 {/* <div className="text-xs text-blue-600 mt-1">Total: {(submittedPrice || 0) * 5} {currencyText}</div> */}
               </div>
             </div>
-            <p className="text-xs text-blue-600">{availabilityText}</p>
+            <p className="text-xs text-muted-foreground">{t.availabilityText}</p>
           </div>
-          
+
           <div className="flex gap-2">
-            <button
-              className="flex-1 py-2 bg-black hover:bg-neutral-900 text-white rounded-md transition duration-200"
+            <UiButton
+              className="flex-1"
               onClick={() => {
                 // Reset to allow updating the bid
                 onCancelBid?.()
               }}
             >
-              {updateBidText}
-            </button>
-            <button
-              className="py-2 px-4 border border-neutral-300 hover:bg-neutral-50 rounded-md transition duration-200"
+              {t.updateBidText}
+            </UiButton>
+            <UiButton
+              variant='outline'
               onClick={() => {
                 onCancelBid?.()
               }}
             >
-              {cancelBidText}
-            </button>
+              {t.cancelBidText}
+            </UiButton>
           </div>
         </div>
       ) : (
@@ -123,11 +133,11 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
           <div className="text-sm font-medium mb-2 flex justify-between items-start">
             <span>{dynamicProposeText}</span>
             <div className="text-right">
-              <div className="text-lg md:text-xl font-bold text-black">{`${proposedPrice} ${currencyText} ${nightText}`}</div>
+              <div className="text-lg md:text-xl font-bold text-foreground">{`${proposedPrice} ${t.currencyText} ${t.nightText}`}</div>
               {/* <div className="text-xs text-neutral-500 mt-1">Total: {proposedPrice * 5} {currencyText}</div> */}
             </div>
           </div>
-          <div 
+          <div
             className="relative w-full py-2"
             onPointerDown={handlePointerEvent}
             onMouseDown={handlePointerEvent}
@@ -147,18 +157,18 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
               className="w-full transition-all"
               data-carousel-drag-disabled
             />
-            <div className="w-full flex justify-between text-xs text-neutral-500 mt-2">
-              <span>{`${minPrice} ${currencyText}/${nightText}`}</span>
-              <span>{`${maxPrice} ${currencyText}/${nightText}`}</span>
+            <div className="w-full flex justify-between text-xs text-muted-foreground mt-2">
+              <span>{`${minPrice} ${t.currencyText}/${t.nightText}`}</span>
+              <span>{`${maxPrice} ${t.currencyText}/${t.nightText}`}</span>
             </div>
           </div>
-          <button
-            className="w-full mt-3 py-2 bg-black hover:bg-neutral-900 text-white rounded-md transition duration-200"
+          <UiButton
+            className="w-full mt-3 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition duration-200"
             onClick={onMakeOffer}
           >
-            {makeOfferText}
-          </button>
-          <p className="text-xs text-neutral-500 mt-1 text-center">{availabilityText}</p>
+            {t.makeOfferText}
+          </UiButton>
+          <p className="text-xs text-muted-foreground mt-2 text-center">{t.availabilityText}</p>
         </>
       )}
     </div>

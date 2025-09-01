@@ -113,10 +113,10 @@ const RoomCard: React.FC<RoomCardProps> = ({
     activeBid,
   } = state
   const isBidActive = activeBid?.roomId === room.id
-  
+
   // State to control slider visibility with smooth transition
   const [sliderVisible, setSliderVisible] = useState(false)
-  
+
 
   // Slider logic is now local to each card
   const {
@@ -173,37 +173,23 @@ const RoomCard: React.FC<RoomCardProps> = ({
   return (
     <div
       className={clsx(
-        'relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300',
-        isActive && showPriceSlider ? 'bg-gray-50 md:ring-2 ring-gray-200' : 'bg-white',
+        'cq-container bg-card relative rounded-lg overflow-visible md:shadow-sm w-full max-w-md transition-all duration-300 ml-0.5',
         {
-          'border-2 border-green-300 bg-green-50/30': selectedRoom?.id === room.id,
-          'border-2 border-blue-300 bg-blue-50/30': isBidActive && selectedRoom?.id !== room.id,
-          'border border-transparent': selectedRoom?.id !== room.id && !isBidActive,
+          'ring-2 ring-green-300': selectedRoom?.id === room.id,
+          'ring-2 ring-blue-300': isBidActive && selectedRoom?.id !== room.id,
         }
       )}
     >
-      {/* Badges */}
-      <RoomBadges
-        hasDiscount={!!room.oldPrice && !selectedRoom?.id && !isBidActive}
-        oldPrice={room.oldPrice}
-        currentPrice={room.price}
-        discountBadgeText={discountBadgeText}
-        isSelected={selectedRoom?.id === room.id}
-        selectedText={selectedText}
-        isBidActive={isBidActive && selectedRoom?.id !== room.id}
-        bidSubmittedText={bidSubmittedText}
-      />
-
       {/* Room Image Display with Click-to-Modal */}
-      <div className="relative h-64 bg-neutral-100 group cursor-zoom-in" onClick={handleImageClick}>
+      <div className="relative h-64 bg-muted group cursor-zoom-in rounded-t-lg" onClick={handleImageClick}>
         {/* Current image */}
-        <img 
-          src={room.images[currentImageIndex]} 
-          alt={`${room.title || room.roomType} - Image ${currentImageIndex + 1}`} 
-          className="object-cover w-full h-full rounded-t-lg" 
+        <img
+          src={room.images[currentImageIndex]}
+          alt={`${room.title || room.roomType} - Image ${currentImageIndex + 1}`}
+          className="object-cover w-full h-full rounded-t-lg"
           draggable={false}
         />
-        
+
         {/* Multiple images indicator - simple overlay */}
         {room.images.length > 1 && (
           <div className="absolute bottom-3 right-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
@@ -213,18 +199,30 @@ const RoomCard: React.FC<RoomCardProps> = ({
             </svg>
           </div>
         )}
-        
+
         {/* Amenities overlay - top left */}
         <div className="absolute top-3 left-3 z-30 flex flex-wrap gap-1 max-w-[85%]">
           {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
             <span
               key={`${room.id}-${amenity}`}
-              className="text-xs bg-white/90 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-md text-gray-800 shadow-sm"
+              className="text-xs bg-background/90 backdrop-blur-sm border border-border px-2 py-1 rounded-md text-foreground shadow-sm"
             >
               {amenity}
             </span>
           ))}
         </div>
+
+        {/* Badges */}
+        <RoomBadges
+          hasDiscount={!!room.oldPrice && !selectedRoom?.id && !isBidActive}
+          oldPrice={room.oldPrice}
+          currentPrice={room.price}
+          discountBadgeText={discountBadgeText}
+          isSelected={selectedRoom?.id === room.id}
+          selectedText={selectedText}
+          isBidActive={isBidActive && selectedRoom?.id !== room.id}
+          bidSubmittedText={bidSubmittedText}
+        />
       </div>
 
       {/* Room Details */}
@@ -250,46 +248,51 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
       {/* Additional Info */}
       <div className="px-4 pb-4">
-        <p className="text-xs text-neutral-500 mt-2">{priceInfoText}</p>
+        <p className="text-xs text-muted-foreground mt-2">{priceInfoText}</p>
       </div>
 
-      {/* Price Slider - integrated within the card */}
-      <div
-        className={clsx(
-          'overflow-hidden',
-          // Apply transition only when expanding to make it smooth
-          sliderVisible ? 'transition-all duration-500 ease-in-out max-h-96 opacity-100' : 'transition-none max-h-0 opacity-0'
-        )}
-      >
-        <div className={clsx(
-          "border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg",
-          sliderVisible ? 'opacity-100' : 'opacity-0'
-        )}>
-          <PriceSlider
-            proposedPrice={proposedPrice}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            nightText={nightText}
-            proposePriceText={proposePriceText}
-            availabilityText={availabilityText}
-            currencyText={currencyText}
-            bidStatus={bidStatus}
-            submittedPrice={submittedPrice}
-            bidSubmittedText={bidSubmittedText}
-            updateBidText={updateBidText}
-            cancelBidText={cancelBidText}
-            roomName={room.roomType}
-            onPriceChange={setProposedPrice}
-            onMakeOffer={makeOffer}
-            onCancelBid={() => {
-              if (onCancelBid) {
-                onCancelBid(room.id)
-              }
-              resetBid()
-            }}
-          />
+      {/* Price Slider - integrated within the card (only show if bidding is enabled) */}
+      {showPriceSlider && (
+        <div
+          className={clsx(
+            'overflow-hidden',
+            // Apply transition only when expanding to make it smooth
+            sliderVisible ? 'transition-all duration-500 ease-in-out max-h-96 opacity-100' : 'transition-none max-h-0 opacity-0'
+          )}
+        >
+          <div className={clsx(
+            "border-t border-border p-4 rounded-b-lg",
+            sliderVisible ? 'opacity-100' : 'opacity-0'
+          )}>
+            <PriceSlider
+              proposedPrice={proposedPrice}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              translations={{
+                nightText,
+                makeOfferText: translations.selectText,
+                availabilityText: availabilityText || 'Subject to availability',
+                proposePriceText: proposePriceText || 'Propose your price:',
+                currencyText: currencyText || 'EUR',
+                bidSubmittedText: bidSubmittedText || 'Bid submitted',
+                updateBidText: updateBidText || 'Update bid',
+                cancelBidText: cancelBidText || 'Cancel',
+              }}
+              bidStatus={bidStatus}
+              submittedPrice={submittedPrice}
+              roomName={room.roomType}
+              onPriceChange={setProposedPrice}
+              onMakeOffer={makeOffer}
+              onCancelBid={() => {
+                if (onCancelBid) {
+                  onCancelBid(room.id)
+                }
+                resetBid()
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Image Modal */}
       <ImageModal

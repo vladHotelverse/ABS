@@ -95,42 +95,11 @@ export interface RoomSelectionCarouselProps {
   currentRoomAmenities?: string[]
   mode?: 'selection' | 'consultation'
   readonly?: boolean
+  
+  // Multibooking support
+  contextRoomId?: string // The room context (e.g., "room1", "room2") for multibooking scenarios
+  roomSpecificSelections?: Record<string, string> // Maps contextRoomId -> selectedRoomId
 
-  // Deprecated individual text props - keeping for backward compatibility but will be removed
-  /** @deprecated Use translations.learnMoreText instead */
-  learnMoreText?: string
-  /** @deprecated Use translations.nightText instead */
-  nightText?: string
-  /** @deprecated Use translations.priceInfoText instead */
-  priceInfoText?: string
-  /** @deprecated Use translations.makeOfferText instead */
-  makeOfferText?: string
-  /** @deprecated Use translations.availabilityText instead */
-  availabilityText?: string
-  /** @deprecated Use translations.selectedText instead */
-  selectedText?: string
-  /** @deprecated Use translations.selectText instead */
-  selectText?: string
-  /** @deprecated Use translations.discountBadgeText instead */
-  discountBadgeText?: string
-  /** @deprecated Use translations.offerMadeText instead */
-  offerMadeText?: string
-  /** @deprecated Use translations.proposePriceText instead */
-  proposePriceText?: string
-  /** @deprecated Use translations.currencyText instead */
-  currencyText?: string
-  /** @deprecated Use translations.currencySymbol instead */
-  currencySymbol?: string
-  /** @deprecated Use translations.bidSubmittedText instead */
-  bidSubmittedText?: string
-  /** @deprecated Use translations.updateBidText instead */
-  updateBidText?: string
-  /** @deprecated Use translations.cancelBidText instead */
-  cancelBidText?: string
-  /** @deprecated Use translations.upgradeNowText instead */
-  upgradeNowText?: string
-  /** @deprecated Use translations.removeText instead */
-  removeText?: string
   
   // Active bid information
   activeBid?: {

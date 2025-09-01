@@ -49,6 +49,9 @@ export interface RoomSelectionSectionProps {
     bidAmount: number
     status: 'pending' | 'submitted' | 'accepted' | 'rejected'
   }
+  // Multibooking support
+  contextRoomId?: string
+  roomSpecificSelections?: Record<string, string>
 }
 
 // Convert RoomOption to CarouselRoomOption for compatibility
@@ -89,6 +92,8 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
   isVisible = true,
   showPriceSlider = false,
   activeBid,
+  contextRoomId,
+  roomSpecificSelections,
 }) => {
   if (!isVisible || roomOptions.length === 0) {
     return null
@@ -122,30 +127,21 @@ export const RoomSelectionSection: React.FC<RoomSelectionSectionProps> = ({
   )
 
   return (
-    <section className={`bg-white md:p-6 rounded-lg md:shadow md:border md:border-neutral-300 ${className}`}>
+    <section className={`bg-card border border-border p-4 md:p-6 rounded-lg md:shadow ${className}`}>
       <h2 className="text-3xl font-bold mb-4">{texts.roomTitle}</h2>
       <p className="mb-6">{texts.roomSubtitle}</p>
       <RoomSelectionCarousel
         roomOptions={carouselRoomOptions}
         onRoomSelected={handleRoomSelect}
         initialSelectedRoom={selectedRoom ? convertToCarouselRoomOption(selectedRoom) : null}
-        selectText={texts.selectText}
-        selectedText={texts.selectedText}
-        nightText={texts.nightText}
-        learnMoreText={texts.learnMoreText}
-        priceInfoText={texts.priceInfoText}
         onLearnMore={handleLearnMore}
         onMakeOffer={handleMakeOffer}
         onCancelBid={onCancelBid}
         showPriceSlider={showPriceSlider}
-        makeOfferText={texts.makeOfferText}
-        proposePriceText={texts.proposePriceText}
-        availabilityText={texts.availabilityText}
-        offerMadeText={texts.offerMadeText}
-        bidSubmittedText={texts.bidSubmittedText}
-        updateBidText={texts.updateBidText}
-        cancelBidText={texts.cancelBidText}
         activeBid={activeBid}
+        contextRoomId={contextRoomId}
+        roomSpecificSelections={roomSpecificSelections}
+        translations={undefined}
       />
     </section>
   )

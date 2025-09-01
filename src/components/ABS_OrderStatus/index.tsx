@@ -260,7 +260,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
 
   if (viewState === 'invalid_id' || viewState === 'not_found') {
     return (
-      <div className={clsx('min-h-screen bg-gray-50 py-12 px-4', className)}>
+      <div className={clsx('min-h-screen bg-background py-12 px-4', className)}>
         <ErrorState
           type={viewState}
           onTryAgain={handleTryAgain}
@@ -272,7 +272,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
 
   if (!orderData) {
     return (
-      <div className={clsx('min-h-screen bg-gray-50 py-12 px-4', className)}>
+      <div className={clsx('min-h-screen bg-background py-12 px-4', className)}>
         <OrderStatusInputForm
           onSubmit={handleOrderIdSubmit}
           onBackToHome={onBackToHome}
@@ -283,7 +283,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
 
   // Main order status view
   return (
-    <div className={clsx('min-h-screen bg-gray-50', className)}>
+    <div className={clsx('min-h-screen bg-background', className)}>
       <div className="container mx-auto px-4 py-8">
         <OrderHeader orderData={orderData} />
         
@@ -292,7 +292,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
           <div className="w-full">
             {/* Room Selection (Read-only) */}
             {orderData.selections.room && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-card rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Selected Room</h2>
                 <div className="order-consultation-mode [&_button]:hidden [&_.room-select-button]:hidden [&_.make-offer-button]:hidden [&_.bid-controls]:hidden [&_[role=button]]:pointer-events-none">
                   <ABS_RoomSelectionCarousel
@@ -344,7 +344,7 @@ const ABS_OrderStatus: React.FC<OrderStatusProps> = ({
             
             {/* Customizations (Read-only) */}
             {orderData.selections.customizations.length > 0 && processedSectionData && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-card rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Room Customizations</h2>
                 <div className="order-consultation-mode">
                   <ABS_RoomCustomization

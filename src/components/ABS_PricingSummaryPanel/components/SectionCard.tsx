@@ -23,30 +23,30 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, fromLabel, euroSuffi
       case 'room':
         return {
           icon: ArrowUpCircle,
-          iconColor: 'text-blue-500',
-          bgHover: 'hover:bg-blue-50',
-          borderHover: 'hover:border-blue-300',
+          iconColor: 'text-primary',
+          bgHover: 'hover:bg-primary/5',
+          borderHover: 'hover:border-primary',
         }
       case 'customization':
         return {
           icon: Pencil,
-          iconColor: 'text-green-500',
-          bgHover: 'hover:bg-green-50',
-          borderHover: 'hover:border-green-300',
+          iconColor: 'text-green-600 dark:text-green-400',
+          bgHover: 'hover:bg-green-100/50 dark:hover:bg-green-900/20',
+          borderHover: 'hover:border-green-300 dark:hover:border-green-600',
         }
       case 'offer':
         return {
           icon: CreditCard,
-          iconColor: 'text-purple-500',
-          bgHover: 'hover:bg-purple-50',
-          borderHover: 'hover:border-purple-300',
+          iconColor: 'text-purple-600 dark:text-purple-400',
+          bgHover: 'hover:bg-purple-100/50 dark:hover:bg-purple-900/20',
+          borderHover: 'hover:border-purple-300 dark:hover:border-purple-600',
         }
       default:
         return {
           icon: ArrowUpCircle,
-          iconColor: 'text-neutral-600',
-          bgHover: 'hover:bg-neutral-50',
-          borderHover: 'hover:border-neutral-300',
+          iconColor: 'text-muted-foreground',
+          bgHover: 'hover:bg-muted/50',
+          borderHover: 'hover:border-border',
         }
     }
   }
@@ -56,7 +56,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, fromLabel, euroSuffi
   return (
     <Card
       className={`transition-all duration-300 border-2 ${
-        isHovered ? `${bgHover} ${borderHover}` : 'border-neutral-200 hover:border-neutral-300'
+        isHovered ? `${bgHover} ${borderHover}` : 'border-border hover:border-border'
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -67,39 +67,28 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, fromLabel, euroSuffi
           <div className="flex items-center space-x-3">
             <div
               className={`p-2 rounded-full transition-colors duration-200 ${
-                isHovered ? 'bg-white shadow-sm' : 'bg-neutral-50'
+                isHovered ? 'bg-background shadow-sm' : 'bg-muted'
               }`}
             >
               <IconComponent className={`h-5 w-5 ${iconColor}`} />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-medium text-sm text-neutral-800">{section.label}</h3>
+                <h3 className="font-medium text-sm text-foreground">{section.label}</h3>
               </div>
               {section.startingPrice !== undefined && (
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-muted-foreground">
                   {fromLabel} {formatPrice(section.startingPrice)}
                 </p>
               )}
             </div>
           </div>
-
-          {/* <UiButton
-            variant="ghost"
-            size="sm"
-            className={`text-blue-600 font-medium hover:bg-blue-50 transition-colors duration-200 ${
-              isHovered ? 'bg-blue-50' : ''
-            }`}
-          >
-            <span className="text-xs">{exploreLabel}</span>
-            <ChevronRight className="h-3 w-3 ml-1" />
-          </UiButton> */}
         </div>
 
         {/* Show description on hover */}
         {isHovered && section.description && (
           <div className="mt-3 pl-10 animate-in fade-in duration-500">
-            <p className="text-xs text-neutral-600 leading-relaxed">{section.description}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{section.description}</p>
           </div>
         )}
       </CardContent>

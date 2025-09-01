@@ -2,7 +2,7 @@
   "language": "English",
   "navigation": {
     "home": "Home",
-    "booking": "Booking",
+    "booking": "Selection",
     "rooms": "Rooms",
     "offers": "Offers"
   },
@@ -39,26 +39,26 @@
     "check_out": "Check-out",
     "dates": "Dates",
     "occupancy": "Occupancy",
-    "reservation": "Reservation",
-    "booking_code": "Booking Code",
+    "reservation": "Selection",
+    "booking_code": "Selection Code",
     "view_cart": "View Cart",
     "add_to_cart": "Add to Cart",
     "remove_from_cart": "Remove from Cart",
     "empty_cart": "Empty Cart",
-    "book_now": "Book Now",
+    "book_now": "Select Now",
     "available": "Available",
     "unavailable": "Unavailable",
     "sold_out": "Sold Out",
     "explore": "Explore"
   },
   "booking": {
-    "title": "Book Your Stay",
+    "title": "Select Your Stay",
     "subtitle": "Choose your perfect room and customize your experience",
     "room_selection": {
       "title": "Select Your Room",
       "subtitle": "Choose from our luxurious accommodations",
       "view_details": "View Details",
-      "book_room": "Book Room",
+      "book_room": "Select Room",
       "amenities": "Amenities",
       "capacity": "Capacity",
       "size": "Size",
@@ -106,7 +106,7 @@
       "cultural": "Cultural Package"
     },
     "summary": {
-      "title": "Booking Summary",
+      "title": "Selection Summary",
       "subtitle": "Review your selection",
       "room_details": "Room Details",
       "stay_details": "Stay Details",
@@ -133,11 +133,11 @@
     "cottage": "Cottage"
   },
   "messages": {
-    "welcome": "Welcome to our hotel booking system",
+    "welcome": "Welcome to our hotel selection system",
     "room_added": "Room added to cart successfully",
     "room_removed": "Room removed from cart",
-    "booking_confirmed": "Booking confirmed successfully",
-    "booking_failed": "Booking failed. Please try again.",
+    "booking_confirmed": "Selection confirmed successfully",
+    "booking_failed": "Selection failed. Please try again.",
     "invalid_dates": "Please select valid dates",
     "invalid_occupancy": "Please select valid occupancy",
     "network_error": "Network error. Please check your connection.",
@@ -145,7 +145,7 @@
     "unavailable_dates": "Selected dates are not available",
     "maximum_occupancy": "Maximum occupancy exceeded",
     "minimum_stay": "Minimum stay requirement not met",
-    "advance_booking": "Advance booking required"
+    "advance_booking": "Advance selection required"
   },
   "abs_components": {
     "pricing_summary": {
@@ -161,7 +161,7 @@
       "special_offers_label": "Special Offers",
       "pay_at_hotel_label": "Pay at Hotel",
       "view_terms_label": "View Terms & Conditions",
-      "confirm_button_label": "Confirm Booking",
+      "confirm_button_label": "Confirm Selection",
       "no_upgrades_selected_label": "No upgrades selected",
       "no_offers_selected_label": "No special offers selected",
       "edit_label": "Edit",
@@ -214,7 +214,7 @@
       "per_person": "per person",
       "per_night": "per night",
       "total": "Total",
-      "book_now": "Book Now",
+      "book_now": "Select Now",
       "number_of_persons": "Number of persons",
       "number_of_nights": "Number of nights",
       "added_label": "Added",
@@ -248,11 +248,11 @@
     },
     "booking_state": {
       "loading_label": "Loading...",
-      "error_title": "Booking Error",
-      "error_message": "There was an error processing your booking. Please try again.",
+      "error_title": "Selection Error",
+      "error_message": "There was an error processing your selection. Please try again.",
       "try_again_label": "Try Again",
-      "booking_confirmed_title": "Booking Confirmed!",
-      "confirmation_message": "Your booking has been confirmed successfully.",
+      "booking_confirmed_title": "Selection Confirmed!",
+      "confirmation_message": "Your selection has been confirmed successfully.",
       "back_to_home_label": "Back to Home"
     },
     "header": {
@@ -261,14 +261,14 @@
       "confirmation_tab": "Confirmation"
     },
     "multi_booking": {
-      "title": "Multi-Room Booking",
+      "title": "Multi-Room Selection",
       "subtitle": "Manage multiple room selections",
       "rooms_selected": "Rooms Selected",
       "total_price": "Total Price",
       "confirm_all": "Confirm All",
       "remove_room": "Remove Room",
       "add_room": "Add Room",
-      "booking_summary": "Booking Summary",
+      "booking_summary": "Selection Summary",
       "room_details": "Room Details",
       "guest_details": "Guest Details",
       "pricing_details": "Pricing Details"

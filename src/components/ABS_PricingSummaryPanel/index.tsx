@@ -1,15 +1,15 @@
 import clsx from 'clsx'
 import type React from 'react'
 import { useMemo, useCallback } from 'react'
+import { toast } from 'sonner'
 import EmptyState from './components/EmptyState'
 import PriceBreakdown from './components/PriceBreakdown'
-import ToastContainer from './components/ToastContainer'
-import PricingItemComponent from './components/PricingItemComponent'
+import PricingSummaryHeader from './components/PricingSummaryHeader'
+import RoomSection from './components/RoomSection'
 import ItemsSection from './components/ItemsSection'
-import LoadingOverlay from './components/LoadingOverlay'
+import { LoadingOverlay } from '../shared'
 import type { PricingItem, PricingSummaryPanelProps } from './types'
-import { PANEL_CONFIG, DEFAULT_ROOM_IMAGE } from './constants'
-import { useToasts } from './hooks/useToasts'
+import { DEFAULT_ROOM_IMAGE } from './constants'
 
 const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   className,
@@ -24,18 +24,15 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   onRemoveItem,
   onConfirm,
 }) => {
-  // Toast notifications using custom hook
-  const { toasts, showToast, removeToast } = useToasts(PANEL_CONFIG.TOAST_DURATION)
 
   // Memoize expensive filtering operations - now grouped by concept
-  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, bidForUpgradeItems, isEmpty } = useMemo(() => {
+  const { chooseYourSuperiorRoomItems, customizeYourRoomItems, chooseYourRoomItems, enhanceYourStayItems, isEmpty } = useMemo(() => {
     const safeItems = items || []
     return {
       chooseYourSuperiorRoomItems: safeItems.filter((item) => item.concept === 'choose-your-superior-room'),
       customizeYourRoomItems: safeItems.filter((item) => item.concept === 'customize-your-room'),
       chooseYourRoomItems: safeItems.filter((item) => item.concept === 'choose-your-room'),
       enhanceYourStayItems: safeItems.filter((item) => item.concept === 'enhance-your-stay'),
-      bidForUpgradeItems: safeItems.filter((item) => item.concept === 'bid-for-upgrade'),
       isEmpty: safeItems.length === 0,
     }
   }, [items])
@@ -63,17 +60,17 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           toastMessage = `Room selection removed: ${item.name}`
         }
 
-        showToast(toastMessage, 'info')
+        toast.info(toastMessage)
       }
     },
-    [onRemoveItem, labels, showToast]
+    [onRemoveItem, labels]
   )
 
   // Enhanced safety checks for required props
   if (!labels) {
     console.error('PricingSummaryPanel: labels prop is required')
     return (
-      <div className="p-4 text-red-500 border border-red-300 rounded-lg bg-red-50">
+      <div className="p-4 text-destructive border border-destructive rounded-lg bg-destructive/5">
         <h3 className="font-semibold mb-2">Configuration Error</h3>
         <p>Missing required labels configuration. Please provide all required labels.</p>
       </div>
@@ -95,15 +92,16 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
   return (
     <section
       className={clsx(
-        'border border-neutral-300 rounded-lg overflow-hidden bg-white shadow-sm w-full md:w-[400px] sticky top-28 ',
+        'border border-border rounded-lg overflow-hidden bg-card text-card-foreground shadow-sm w-full md:w-[400px] sticky top-28 ',
         className
       )}
       aria-label={labels.pricingSummaryLabel}
     >
-      {/* Room image at the top */}
-      <div className="w-full md:h-40 bg-neutral-200 overflow-hidden">
-        <img src={roomImage} alt={labels.roomImageAltText} className="w-full h-full object-cover" />
-      </div>
+      {/* Room image header */}
+      <PricingSummaryHeader 
+        roomImage={roomImage}
+        roomImageAltText={labels.roomImageAltText}
+      />
 
       {/* Content container with padding */}
       <div className="p-4 space-y-4 relative">
@@ -125,59 +123,13 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
         )}
 
         {/* Room Section - combining all room-related items */}
-        {(chooseYourRoomItems.length > 0 || chooseYourSuperiorRoomItems.length > 0) && (
-          <section aria-labelledby="room-section-title" className="bg-gray-50 rounded-lg p-3 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="room-section-title" className="text-base font-semibold">
-                {chooseYourSuperiorRoomItems.length > 0 ? 'Superior Room Selection' : 'Room Selection'}
-              </h3>
-            </div>
-            {[...chooseYourRoomItems, ...chooseYourSuperiorRoomItems].map((item) => (
-              <PricingItemComponent
-                key={item.id}
-                item={item}
-                euroSuffix={labels.euroSuffix}
-                removeLabel={labels.removeRoomUpgradeLabel}
-                onRemove={() => {
-                  try {
-                    handleRemoveItem(item)
-                  } catch (error) {
-                    console.error('Error in remove item callback:', error)
-                  }
-                }}
-              />
-            ))}
-          </section>
-        )}
-
-                {/* Bid Upgrades Section */}
-                {bidForUpgradeItems.length > 0 && (
-          <section aria-labelledby="bid-section-title">
-            <div className="flex justify-between items-center mb-2">
-              <h3 id="bid-section-title" className="text-base font-semibold">
-                Bid for Upgrades
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {bidForUpgradeItems.map((item) => (
-                <PricingItemComponent
-                  key={item.id}
-                  item={item}
-                  euroSuffix={labels.euroSuffix}
-                  removeLabel={`Remove ${item.name}`}
-                  onRemove={() => {
-                    try {
-                      handleRemoveItem(item)
-                    } catch (error) {
-                      console.error('Error in remove item callback:', error)
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
+        <RoomSection
+          chooseYourRoomItems={chooseYourRoomItems}
+          chooseYourSuperiorRoomItems={chooseYourSuperiorRoomItems}
+          euroSuffix={labels.euroSuffix}
+          removeRoomUpgradeLabel={labels.removeRoomUpgradeLabel}
+          onRemoveItem={handleRemoveItem}
+        />
 
         {/* Customizations Section */}
         <ItemsSection
@@ -196,36 +148,26 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
           onRemoveItem={handleRemoveItem}
         />
 
-        {/* Price Breakdown - Only show when not empty */}
-        {!isEmpty && (
-          <div className="border-t pt-4">
-            <PriceBreakdown
-              subtotal={safePricing.subtotal}
-              isLoading={isLoading}
-              labels={{
-                subtotalLabel: labels.subtotalLabel,
-                totalLabel: labels.totalLabel,
-                payAtHotelLabel: labels.payAtHotelLabel,
-                viewTermsLabel: labels.viewTermsLabel,
-                confirmButtonLabel: labels.confirmButtonLabel,
-                loadingLabel: labels.loadingLabel,
-                euroSuffix: labels.euroSuffix,
-              }}
-              currency={currency}
-              locale={locale}
-              onConfirm={onConfirm}
-            />
-          </div>
-        )}
+        {/* Price Breakdown - Always show to display totals and confirm button */}
+        <div className="border-t pt-4">
+          <PriceBreakdown
+            subtotal={safePricing.subtotal}
+            isLoading={isLoading}
+            labels={{
+              subtotalLabel: labels.subtotalLabel,
+              totalLabel: labels.totalLabel,
+              payAtHotelLabel: labels.payAtHotelLabel,
+              viewTermsLabel: labels.viewTermsLabel,
+              confirmButtonLabel: labels.confirmButtonLabel,
+              loadingLabel: labels.loadingLabel,
+              euroSuffix: labels.euroSuffix,
+            }}
+            currency={currency}
+            locale={locale}
+            onConfirm={onConfirm}
+          />
+        </div>
       </div>
-
-      {/* Toast Container */}
-      <ToastContainer
-        toasts={toasts}
-        removeToast={removeToast}
-        notificationsLabel={labels.notificationsLabel}
-        closeNotificationLabel={labels.closeNotificationLabel}
-      />
     </section>
   )
 }
@@ -233,3 +175,22 @@ const PricingSummaryPanel: React.FC<PricingSummaryPanelProps> = ({
 export default PricingSummaryPanel
 export { PricingSummaryPanel as ABS_PricingSummaryPanel }
 export type { PricingSummaryPanelProps, PricingItem, AvailableSection, PricingLabels } from './types'
+
+// Export focused sub-components
+export { 
+  PricingSummaryHeader,
+  RoomSection,
+  SectionRenderer
+} from './components'
+
+// Export hooks
+export { useSectionConfiguration } from './hooks'
+
+// Export additional types
+export type { 
+  PricingSummaryHeaderProps,
+  RoomSectionProps,
+  SectionConfig,
+  SectionRendererProps,
+  SectionConfigurationProps
+} from './components'

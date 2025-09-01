@@ -256,38 +256,110 @@ export const generateAvailableSections = (
 }
 
 /**
- * Counts total items in the cart
+ * Counts total items in the cart using unified room system
  */
 export const countCartItems = (
-  state: {
-    selectedRoom?: RoomOption
-    selectedCustomizations?: Record<string, any[]> | SelectedCustomizations
-    selectedOffers?: SelectedOffer[]
-    activeBid?: { roomId: string; bidAmount: number; status: string } | null
-  }
+  rooms: Array<{
+    items: Array<{
+      type: 'room' | 'customization' | 'offer' | 'bid'
+    }>
+  }>
 ): number => {
-  if (!state) return 0
+  if (!rooms || rooms.length === 0) return 0
   
-  const roomCount = state.selectedRoom ? 1 : 0
+  return rooms.reduce((total, room) => {
+    return total + (room.items?.length || 0)
+  }, 0)
+}
+
+/**
+ * Get detailed counts for mobile pricing badges using unified room system
+ */
+export const getDetailedCartCounts = (
+  rooms: Array<{
+    items: Array<{
+      type: 'room' | 'customization' | 'offer' | 'bid'
+      name?: string
+      category?: string
+      concept?: string
+    }>
+  }>
+): {
+  upgradeCount: number
+  customizationCount: number
+  offerCount: number
+} => {
+  // Use the existing multi-booking function since it works with the same unified structure
+  return getMultiBookingDetailedCounts(rooms)
+}
+
+/**
+ * Get detailed counts for multibooking mobile pricing badges
+ */
+export const getMultiBookingDetailedCounts = (
+  roomBookings: Array<{
+    items: Array<{
+      type: 'room' | 'customization' | 'offer' | 'bid'
+      name?: string
+      category?: string
+      concept?: string
+    }>
+  }>
+): {
+  upgradeCount: number
+  customizationCount: number
+  offerCount: number
+} => {
+  if (!roomBookings || roomBookings.length === 0) {
+    return { upgradeCount: 0, customizationCount: 0, offerCount: 0 }
+  }
   
-  // Count customizations - handle both formats
+  let upgradeCount = 0
   let customizationCount = 0
-  if (state.selectedCustomizations && typeof state.selectedCustomizations === 'object') {
-    Object.entries(state.selectedCustomizations).forEach(([_key, value]) => {
-      if (Array.isArray(value)) {
-        // Handle Record<string, Customization[]> format
-        customizationCount += value.length
-      } else if (value && typeof value === 'object' && 'id' in value) {
-        // Handle SelectedCustomizations format
-        customizationCount += 1
+  let offerCount = 0
+  
+  roomBookings.forEach(room => {
+    if (!room.items) return
+    
+    room.items.forEach(item => {
+      switch (item.type) {
+        case 'offer':
+          offerCount++
+          break
+        case 'bid':
+          upgradeCount++
+          break
+        case 'room':
+          // Rooms with upgrade-related concepts or categories are upgrades
+          if (item.concept === 'choose-your-superior-room' || 
+              item.category?.includes('upgrade')) {
+            upgradeCount++
+          }
+          break
+        case 'customization':
+          // Check if customization is an upgrade
+          const isUpgrade = item.name?.toLowerCase().includes('upgrade') ||
+                           item.name?.toLowerCase().includes('superior') ||
+                           item.name?.toLowerCase().includes('suite') ||
+                           item.name?.toLowerCase().includes('deluxe') ||
+                           item.concept === 'choose-your-superior-room' ||
+                           item.category?.includes('upgrade')
+          
+          if (isUpgrade) {
+            upgradeCount++
+          } else {
+            customizationCount++
+          }
+          break
       }
     })
+  })
+  
+  return {
+    upgradeCount,
+    customizationCount,
+    offerCount
   }
-  
-  const offerCount = state.selectedOffers ? state.selectedOffers.length : 0
-  const bidCount = state.activeBid ? 1 : 0
-  
-  return roomCount + customizationCount + offerCount + bidCount
 }
 
 /**

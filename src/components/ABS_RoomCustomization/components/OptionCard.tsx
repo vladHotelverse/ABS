@@ -39,7 +39,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 
   const cardContent = (
     <div className={clsx(
-      'flex-none sm:w-auto h-full bg-white border border-neutral-300 rounded-lg overflow-hidden snap-center transition-all duration-200 relative',
+      'flex-none sm:w-auto h-full bg-card border border-border rounded-lg overflow-hidden snap-center transition-all duration-200 shadow-sm relative',
       {
         'opacity-50 cursor-not-allowed': isDisabled,
         'hover:shadow-md': !isDisabled,
@@ -47,25 +47,25 @@ export const OptionCard: React.FC<OptionCardProps> = ({
     )}>
       {/* Selected indicator - only show in interactive mode */}
       {isSelected && !isDisabled && mode !== 'consultation' && (
-        <div className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-green-600/90">
+        <div className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded flex items-center gap-1 bg-emerald-700">
           <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
           Selected
         </div>
       )}
-      <div className="p-4 flex flex-col h-full">
+      <div className="p-3 sm:p-4 flex flex-col h-full">
         <div className="flex flex-col mb-1">
           <div className="flex gap-2.5 items-center w-20">
             <div className={clsx(
               "flex items-center justify-center w-10 h-10",
               {
-                'text-neutral-400': isDisabled,
+                'text-muted-foreground': isDisabled,
               }
             )}>
               <IconRenderer iconName={option.icon} fallbackImageUrl={fallbackImageUrl} label={option.label} />
             </div>
           </div>
           <h3 className={clsx(
-            "font-medium text-sm",
+            "font-medium text-base sm:text-lg",
             {
               'text-neutral-400': isDisabled,
             }
@@ -75,19 +75,20 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         </div>
         {option.description && (
           <p className={clsx(
-            "text-xs mb-1",
+            "text-sm sm:text-base mb-1",
             {
-              'text-neutral-300': isDisabled,
-              'text-neutral-500': !isDisabled,
+              'text-muted-foreground opacity-70': isDisabled,
+              'text-muted-foreground': !isDisabled,
             }
           )}>
             {option.description}
           </p>
         )}
         <p className={clsx(
-          "text-sm font-semibold mb-4",
+          "text-base sm:text-lg font-bold mb-4",
           {
-            'text-neutral-400': isDisabled,
+            'text-muted-foreground': isDisabled,
+            'text-foreground': !isDisabled,
           }
         )}>
           {option.price.toFixed(2)} {texts.pricePerNightText}
@@ -100,9 +101,9 @@ export const OptionCard: React.FC<OptionCardProps> = ({
               variant={isSelected ? 'destructive' : 'secondary'} 
               size="sm" 
               className={clsx(
-                "w-full transition-all border",
+                "w-full transition-all border min-h-[44px] touch-manipulation",
                 {
-                  "hover:bg-black hover:text-white": !isSelected,
+                  "hover:bg-primary hover:text-primary-foreground": !isSelected,
                 }
               )}
               disabled={isDisabled || readonly}
@@ -131,7 +132,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
         )}
         {mode === 'consultation' && isSelected && (
           <div className="flex items-center justify-center mt-auto">
-            <div className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full">
+            <div className="text-xs text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
               {texts.selectedText}
             </div>
           </div>

@@ -689,7 +689,7 @@ export const translations = {
 
     // Multi-booking labels
     multiBookingLabels: {
-      multiRoomBookingsTitle: 'Reservas de Múltiples Habitaciones',
+      multiRoomBookingsTitle: 'Selecciones de Múltiples Habitaciones',
       roomsCountLabel: 'habitaciones',
       singleRoomLabel: 'habitación',
       clickToExpandLabel: 'Haz clic para expandir/colapsar',
@@ -706,7 +706,7 @@ export const translations = {
       totalLabel: 'Total',
       payAtHotelLabel: 'El pago se realizará en el hotel',
       viewTermsLabel: 'Ver Términos y Condiciones',
-      confirmAllButtonLabel: 'Confirmar Todas las Reservas',
+      confirmAllButtonLabel: 'Confirmar Todas las Selecciones',
       confirmingAllLabel: 'Confirmando...',
       editLabel: 'Editar',
       addLabel: 'Añadir',
@@ -836,11 +836,7 @@ export const mockRoomBookings = [
     payAtHotel: true,
     roomImage:
       'https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    items: [
-      { id: 'room-1', name: 'Deluxe Room', price: 129.99, type: 'room' as const },
-      { id: 'breakfast-1', name: 'Breakfast Package', price: 15.0, type: 'offer' as const },
-      { id: 'ocean-view-1', name: 'Ocean View', price: 45.0, type: 'customization' as const },
-    ],
+    items: [],
   },
   {
     id: 'booking-2',
@@ -854,12 +850,7 @@ export const mockRoomBookings = [
     payAtHotel: false,
     roomImage:
       'https://images.unsplash.com/photo-1595576508898-0ad5c879a061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
-    items: [
-      { id: 'room-2', name: 'Premium Room', price: 199.99, type: 'room' as const },
-      { id: 'spa-2', name: 'Spa Access', price: 50.0, type: 'offer' as const },
-      { id: 'king-bed-2', name: 'King Bed', price: 30.0, type: 'customization' as const },
-      { id: 'poolside-2', name: 'Poolside', price: 25.0, type: 'customization' as const },
-    ],
+    items: [],
   },
   {
     id: 'booking-3',
@@ -873,12 +864,7 @@ export const mockRoomBookings = [
     payAtHotel: true,
     roomImage:
       'https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
-    items: [
-      { id: 'room-3', name: 'Executive Suite', price: 299.99, type: 'room' as const },
-      { id: 'dinner-3', name: 'Gourmet Dinner', price: 60.0, type: 'offer' as const },
-      { id: 'transfer-3', name: 'Airport Transfer', price: 35.0, type: 'offer' as const },
-      { id: 'high-floor-3', name: 'High Floor (5+)', price: 30.0, type: 'customization' as const },
-    ],
+    items: [],
   },
 ]
 

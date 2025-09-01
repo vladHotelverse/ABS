@@ -29,9 +29,12 @@ const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({ price, euro
     return formatPrice(price, euroSuffix, decimals)
   }
 
+  const formattedPrice = formatCurrency(Math.abs(price))
+  const prefix = price >= 0 ? '+' : '-'
+
   return (
     <span className={`text-sm font-medium ${className}`}>
-      +{formatCurrency(price)}
+      {prefix}{formattedPrice}
     </span>
   )
 }

@@ -29,6 +29,11 @@ export const isDateDisabled = (date: Date, reservationStartDate?: Date, reservat
  * Uses local date to avoid timezone issues
  */
 export const dateToKey = (date: Date): string => {
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    console.warn('dateToKey: Invalid date passed', date)
+    return ''
+  }
+  
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')

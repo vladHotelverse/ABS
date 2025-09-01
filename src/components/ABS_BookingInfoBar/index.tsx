@@ -47,7 +47,7 @@ const BookingInfoBar: React.FC<BookingInfoProps> = ({
       <HotelBanner hotelImage={hotelImage} showBanner={showBanner} />
 
       {/* Booking Info Bar - With sticky positioning built-in */}
-      <div className="sticky top-16 z-40 bg-white shadow-md transition-all duration-300 rounded-b-lg border border-neutral-300">
+      <div className="sticky top-16 z-40 bg-card shadow-md transition-all duration-300 rounded-b-lg border border-border">
         {!isMultiBooking ? (
           /* Single Booking Mode */
           <SingleBookingInfo title={title} items={items} />

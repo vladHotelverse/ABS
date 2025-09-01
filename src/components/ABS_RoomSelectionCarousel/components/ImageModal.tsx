@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { UiButton } from '@/components/ui/button'
 
 interface ImageModalProps {
   images: string[]
@@ -88,7 +89,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-[95vw] max-h-[95vh] w-full h-full bg-white border-none p-6 gap-0 z-[101]"
+        className="max-w-[95vw] max-h-[95vh] w-full h-full border-none p-6 gap-0 z-[101]"
         hideClose={true}
       >
         {/* Hidden title for accessibility */}
@@ -98,15 +99,16 @@ const ImageModal: React.FC<ImageModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center justify-end mb-4">
-          <button
+          <UiButton
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            variant='outline'
+            className="hover:cursor-pointer"
             aria-label="Close image modal"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </UiButton>
         </div>
 
         {/* Main carousel container */}
@@ -149,8 +151,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
                         className={clsx(
                           "w-16 h-16 rounded overflow-hidden border-2 transition-all duration-200",
                           index === currentImageIndex
-                            ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-primary ring-2 ring-primary/20'
+                            : 'border-border hover:border-ring'
                         )}
                         aria-label={`Go to image ${index + 1}`}
                       >

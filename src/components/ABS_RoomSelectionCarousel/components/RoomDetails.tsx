@@ -30,7 +30,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
       {title && (
         <h3 className="text-xl font-bold mb-1">{title}</h3>
       )}
-      <h4 className={clsx('font-medium mb-1 text-neutral-600', {
+      <h4 className={clsx('font-medium mb-1 text-muted-foreground', {
         'text-base': !title,
         'text-sm': title
       })}>
@@ -50,7 +50,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
             </UiTooltipTrigger>
             {isDescriptionTruncated && (
               <UiTooltipContent className="max-w-xs">
-                <p className="text-sm">{description}</p>
+                <p className="text-sm text-foreground">{description}</p>
               </UiTooltipContent>
             )}
           </UiTooltip>

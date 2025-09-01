@@ -10,27 +10,27 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary-700 text-actionPrimaryForeground shadow hover:bg-primary-700/90 dark:bg-neutral-50 dark:text-neutral-800 dark:hover:bg-neutral-50/90',
+          'bg-primary text-primary-foreground shadow hover:bg-primary/90',
         destructive:
-          'bg-red-500 text-neutral-50 shadow-sm hover:bg-red-500/90 dark:bg-red-900 dark:text-neutral-50 dark:hover:bg-red-900/90',
+          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
         outline:
-          'border border-neutral-100 bg-white shadow-sm hover:bg-neutral-50 cursor-pointer dark:border-neutral-700 dark:bg-neutral-950 dark:hover:bg-neutral-800 dark:text-neutral-50',
+          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground cursor-pointer',
         secondary:
-          'bg-neutral-50 text-neutral-950 shadow-sm hover:bg-neutral-50/80 dark:bg-neutral-700 dark:text-neutral-50 dark:hover:bg-neutral-700',
-        ghost: 'hover:bg-neutral-50 hover:text-neutral-800 dark:hover:bg-neutral-800 dark:hover:text-neutral-50',
-        link: 'text-neutral-800 underline-offset-4 hover:underline dark:text-neutral-50',
+          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
         // Additional color variants for compatibility
-        white: 'bg-neutral-50 hover:bg-neutral-100 text-neutral-950 shadow-sm',
-        black: 'bg-neutral-950 hover:bg-neutral-950 text-neutral-50 shadow-sm',
+        white: 'bg-background hover:bg-muted text-foreground shadow-sm',
+        black: 'bg-foreground hover:bg-foreground/90 text-background shadow-sm',
         'outline-white':
-          'border border-neutral-400 text-neutral-50 bg-transparent hover:bg-neutral-50 hover:text-neutral-950',
+          'border border-muted-foreground text-background bg-transparent hover:bg-background hover:text-foreground',
         'outline-black':
-          'border border-neutral-950 text-neutral-950 bg-transparent hover:bg-neutral-950 hover:text-neutral-50',
+          'border border-foreground text-foreground bg-transparent hover:bg-foreground hover:text-background',
         'outline-primary':
-          'border border-primary-700 text-primary-700 bg-transparent hover:bg-primary-700 hover:text-white',
-        'link-white': 'text-neutral-50 hover:text-neutral-100 underline-offset-4 hover:underline bg-transparent',
-        'link-black': 'text-neutral-950 hover:text-neutral-950 underline-offset-4 hover:underline bg-transparent',
-        'link-primary': 'text-primary-700 hover:text-primary-800 underline-offset-4 hover:underline bg-transparent',
+          'border border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground',
+        'link-white': 'text-background hover:text-muted-foreground underline-offset-4 hover:underline bg-transparent',
+        'link-black': 'text-foreground hover:text-foreground/80 underline-offset-4 hover:underline bg-transparent',
+        'link-primary': 'text-primary hover:text-primary/80 underline-offset-4 hover:underline bg-transparent',
       },
       size: {
         xs: 'h-8 px-3 py-1.5 text-xs',

@@ -1,15 +1,14 @@
 import type React from 'react'
+import { toast } from 'sonner'
 import { cn } from '../../lib/utils'
 import PriceBreakdown from './components/PriceBreakdown'
 import RoomAccordionItem from './components/RoomAccordionItem'
-import ToastContainer from './components/ToastContainer'
-import type { PricingItem } from './types'
+import type { ExtendedPricingItem, ComponentRoomBooking } from '../../types/shared'
 import { useAccordionState } from './hooks/useAccordionState'
 import { useConfirmAll } from './hooks/useConfirmAll'
-import { useCurrencyFormatter } from './hooks/useCurrencyFormatter'
+import { useCurrencyFormatter } from '../../hooks/useCurrencyFormatter'
 import { useItemManagement } from './hooks/useItemManagement'
 import { useRoomCalculations } from './hooks/useRoomCalculations'
-import { useToasts } from './hooks/useToasts'
 
 // Available item interface for upgrades and offers
 export interface AvailableItem {
@@ -20,19 +19,14 @@ export interface AvailableItem {
 }
 
 // Extended interface for room booking data
-export interface RoomBooking {
-  id: string
-  roomName: string
-  roomNumber: string
-  guestName: string
-  checkIn?: string
-  checkOut?: string
-  guests?: number
-  nights: number
-  items: PricingItem[]
-  payAtHotel: boolean
-  roomImage?: string
+// Using ComponentRoomBooking for type safety in UI components
+export interface RoomBooking extends ComponentRoomBooking {
+  // This interface now inherits from ComponentRoomBooking
+  // All fields are already defined in the parent interface
 }
+
+// Type alias for backward compatibility
+export type { ComponentRoomBooking as SafeRoomBooking }
 
 // Multi-booking labels interface
 export interface MultiBookingLabels {
@@ -84,9 +78,13 @@ export interface MultiBookingPricingSummaryPanelProps {
   currency?: string
   locale?: string
   isLoading?: boolean
-  onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: PricingItem['type']) => void
+  activeRooms?: string[]
+  onActiveRoomsChange?: (roomIds: string[]) => void
+  onRemoveItem: (roomId: string, itemId: string | number, itemName: string, itemType: ExtendedPricingItem['type']) => void
   onEditSection: (roomId: string, sectionType: 'room' | 'customizations' | 'offers') => void
   onConfirmAll: () => Promise<void>
+  hideFooter?: boolean
+  maxHeight?: string | false
 }
 
 const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelProps> = ({
@@ -96,41 +94,71 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   currency,
   locale,
   isLoading = false,
+  activeRooms,
+  onActiveRoomsChange,
   onRemoveItem,
   onConfirmAll,
+  hideFooter = false,
+  maxHeight = 'max-h-[600px]',
 }) => {
   // Custom hooks
-  const { toasts, showToast, removeToast } = useToasts(3000)
-  const { handleAccordionToggle, isRoomActive } = useAccordionState(roomBookings[0]?.id)
-  const { overallTotal } = useRoomCalculations(roomBookings)
-  const formatCurrency = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
+  const { handleAccordionToggle, isRoomActive } = useAccordionState(
+    roomBookings.map(room => room.id), // Pass all room IDs
+    activeRooms, // Can be undefined - accordion will manage its own state
+    onActiveRoomsChange, // Can be undefined - accordion will manage its own state
+    true // Enable multiple open accordions
+  )
+  const { overallTotal, totalItemsCount } = useRoomCalculations(roomBookings)
+  const { format: formatCurrency } = useCurrencyFormatter({ currency, locale, euroSuffix: labels.euroSuffix })
   const { removingItems, handleRemoveItem } = useItemManagement({
     roomBookings,
     labels,
     onRemoveItem,
-    showToast,
+    showToast: (message: string, type?: 'success' | 'error' | 'info') => {
+      switch (type) {
+        case 'success':
+          toast.success(message)
+          break
+        case 'error':
+          toast.error(message)
+          break
+        default:
+          toast.info(message)
+      }
+    },
   })
   const { confirmingAll, handleConfirmAll } = useConfirmAll({
     roomCount: roomBookings.length,
     labels,
     onConfirmAll,
-    showToast,
+    showToast: (message: string, type?: 'success' | 'error' | 'info') => {
+      switch (type) {
+        case 'success':
+          toast.success(message)
+          break
+        case 'error':
+          toast.error(message)
+          break
+        default:
+          toast.info(message)
+      }
+    },
   })
 
   return (
-    <div className={cn('sticky top-28', className)}>
-      <div className="w-[400px] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+    <div className={cn('sticky md:top-28 w-full', className)} data-testid="multi-booking-pricing-panel">
+      <div className="min-w-[350px] w-full bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         {/* Header */}
-        <div className="p-4 border-b bg-gray-50">
-          <h2 className="text-lg font-semibold text-gray-900">{labels.multiRoomBookingsTitle}</h2>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="p-4 border-b border-border bg-muted">
+          <h2 className="text-lg font-semibold text-card-foreground">{labels.multiRoomBookingsTitle}</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             {roomBookings.length} {roomBookings.length === 1 ? 'room' : labels.roomsCountLabel} •{' '}
             {labels.clickToExpandLabel}
           </p>
         </div>
 
         {/* Accordion Sections */}
-        <div className="max-h-[600px] overflow-y-auto">
+        <div className={cn('overflow-y-auto', maxHeight && maxHeight)}>
           {roomBookings.map((room) => (
             <RoomAccordionItem
               key={room.id}
@@ -146,35 +174,30 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
         </div>
 
         {/* Consolidated Summary Footer */}
-        <div className="border-t bg-gray-50 p-4">
-          <PriceBreakdown
-            subtotal={overallTotal}
-            isLoading={confirmingAll || isLoading}
-            labels={{
-              subtotalLabel: labels.subtotalLabel,
-              totalLabel: labels.totalLabel,
-              payAtHotelLabel: labels.payAtHotelLabel,
-              viewTermsLabel: labels.viewTermsLabel,
-              confirmButtonLabel: confirmingAll
-                ? labels.confirmingAllLabel
-                : `${labels.confirmAllButtonLabel} ${roomBookings.length} Selections`,
-              loadingLabel: labels.confirmingAllLabel,
-              euroSuffix: labels.euroSuffix,
-            }}
-            currency={currency}
-            locale={locale}
-            onConfirm={handleConfirmAll}
-          />
-        </div>
+        {!hideFooter && (
+          <div className="border-t border-border bg-muted p-4">
+            <PriceBreakdown
+              subtotal={overallTotal}
+              isLoading={confirmingAll || isLoading}
+              labels={{
+                subtotalLabel: labels.subtotalLabel,
+                totalLabel: labels.totalLabel,
+                payAtHotelLabel: labels.payAtHotelLabel,
+                viewTermsLabel: labels.viewTermsLabel,
+                confirmButtonLabel: confirmingAll
+                  ? labels.confirmingAllLabel
+                  : `Confirm Selection`,
+                loadingLabel: labels.confirmingAllLabel,
+                euroSuffix: labels.euroSuffix,
+              }}
+              currency={currency}
+              locale={locale}
+              disabled={totalItemsCount === 0}
+              onConfirm={handleConfirmAll}
+            />
+          </div>
+        )}
       </div>
-
-      {/* Toast Notifications */}
-      <ToastContainer
-        toasts={toasts}
-        removeToast={removeToast}
-        notificationsLabel={labels.notificationsLabel}
-        closeNotificationLabel={labels.closeNotificationLabel}
-      />
     </div>
   )
 }

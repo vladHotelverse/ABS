@@ -13,10 +13,10 @@ const BookingInfoItem: React.FC<BookingInfoItemProps> = ({ icon, label, value, c
     <div className={clsx('flex flex-col min-w-0 gap-1', className)}>
       <div className="flex items-center gap-2 min-w-0">
         <div className="flex-shrink-0">{icon}</div>
-        <span className="text-sm font-medium text-gray-600 truncate">{label}</span>
+        <span className="text-sm font-medium text-muted-foreground truncate">{label}</span>
       </div>
       <div className={clsx(
-        'text-black font-semibold text-sm sm:text-base',
+        'text-card-foreground font-semibold text-sm sm:text-base',
         'break-words min-h-[1.25rem] leading-tight',
         // Better mobile text handling - allow wrapping instead of truncating
         'hyphens-auto'
