@@ -15,7 +15,7 @@ Each feature specification contains three core documents:
 ### Core Business Features
 
 #### [Multi-Booking System](./multi-booking-system/)
-**Status**: ✅ **COMPLETE** - Production Ready  
+**Status**: ✅ **CORE COMPLETE** - 80+ components implemented  
 **Priority**: Critical - Core business functionality
 
 - **Requirements**: Email-to-booking flow, room-specific customizations, state management
@@ -23,7 +23,7 @@ Each feature specification contains three core documents:
 - **Tasks**: 12/12 core tasks complete, testing and optimization ongoing
 
 #### [Room Customization System](./room-customization-system/)  
-**Status**: ✅ **COMPLETE** - Production Ready  
+**Status**: ✅ **CORE COMPLETE** - Functional implementation  
 **Priority**: Critical - Primary user interface
 
 - **Requirements**: Room customization options, upgrade selection, compatibility management  
@@ -31,7 +31,7 @@ Each feature specification contains three core documents:
 - **Tasks**: 21/21 core tasks complete, advanced features planned
 
 #### [Special Offers System](./special-offers-system/)
-**Status**: ✅ **COMPLETE** - Production Ready
+**Status**: ✅ **CORE COMPLETE** - Basic functionality working
 **Priority**: High - Revenue optimization
 
 - **Requirements**: Dynamic offer management, pricing models, category organization
@@ -39,7 +39,7 @@ Each feature specification contains three core documents:
 - **Tasks**: Core implementation complete, personalization enhancements planned
 
 #### [Order Management](./order-management/)
-**Status**: ✅ **COMPLETE** - Production Ready  
+**Status**: ✅ **CORE COMPLETE** - Tracking system functional  
 **Priority**: High - Post-booking experience
 
 - **Requirements**: Order tracking, hotel proposals, guest services
@@ -49,15 +49,15 @@ Each feature specification contains three core documents:
 ### Technical Infrastructure
 
 #### [Testing Framework](./testing-framework/)
-**Status**: ✅ **COMPLETE** - Production Ready
+**Status**: ⚠️ **IN PROGRESS** - Core setup complete, component tests ongoing
 **Priority**: Critical - Quality assurance
 
 - **Requirements**: Comprehensive testing coverage, CI/CD integration, performance validation
 - **Design**: Vitest + Playwright, mock factories, E2E automation  
-- **Tasks**: 20/20 infrastructure tasks complete, component test coverage ongoing
+- **Tasks**: Infrastructure setup complete, component testing in progress (some tests failing)
 
 #### [Content Management](./content-management/)
-**Status**: ✅ **COMPLETE** - Production Ready
+**Status**: ✅ **CORE COMPLETE** - Supabase integration working
 **Priority**: High - Dynamic content delivery
 
 - **Requirements**: Database-driven content, real-time updates, multilingual support

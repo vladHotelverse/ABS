@@ -5,13 +5,20 @@ A modern, React-based hotel booking platform that provides guests with an intera
 ## ✨ Features
 
 - **Interactive Room Selection**: Browse rooms with high-quality images and detailed information
-- **Room Customization**: Upgrade beds, views, floors, and amenities
+- **Room Customization**: Upgrade beds, views, floors, and amenities with fixed pricing
 - **Special Offers**: Dynamic offer system with real-time pricing
+- **Multi-Booking System**: Manage multiple room bookings with unified state management
 - **Multi-language Support**: English and Spanish localization
 - **Order Tracking**: Real-time booking status and management
 - **Interactive Maps**: Visual room selection via hotel floor plans
 - **Mobile Responsive**: Optimized for all devices and screen sizes
 - **Dynamic Content**: Content management through Supabase integration
+- **Performance Optimized**: Zustand-powered state management with optimistic updates
+
+### 🚨 Recent Changes
+- **Bidding System Temporarily Disabled** - Fixed pricing model currently active ([See Re-enable Guide](BIDDING_FUNCTIONALITY.md))
+- **Unified State Management** - Migrated to Zustand store for improved performance
+- **Enhanced Testing** - Comprehensive E2E testing with Playwright
 
 ## 🚀 Quick Start
 
@@ -129,29 +136,51 @@ Translations are stored in `src/i18n/locales/`.
 | Supabase | ^2.52.0 | Backend Services |
 | React Router | ^7.7.0 | Routing |
 | i18next | ^25.3.0 | Internationalization |
-| Zustand | ^5.0.8 | State Management |
+| **Zustand** | ^5.0.8 | **Unified State Management** |
 | Playwright | Latest | E2E Testing |
 | Vitest | Latest | Unit Testing |
+| Immer | Latest | Immutable State Updates |
+
+### 🔄 Architecture Highlights
+- **Unified Booking Store** - Single source of truth for all booking operations
+- **Optimistic Updates** - Fast UI responses with automatic rollback on errors
+- **Multi-Booking Support** - Complex room-specific state management
+- **Performance Monitoring** - Real-time performance tracking and optimization
 
 ## 📚 Documentation
 
-Detailed documentation is available in the `docs/` directory:
+Comprehensive documentation is available in the `docs/` directory and root-level guides:
 
-### Feature Specifications (Requirements → Design → Implementation)
-- **[All Specifications](docs/specs/)** - Complete feature specifications
-- [Multi-Booking System](docs/specs/multi-booking-system/) - Room-specific customizations
-- [Room Customization System](docs/specs/room-customization-system/) - Room customization and upgrades  
-- [Testing Framework](docs/specs/testing-framework/) - Quality assurance
-- [Special Offers](docs/specs/special-offers-system/) - Dynamic offers
-- [Order Management](docs/specs/order-management/) - Booking tracking
-- [Content Management](docs/specs/content-management/) - Dynamic content
-- [Internationalization](docs/specs/internationalization/) - Multi-language support
+### 🚀 Getting Started
+- **[README](README.md)** - This file - project overview and quick start
+- **[Development Guide](docs/guides/04-development-guide.md)** - Complete setup and development workflow
+- **[Supabase Integration](docs/guides/SUPABASE_INTEGRATION.md)** - Database setup and configuration
 
-### Core Documentation
-- [Project Overview](docs/01-project-overview.md) - Architecture and tech stack
-- [Component Architecture](docs/02-component-architecture.md) - Technical breakdown
-- [Database Integration](docs/03-database-integration.md) - Supabase integration
-- [Development Guide](docs/04-development-guide.md) - Setup and workflow
+### 🏗️ Architecture & Technical Design
+- **[Architecture Overview](docs/architecture/01-project-overview.md)** - System architecture and technology stack
+- **[Component Architecture](docs/architecture/02-component-architecture.md)** - Unified Zustand store patterns and component breakdown
+- **[Database Integration](docs/architecture/03-database-integration.md)** - Supabase schema and integration patterns
+
+### 📚 Comprehensive Documentation
+- **[Developer Handbook](docs/reference/DEVELOPER_HANDBOOK.md)** - 50+ page complete technical architecture guide
+- **[State Management Migration](docs/guides/06-state-management-migration-guide.md)** - Zustand migration guide (COMPLETED)
+- **[Bidding System Guide](docs/guides/BIDDING_FUNCTIONALITY.md)** - Complete guide to re-enabling bidding features
+
+### 📋 Feature Specifications (Requirements → Design → Implementation)
+- **[All Specifications](docs/specs/)** - Complete feature specifications with implementation details
+- [Multi-Booking System](docs/specs/multi-booking-system/) - Complex room-specific booking management
+- [Room Customization System](docs/specs/room-customization-system/) - Room upgrade and customization features
+- [Special Offers System](docs/specs/special-offers-system/) - Dynamic promotional offers
+- [Testing Framework](docs/specs/testing-framework/) - Quality assurance and E2E testing
+- [Order Management](docs/specs/order-management/) - Booking lifecycle and order tracking
+- [Content Management](docs/specs/content-management/) - Dynamic content through Supabase
+- [Internationalization](docs/specs/internationalization/) - Multi-language support implementation
+
+### 📊 Project Status & Analysis
+- **[Completed Features](docs/reference/09-completed-features.md)** - Comprehensive list of implemented functionality
+- **[Roadmap & Next Steps](docs/reference/10-next-steps.md)** - Planned improvements and development roadmap
+- **[Mobile UX Analysis](docs/analysis/mobile-booking-ux-analysis.md)** - Mobile user experience research and optimization recommendations
+- **[Component Analysis](docs/analysis/05-room-selection-pricing-components-review.md)** - Detailed technical component review
 
 ## 🤝 Contributing
 

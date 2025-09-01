@@ -4,27 +4,39 @@ Welcome to the ABS project documentation. This React-based hotel booking system 
 
 ## 📚 Documentation Structure
 
-### Core Documentation
-- [Project Overview](./01-project-overview.md) - High-level architecture and technology stack
-- [Component Architecture](./02-component-architecture.md) - Detailed component breakdown
-- [Database Integration](./03-database-integration.md) - Supabase integration guide
-- [Development Guide](./04-development-guide.md) - Setup and development workflow
+### 🏗️ Architecture & Technical Design
+- **[Architecture Overview](./architecture/01-project-overview.md)** - High-level system architecture and technology stack
+- **[Component Architecture](./architecture/02-component-architecture.md)** - Detailed component breakdown with unified store patterns
+- **[Database Integration](./architecture/03-database-integration.md)** - Supabase integration and schema design
 
-### Feature Specifications (NEW ✨)
-- **[Feature Specifications](./specs/)** - Requirements → Design → Implementation workflow
-  - [Multi-Booking System](./specs/multi-booking-system/) - Room-specific customizations
-  - [Room Customization System](./specs/room-customization-system/) - Room customization and upgrades
-  - [Testing Framework](./specs/testing-framework/) - Quality assurance and automation
-  - [Special Offers System](./specs/special-offers-system/) - Dynamic offer management
-  - [Order Management](./specs/order-management/) - Booking tracking and proposals
-  - [Content Management](./specs/content-management/) - Database-driven content
-  - [Internationalization](./specs/internationalization/) - Multilingual support
+### 📖 Developer Guides
+- **[Development Guide](./guides/04-development-guide.md)** - Complete setup and development workflow
+- **[State Management Migration](./guides/06-state-management-migration-guide.md)** - Zustand migration guide (COMPLETED)
+- **[Bidding System Guide](./guides/BIDDING_FUNCTIONALITY.md)** - Complete guide to re-enabling bidding features
+- **[Supabase Quick Start](./guides/SUPABASE_INTEGRATION.md)** - Quick setup guide (see [Database Integration](./architecture/03-database-integration.md) for details)
 
-### Legacy Documentation
-- [Completed Features](./09-completed-features.md) - List of implemented functionality
-- [Next Steps](./10-next-steps.md) - Planned improvements and roadmap
+### 🔬 Analysis & Reviews
+- **[Documentation Audit](./analysis/DOCUMENTATION_AUDIT.md)** - Complete documentation modernization plan
+- **[Component Review](./analysis/05-room-selection-pricing-components-review.md)** - Detailed technical component analysis
+- **[Mobile UX Analysis](./analysis/mobile-booking-ux-analysis.md)** - Mobile user experience research and optimization
 
-> **Note**: Multi-booking guides, testing framework documentation, and booking flow details have been migrated to the new [Feature Specifications](./specs/) structure.
+### 📚 Reference Documentation
+- **[Developer Handbook](./reference/DEVELOPER_HANDBOOK.md)** - Comprehensive 50+ page technical architecture guide
+- **[Completed Features](./reference/09-completed-features.md)** - Complete list of implemented functionality
+- **[Roadmap & Next Steps](./reference/10-next-steps.md)** - Planned improvements and development roadmap
+
+### ⚙️ Feature Specifications
+- **[Feature Specifications](./specs/)** - Complete Requirements → Design → Implementation workflow
+  - [Multi-Booking System](./specs/multi-booking-system/) - Advanced room-specific customizations
+  - [Room Customization System](./specs/room-customization-system/) - Room upgrades and amenities
+  - [Testing Framework](./specs/testing-framework/) - Quality assurance and E2E testing
+  - [Special Offers System](./specs/special-offers-system/) - Dynamic promotional offers
+  - [Order Management](./specs/order-management/) - Booking lifecycle and tracking
+  - [Content Management](./specs/content-management/) - Database-driven content system
+  - [Internationalization](./specs/internationalization/) - Multilingual support implementation
+
+### 📁 Archive
+- **[Historical Documentation](./archive/)** - Archived and legacy documentation
 
 ## 🚀 Quick Start
 
@@ -53,32 +65,41 @@ Welcome to the ABS project documentation. This React-based hotel booking system 
 
 ## 📋 Project Status
 
-- **Current Version**: 0.0.0
-- **Last Updated**: 2025-08-20
-- **Development Stage**: Active Development
+- **Current Version**: 1.0.0-beta
+- **Last Updated**: 2025-09-01
+- **Development Stage**: Beta - Core Features Functional, Testing & Production Prep Ongoing
 - **Primary Framework**: React 19.1.0 + TypeScript + Vite
-- **UI Library**: Tailwind CSS + Radix UI
-- **Backend**: Supabase (PostgreSQL)
-- **State Management**: React Hooks + Context
-- **Internationalization**: i18next
-- **Testing**: [To be configured]
+- **UI Library**: Tailwind CSS v4 + Radix UI
+- **Backend**: Supabase (PostgreSQL + Realtime)
+- **State Management**: **Zustand Store (Unified Architecture)**
+- **Internationalization**: i18next + Database-driven translations
+- **Testing**: Playwright E2E + Vitest Unit Testing (In Progress)
 
 ## 🛠️ Technology Stack
 
 - **Frontend**: React 19, TypeScript, Vite
 - **Styling**: Tailwind CSS v4, Radix UI Components
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime)
+- **State Management**: **Zustand + Immer (Unified Store)**
 - **Routing**: React Router v7
-- **Internationalization**: i18next + react-i18next
+- **Internationalization**: i18next + react-i18next + Database translations
+- **Testing**: Playwright (E2E) + Vitest (Unit)
 - **Icons**: Lucide React, Iconify
 - **Package Manager**: pnpm
 
-## 📝 Recent Updates
+## 🚀 Recent Major Updates (September 2025)
 
-- Enhanced component structure and styling
-- Added segment-based pricing and discounts
-- Improved order status tracking
-- Enhanced room selection carousel with drag & drop
-- Supabase integration for dynamic content
+- **🏗️ State Management Progress**: Ongoing migration to unified Zustand store architecture
+- **💰 Pricing Calculations**: Enhanced pricing logic and item management across components
+- **🧪 Testing Framework Setup**: Basic Playwright E2E and Vitest unit testing infrastructure implemented
+- **📱 Multi-Booking Enhancements**: Improved room-specific state management and UI synchronization
+- **🔄 Component Refactoring**: Ongoing unification of pricing item handling across ABS components
+- **🎨 UI Improvements**: Enhanced styling and accessibility updates across components
+
+### 🔄 Architecture Evolution
+- **Legacy Hook System** → **Unified Zustand Store**
+- **Dual State Management** → **Single Source of Truth**
+- **Manual State Synchronization** → **Automatic Consistency**
+- **Basic Error Handling** → **Comprehensive Error Boundaries with Recovery**
 
 For detailed changelog, see [Completed Features](./09-completed-features.md).

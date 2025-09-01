@@ -44,39 +44,71 @@ App.tsx (Root)
 - `SpecialOffersSection`: Dynamic offers display
 - `RoomSelectionMapSection`: Interactive room maps
 
-**State Management** (Updated Implementation):
+**State Management** (Unified Zustand Architecture - August 2025):
 ```typescript
-// Unified Zustand store with performance optimization
-const {
-  rooms,
-  activeRoomId,
-  mode,
-  addRoom,
-  setActiveRoom,
-  addItemToRoom,
-  removeItemFromRoom,
-  getRoomTotal,
-  getTotalPrice
-} = useBookingStore()
+// Single unified store for all booking operations
+const useBookingStore = create<BookingState>()(
+  immer((set, get) => ({
+    // State
+    mode: 'single',
+    rooms: [],
+    activeRoomId: null,
+    biddingEnabled: false, // System-wide bidding control
+    showMobilePricing: false,
+    bookingStatus: 'normal',
+    performanceMetrics: {},
+    
+    // Actions with optimistic updates
+    addItemToRoom: (roomId, itemData) => set((state) => {
+      if (itemData.type === 'bid' && !state.biddingEnabled) {
+        console.warn('Bidding is disabled')
+        return
+      }
+      const room = state.rooms.find(r => r.id === roomId)
+      if (room) {
+        room.items.push(createBookingItem(itemData))
+      }
+    }),
+    
+    // Business rule validation
+    handleRoomUpgrade: (roomId, newRoom) => set((state) => {
+      const room = state.rooms.find(r => r.id === roomId)
+      if (room) {
+        // Remove conflicting items automatically
+        room.items = room.items.filter(item => 
+          !hasConflict(item.type, 'room-upgrade')
+        )
+        room.items.push(createRoomUpgradeItem(newRoom))
+        room.baseRoom = newRoom
+      }
+    }),
+    
+    // Performance monitoring
+    trackPerformance: (operation, duration) => set((state) => {
+      state.performanceMetrics[operation] = duration
+    })
+  }))
+)
 
-// Performance-optimized hook for high-frequency operations
-const {
-  addItemOptimistically,
-  switchRoomOptimistically,
-  performanceMetrics
-} = useOptimizedBooking()
+// Usage in components - selective subscriptions
+const currentRoom = useBookingStore(state => 
+  state.rooms.find(r => r.id === state.activeRoomId),
+  shallow
+)
+const roomCount = useBookingStore(state => state.rooms.length)
+const totalPrice = useBookingStore(state => state.getTotalPrice())
 
-// Specialized hooks for specific features
-const {
-  sectionConfiguration,
-  updateSectionVisibility
-} = useSectionConfiguration()
-
-const {
-  formatCurrency,
-  formatPriceWithCurrency
-} = useCurrencyFormatter({ currency: 'EUR', locale: 'en-US' })
+// Utility hooks (maintained)
+const { formatCurrency } = useCurrencyFormatter({ currency: 'EUR', locale: 'en-US' })
+const { sectionConfiguration } = useSectionConfiguration()
 ```
+
+**Key Architecture Changes**:
+- **Single Source of Truth**: All booking state in one unified Zustand store
+- **Optimistic Updates**: Immediate UI feedback with automatic error rollback
+- **Business Rules Integration**: Conflict resolution built into store actions
+- **Performance Monitoring**: Real-time performance tracking and optimization
+- **Bidding Control**: System-wide feature flag with conditional rendering
 
 ### 2. ABS_OrderStatus Component
 **Location**: `src/components/ABS_OrderStatus/`
@@ -234,6 +266,35 @@ Built on Radix UI primitives with Tailwind CSS styling:
 - **Form components**: Enhanced form inputs with validation
 - **Layout primitives**: Flexible containers and spacing utilities
 
+## 🚨 Recent Architectural Updates (August 2025)
+
+### State Management Migration
+The ABS system has undergone a major architectural migration from dual hook systems to a unified Zustand store:
+
+**Before (Legacy Architecture)**:
+- Separate `useBookingState` and `useMultiBookingState` hooks
+- Manual state synchronization between components
+- Performance issues with multiple state systems
+
+**After (Current Architecture)**:
+- Single `useBookingStore` with unified room-based state model
+- Automatic business rule validation and conflict resolution
+- Optimistic updates with rollback capabilities
+- Real-time performance monitoring
+
+### Bidding System Status
+The bidding functionality has been temporarily disabled across the entire system:
+- **UI Components**: PriceSlider components conditionally rendered based on `biddingEnabled` flag
+- **Store Logic**: Bid items rejected at store level with warning messages
+- **Component Props**: `showPriceSlider={false}` throughout component tree
+- **Future Re-enabling**: Complete restoration guide available in `BIDDING_FUNCTIONALITY.md`
+
+### Performance Enhancements
+- **Selective Subscriptions**: Components only re-render when relevant data changes
+- **Shallow Comparison**: `useShallow` prevents unnecessary re-renders on object references
+- **Optimistic Updates**: Immediate UI feedback with background validation
+- **Real-time Monitoring**: Performance metrics collection for operations <50ms target
+
 ## 🔄 Data Flow Patterns
 
 ### 1. Props Down, Events Up
@@ -252,34 +313,67 @@ const handleOptionSelect = (optionId: string) => {
 }
 ```
 
-### 2. Custom Hooks for State Logic
+### 2. Zustand Store for State Logic (Current Architecture)
 ```typescript
-// Encapsulate complex state logic
-const useBookingState = () => {
-  const [selectedRooms, setSelectedRooms] = useState([])
-  const [selectedCustomizations, setSelectedCustomizations] = useState({})
+// Unified state management with Zustand
+const useBookingStore = create<BookingState>()(
+  subscribeWithSelector(
+    immer((set, get) => ({
+      // State
+      mode: 'single',
+      rooms: [],
+      activeRoomId: null,
+      biddingEnabled: false,
+      
+      // Actions with automatic business rule validation
+      updateRoomSelection: (roomId: string, room: RoomOption) => set((state) => {
+        const targetRoom = state.rooms.find(r => r.id === roomId)
+        if (targetRoom) {
+          // Business rule: Remove conflicting room upgrades
+          targetRoom.items = targetRoom.items.filter(item => 
+            !hasConflict(item.type, 'room-upgrade')
+          )
+          targetRoom.baseRoom = room
+          targetRoom.items.push(createRoomUpgradeItem(room))
+        }
+      }),
+      
+      getTotalPrice: () => {
+        const state = get()
+        return state.rooms.reduce((total, room) => {
+          return total + room.items.reduce((roomTotal, item) => {
+            return roomTotal + calculateItemPrice(item, room.nights)
+          }, 0)
+        }, 0)
+      }
+    }))
+  )
+)
+
+// Component usage with selective subscriptions
+const MyComponent = () => {
+  const totalPrice = useBookingStore(state => state.getTotalPrice())
+  const updateRoom = useBookingStore(state => state.updateRoomSelection)
   
-  const updateRoomSelection = useCallback((room: RoomOption) => {
-    // Complex selection logic
-  }, [])
-  
-  const getTotalPrice = useCallback(() => {
-    // Price calculation logic
-  }, [selectedRooms, selectedCustomizations])
-  
-  return { selectedRooms, selectedCustomizations, updateRoomSelection, getTotalPrice }
+  // Only re-renders when totalPrice changes
+  return <div>Total: €{totalPrice}</div>
 }
 ```
 
-### 3. Context for Global State
+### 3. Legacy Context for Specialized State (Auth & Content)
 ```typescript
-// Authentication context
+// Authentication context (maintained for auth-specific logic)
 const AuthContext = createContext<AuthState | null>(null)
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) throw new Error('useAuth must be used within AuthProvider')
   return context
+}
+
+// Supabase content hooks (maintained for database operations)
+const useSupabaseContent = (tableName: string) => {
+  // Database-specific logic remains in specialized hooks
 }
 ```
 
