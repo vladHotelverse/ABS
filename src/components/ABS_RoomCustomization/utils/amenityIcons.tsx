@@ -1,3 +1,13 @@
+/**
+ * Solar Icon Set Attribution
+ *
+ * This file uses icons from the Solar icon set, which is licensed under
+ * Creative Commons Attribution 4.0 International License.
+ *
+ * License: https://creativecommons.org/licenses/by/4.0/
+ * Iconify: https://icon-sets.iconify.design/solar/
+ */
+
 import { Icon } from '@iconify/react'
 
 export interface AmenityIconMapping {

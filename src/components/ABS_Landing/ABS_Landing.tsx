@@ -786,6 +786,36 @@ export const ABSLanding: React.FC<ABSLandingProps> = ({
           else if (section === 'offers') handleEditSection('offer')
         }}
       />
+
+      {/* Footer with attribution */}
+      <footer className="mt-8 py-4 border-t border-gray-200 bg-white">
+        <div className="container mx-auto px-4 flex justify-between items-center text-xs text-gray-500">
+          <div className="font-medium text-gray-700">
+            Hotelverse.
+          </div>
+          <div className="text-right">
+            Icons by{' '}
+            <a
+              href="https://icon-sets.iconify.design/solar/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Solar
+            </a>{' '}
+            (
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              CC BY 4.0
+            </a>
+            )
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
