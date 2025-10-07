@@ -51,7 +51,7 @@ export const roomOptions = [
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/cdf69769-f553-4c82-aa06-e3e8867954fb/image.webp',
     images: [
-        'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/cdf69769-f553-4c82-aa06-e3e8867954fb/image.webp',
+      'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/cdf69769-f553-4c82-aa06-e3e8867954fb/image.webp',
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/c46d320b-89d6-4975-9af0-febbeaf4b450/image.webp',
     ],
     amenities: [
@@ -782,7 +782,7 @@ export const getSectionsConfig = (lang: 'en' | 'es') => {
       icon: Star,
       hasModal: false,
       hasFeatures: false,
-      infoText: lang === 'es' ? 
+      infoText: lang === 'es' ?
         'Transforma tu estancia con nuestros paquetes de upgrade exclusivos. Cada oferta incluye servicios premium y beneficios especiales.' :
         'Transform your stay with our exclusive upgrade packages. Each offer includes premium amenities and special benefits.',
       isSpecialOffer: true,

@@ -143,8 +143,8 @@ function Home() {
     // Create user info from current session
     const userInfo: UserInfo = {
       roomType: 'DELUXE SILVER',
-      checkIn: '2025-10-10',
-      checkOut: '2025-10-15',
+      checkIn: '2026-05-10',
+      checkOut: '2026-05-15',
       occupancy: '2 Adults, 0 Children',
       reservationCode: '1003066AU',
       userEmail: 'guest@hotel.com',
@@ -223,7 +223,7 @@ function Home() {
     id: 'room-selection',
     title: 'Choose your Room Number!',
     description: 'Select the exact room you want to stay in',
-    url: 'https://map-uat.hotelverse.tech/Webmap/en/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUk0TWpSbU5EUmtaakZqWXpneFlXUTBOelkxT1dWaVpEUTJNbVJpTXpsbVlUTTBNRFprTUdZelpHSTJNVFkwWTJZMVpqRmhNVGRrWWpZNE16Y3paVFl4WkRRM1pXVmtNekUwTXpreVpHWm1ZbVU1WXpKa00yRTFPRGsxTkRBNE1tTXhNMkk1Wm1ZM056SXpaVEE1WWpjMVpXSmhZakl6Tm1FMU1EUTVPV1k0TkNJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxTVRVME9UYzFOalUwTUgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=en&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0IiwiZXh0ZXJuYWxDaGFubmVsSWQiOjAsInBsYXRmb3JtIjoiT3Ryb3MiLCJib29raW5nRGF0YSI6eyJmaXJzdE5hbWUiOiJURVNUIiwibGFzdE5hbWUiOiJURVNUIiwiZW1haWwiOiJmcmFuY2lzY28uY29zdGlsbG9AaG90ZWx2ZXJzZS50ZWNoIiwiY2hlY2tJbiI6IjIwMjUtMTAtMTAiLCJjaGVja091dCI6IjIwMjUtMTAtMTUiLCJodlJvb21UeXBlIjo2MzIsIm9jY3VwYW5jeSI6eyJhZHVsdHMiOjIsImNoaWxkcmVuIjowLCJjaGlsZEFnZXMiOltdLCJpbmZhbnRzIjowLCJjdXJyZW5jeSI6IiJ9LCJleHRlcm5hbENoYW5uZWxJZCI6MCwiaXNPd25Ib3RlbCI6ZmFsc2V9fQ%3D%3D&noFS=true',
+    url: 'https://map-uat.hotelverse.tech/Webmap/es/ChooseYourRoom?config=eyJjbGllbnRJZCI6MSwiaG90ZWxJZCI6ODMsImN1cnJlbmN5IjoiRVVSIiwiYWNjZXNzVG9rZW5IViI6ImV5SnphV2R1WVhSMWNtVWlPaUkzT1dWaVlUQm1NV0UxTTJZME5tUmxaV05tTXpJd1lqa3dOemhsTURCa00yRTNNVEJpTURRMVkyTTBZakF4WmpneE9UUmpNR1UzTnpFd00yTTJPRE00WkdSa09UUTVOVEZtTVdRNU1qUXlOREExTWpNeVl6Z3hNell5T0RabE1EYzJaREEwTmpZMU5UZGhOamhsWW1WaVlqRTJPVFl4WXpFME16UXdZekE0WWlJc0luUnBiV1Z6ZEdGdGNDSTZNVGMxT1RnME1qTXhNREUwTkgwPSIsImhpZGRlbkVsZW1lbnRzIjpbXSwic291cmNlIjpudWxsfQ%3D%3D&devMode=true&language=es&booking=eyJ0eXBlIjoidXNlci1pbnB1dCIsImxvY2F0b3IiOiJ0ZXN0LTEyMyIsImV4dGVybmFsQ2hhbm5lbElkIjowLCJwbGF0Zm9ybSI6Ik90cm9zIiwiYm9va2luZ0RhdGEiOnsiZmlyc3ROYW1lIjoiVGVzdCIsImxhc3ROYW1lIjoidmxhZCIsImVtYWlsIjoidmxhZC5jYXJhc2VsaUBob3RlbHZlcnNlLnRlY2giLCJjaGVja0luIjoiMjAyNi0wNS0xMCIsImNoZWNrT3V0IjoiMjAyNi0wNS0xNSIsImh2Um9vbVR5cGUiOjYzMiwib2NjdXBhbmN5Ijp7ImFkdWx0cyI6MiwiY2hpbGRyZW4iOjAsImNoaWxkQWdlcyI6W10sImluZmFudHMiOjAsImN1cnJlbmN5IjoiIn0sImV4dGVybmFsQ2hhbm5lbElkIjowLCJpc093bkhvdGVsIjpmYWxzZX19',
     type: 'iframe' as const,
     iframe: {
       width: '100%',
@@ -244,7 +244,7 @@ function Home() {
         roomSelectionMap={roomSelectionMap}
         translations={processedData.translations}
         language={currentLang}
-        checkIn="2025-10-10"
+        checkIn="2026-05-10"
         checkOut="2025-10-15"
         roomType="DELUXE SILVER"
         occupancy="2 Adults, 0 Children"

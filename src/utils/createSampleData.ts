@@ -18,8 +18,8 @@ export function initializeSampleOrders(): void {
     status: 'confirmed',
     userInfo: {
       roomType: 'DELUXE SILVER',
-      checkIn: '2025-10-10',
-      checkOut: '2025-10-15',
+      checkIn: '2026-05-10',
+      checkOut: '2026-05-15',
       occupancy: '2 Adults, 0 Children',
       reservationCode: '1003066AU'
     },
@@ -70,8 +70,8 @@ export function initializeSampleOrders(): void {
     status: 'modified',
     userInfo: {
       roomType: 'DELUXE SILVER',
-      checkIn: '2025-10-08',
-      checkOut: '2025-10-12',
+      checkIn: '2026-05-08',
+      checkOut: '2026-05-12',
       occupancy: '2 Adults, 1 Child',
       reservationCode: '1003067AU'
     },

@@ -57,8 +57,8 @@ export async function createOrder(params: CreateOrderParams): Promise<string | n
 export async function createSampleOrder(): Promise<string | null> {
   const sampleUserInfo: UserInfo = {
     roomType: 'DELUXE SILVER',
-    checkIn: '2025-10-10',
-    checkOut: '2025-10-15',
+    checkIn: '2026-05-10',
+    checkOut: '2026-05-15',
     occupancy: '2 Adults, 0 Children',
     reservationCode: '1003066AU'
   }
