@@ -245,7 +245,7 @@ function Home() {
         translations={processedData.translations}
         language={currentLang}
         checkIn="2026-05-10"
-        checkOut="2025-10-15"
+        checkOut="2026-05-15"
         roomType="DELUXE SILVER"
         occupancy="2 Adults, 0 Children"
         reservationCode="1003066AU"
