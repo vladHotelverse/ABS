@@ -69,7 +69,7 @@ function Home() {
     if (!loading) {
       // Use mock data if Supabase data is not available or has errors
       const useMockData = error || !translations || roomTypes.length === 0
-      
+
       if (useMockData) {
         // Use mock data
         const mockSections = getSectionsConfig(currentLang)
@@ -79,8 +79,8 @@ function Home() {
           additionalBenefitsText: currentLang === 'es' ? 'Beneficios adicionales:' : 'Additional benefits:',
           upgradeForText: currentLang === 'es' ? 'Mejora por' : 'Upgrade for',
         }
-        
-        
+
+
         setProcessedData({
           roomOptions: mockRoomOptions,
           sections: mockSections,
@@ -93,7 +93,7 @@ function Home() {
         // Use Supabase data
         const roomOptions = roomTypes.map(room => convertRoomType(room, currentLang))
         const sectionsData = sections.map(section => convertSectionConfig(section))
-        
+
         // Group and convert customization options
         const groupedOptions = groupCustomizationOptions(customizationOptions)
         const sectionOptions: Record<string, any[]> = {}
@@ -139,7 +139,7 @@ function Home() {
 
   const handleConfirmBooking = async (bookingData: any) => {
     // Booking confirmed
-    
+
     // Create user info from current session
     const userInfo: UserInfo = {
       roomType: 'DELUXE SILVER',
@@ -150,12 +150,12 @@ function Home() {
       userEmail: 'guest@hotel.com',
       userName: 'Demo Guest'
     }
-    
+
     // Try to convert booking data to order
     const orderParams = convertBookingDataToOrder(bookingData, userInfo)
-    
+
     let orderId: string | null = null
-    
+
     try {
       if (orderParams) {
         // Create real order from booking data
@@ -164,7 +164,7 @@ function Home() {
         // Fallback to sample order for demo
         orderId = await createSampleOrder()
       }
-      
+
       if (orderId) {
         // Order created successfully
         navigate(`/new-order/${orderId}`)
@@ -300,16 +300,16 @@ function OrderStatusPage() {
   const handleOrderAccess = async (email: string, reservationCode: string) => {
     setAuthLoading(true)
     setAuthError('')
-    
+
     // Simple validation - in production this would verify against backend
     const success = auth.login(email, reservationCode)
-    
+
     if (!success) {
       setAuthError('Please enter a valid email address and reservation code')
       setAuthLoading(false)
       return
     }
-    
+
     setAuthLoading(false)
   }
 
