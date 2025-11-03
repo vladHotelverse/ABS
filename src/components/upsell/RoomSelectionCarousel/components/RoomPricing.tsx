@@ -2,8 +2,6 @@
 
 import type React from 'react'
 import { UiButton } from '@/components/ui/button'
-import type { RoomOption } from '@/components/upsell/RoomSelectionCarousel/types'
-import { SegmentBadge } from '@/components/upsell/segment-badge'
 
 export interface RoomPricingProps {
   price: string
@@ -13,8 +11,7 @@ export interface RoomPricingProps {
   isSelected: boolean
   selectText: string
   removeText: string
-  instantConfirmationText: string
-  segmentDiscount?: RoomOption['segmentDiscount']
+  instantConfirmationText?: string
   readonly?: boolean
   onSelect: (e?: React.MouseEvent) => void
 }
@@ -27,7 +24,7 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
   isSelected,
   selectText,
   removeText,
-  segmentDiscount,
+  instantConfirmationText = '',
   readonly = false,
   onSelect,
 }) => {
@@ -41,9 +38,10 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
             <span className="text-muted-foreground text-sm line-through">{`${currencySymbol}${oldPrice}`}</span>
           )}
           <span className="text-base text-muted-foreground">{`${currencySymbol} / ${nightText}`}</span>
-          {/* Segment Badge */}
-          {segmentDiscount && <SegmentBadge segmentDiscount={segmentDiscount} />}
         </div>
+        {instantConfirmationText && (
+          <span className="text-xs font-medium uppercase text-emerald-600">{instantConfirmationText}</span>
+        )}
       </div>
       {!readonly && (
         <div className="flex flex-col items-end">
@@ -54,8 +52,6 @@ const RoomPricing: React.FC<RoomPricingProps> = ({
           >
             <span>{isSelected ? removeText : selectText}</span>
           </UiButton>
-          {/* Instant Confirmation - positioned below the button */}
-          {/* <span className="mt-2 font-medium text-emerald-800 text-xs dark:text-emerald-600">{instantConfirmationText}</span> */}
         </div>
       )}
     </div>

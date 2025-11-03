@@ -3,7 +3,7 @@
 import { ChevronDown, ChevronRight, Users } from 'lucide-react'
 import type React from 'react'
 import { memo } from 'react'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import RoomContent from '@/components/upsell/PricingSummaryPanel/components/RoomContent'
 import { cn } from '@/lib/utils'
 import type { CartSection } from '../types'
@@ -59,7 +59,7 @@ const RoomAccordionItem: React.FC<RoomAccordionItemProps> = memo(
 
     return (
       <div className="mb-px last:mb-0">
-        <UiButton
+        <Button
           variant="ghost"
           disabled={!hasItems}
           className={cn(
@@ -101,7 +101,7 @@ const RoomAccordionItem: React.FC<RoomAccordionItemProps> = memo(
               </div>
             </div>
           </div>
-        </UiButton>
+        </Button>
 
         {/* Accordion Content - with smooth height transition */}
         <div

@@ -1,7 +1,8 @@
 'use client'
 
-import { ArrowUpRight, Calendar, Users } from 'lucide-react'
-import { Badge } from '@/index'
+import { ArrowUpRight, Calendar, InfoIcon, Users } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { TooltipProvider, UiTooltip, UiTooltipContent, UiTooltipTrigger } from '@/components/ui/tooltip'
 
 interface Occupancy {
   adults: number
@@ -24,6 +25,8 @@ interface BookingCardHeaderProps {
   hasUpgrade: boolean
   hasExtras: boolean
   attributesBreakdown?: Amenity[]
+  statusText?: string
+  isCancelled?: boolean
   formatDate: (date: string) => string
   t: (key: string, values?: Record<string, string | number>) => string
 }
@@ -38,6 +41,8 @@ const BookingCardHeader = ({
   hasUpgrade,
   hasExtras,
   attributesBreakdown = [],
+  statusText,
+  isCancelled = false,
   formatDate,
   t,
 }: BookingCardHeaderProps) => {
@@ -49,7 +54,7 @@ const BookingCardHeader = ({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-3 lg:gap-4">
       <button
-        className="relative h-48 w-full overflow-hidden rounded-lg bg-muted shadow-[var(--shadow-depth-1)] ring-1 ring-border/50 transition-transform hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 sm:h-24 sm:w-32 sm:flex-shrink-0 md:h-28 md:w-40 lg:h-auto lg:w-48 lg:flex-shrink-0 lg:rounded-xl"
+        className="relative h-full min-h-32 w-full overflow-hidden rounded-lg bg-muted shadow-[var(--shadow-depth-1)] ring-1 ring-border/50 transition-transform hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 sm:h-24 sm:w-32 sm:flex-shrink-0 md:h-28 md:w-40 lg:h-auto lg:w-48 lg:flex-shrink-0 lg:rounded-xl"
         aria-label={`View ${roomType || 'room'} photos`}
         title="Click to view room photos"
       >
@@ -57,15 +62,15 @@ const BookingCardHeader = ({
           <img
             src={roomImage}
             alt={`${roomType || 'Room'} - primary view showing accommodation with amenities`}
-            className="object-cover"
+            className="h-full max-h-32 w-full object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-muted-foreground text-xs">—</div>
         )}
       </button>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-        {/* Room Title + Upgrade Badge */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+        {/* Room Title + Upgrade Badge + Status Badge */}
         <div className="flex flex-wrap items-center gap-1.5 max-md:justify-between sm:gap-2">
           <h3 className="truncate font-semibold text-base text-foreground">{roomType}</h3>
           {hasUpgrade && (
@@ -76,6 +81,25 @@ const BookingCardHeader = ({
               <ArrowUpRight className="h-2.5 w-2.5" />
               {t('booking.view.upgraded')}
             </Badge>
+          )}
+          {statusText && (
+            <TooltipProvider>
+              <UiTooltip>
+                <UiTooltipTrigger asChild>
+                  <Badge
+                    className={`ml-auto cursor-help gap-1 rounded-full px-3 py-1 font-medium text-[11px] ${
+                      isCancelled
+                        ? 'border border-destructive/30 bg-destructive/10 text-destructive'
+                        : 'border border-emerald-300 bg-emerald-50 text-emerald-800'
+                    }`}
+                  >
+                    <InfoIcon className="mr-1 h-3 w-3" aria-hidden="true" />
+                    {statusText}
+                  </Badge>
+                </UiTooltipTrigger>
+                <UiTooltipContent>{statusText}</UiTooltipContent>
+              </UiTooltip>
+            </TooltipProvider>
           )}
         </div>
 

@@ -4,46 +4,37 @@ import type React from 'react'
 import { useCallback } from 'react'
 import HoverZoomImage from '@/components/upsell/RoomSelectionCarousel/components/HoverZoomImage'
 import RoomBadges from '@/components/upsell/RoomSelectionCarousel/components/RoomBadges'
-import type { RoomCardState, RoomCardTranslations, RoomOption } from '@/components/upsell/RoomSelectionCarousel/types'
+import type {
+  MediaItem,
+  RoomCardState,
+  RoomCardTranslations,
+  RoomOption,
+} from '@/components/upsell/RoomSelectionCarousel/types'
+import { MediaType } from '@/components/upsell/RoomSelectionCarousel/types'
+
+const isStaticImageType = (type: MediaItem['type']) =>
+  typeof type === 'number' && (type === MediaType.Image || type === MediaType.Image180)
 
 export interface RoomImageSectionProps {
   room: RoomOption
   translations: RoomCardTranslations
   state: RoomCardState
-  dynamicAmenities?: string[]
   onImageClick: () => void
-  enableHoverZoom?: boolean
 }
 
-const RoomImageSection: React.FC<RoomImageSectionProps> = ({
-  room,
-  translations,
-  state,
-  dynamicAmenities,
-  onImageClick,
-}) => {
+const RoomImageSection: React.FC<RoomImageSectionProps> = ({ room, translations, state, onImageClick }) => {
   const { selectedRoom } = state
   const { selectedText } = translations
   const currentImageIndex = 0 // For now, using first image
 
-  // Get images from multimedia.images or fallback to room.images
-  const multimediaImages = room.multimedia?.images
-  const hasMultimediaImages = multimediaImages && multimediaImages.length > 0
+  // Get images from pre-flattened mediaItems
+  const mediaItems = room.mediaItems || []
+  const imageItems = mediaItems.filter((item) => isStaticImageType(item.type))
+  const hasImages = imageItems.length > 0
+  const imageCount = imageItems.length
 
-  // For backward compatibility with simple string arrays
-  const legacyImages = room.images ?? []
-  const hasLegacyImages = legacyImages.length > 0
-
-  const hasImages = hasMultimediaImages || hasLegacyImages
-  const imageCount = hasMultimediaImages ? multimediaImages.length : legacyImages.length
-
-  // Get the current image URL (prefer original from multimedia, fallback to legacy)
-  let currentImageUrl = ''
-  if (hasMultimediaImages) {
-    currentImageUrl = multimediaImages[currentImageIndex]?.url || ''
-  } else if (hasLegacyImages) {
-    currentImageUrl = legacyImages[currentImageIndex] || ''
-  }
+  // Get the current image URL
+  const currentImageUrl = imageItems[currentImageIndex]?.url || ''
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -73,7 +64,7 @@ const RoomImageSection: React.FC<RoomImageSectionProps> = ({
         />
       ) : (
         <div className="flex aspect-[16/9] h-[80%] w-full items-center justify-center rounded-t-lg bg-muted text-muted-foreground">
-          <span>No image available</span>
+          <span>No images available</span>
         </div>
       )}
 
@@ -93,7 +84,7 @@ const RoomImageSection: React.FC<RoomImageSectionProps> = ({
 
       {/* Amenities overlay */}
       <div className="absolute top-3 left-3 z-30 flex max-w-[85%] flex-wrap gap-1">
-        {(dynamicAmenities || room.amenities.slice(0, 3)).map((amenity) => (
+        {(room.displayAmenities || []).map((amenity) => (
           <span
             key={`${room.id}-${amenity}`}
             className="rounded-md border border-border bg-background/90 px-2 py-1 text-foreground text-xs shadow-sm backdrop-blur-sm"

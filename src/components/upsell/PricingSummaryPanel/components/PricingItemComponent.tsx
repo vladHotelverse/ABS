@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react'
 import type React from 'react'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export interface PricingItemData {
@@ -38,7 +38,7 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({
         <div className="flex items-center space-x-2">
           <span className="font-medium text-sm">{item.formattedPrice}</span>
           {!readonly && (
-            <UiButton
+            <Button
               variant="outline"
               size="icon-xs"
               onClick={onRemove}
@@ -50,7 +50,7 @@ const PricingItemComponent: React.FC<PricingItemComponentProps> = ({
               data-testid="pricing-item-remove-button"
             >
               <X size={12} strokeWidth={2} className="h-3 w-3" />
-            </UiButton>
+            </Button>
           )}
         </div>
       </div>

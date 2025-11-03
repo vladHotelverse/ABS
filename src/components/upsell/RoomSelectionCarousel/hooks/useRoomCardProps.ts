@@ -1,54 +1,34 @@
 import { useMemo } from 'react'
-import type {
-  RoomCardConfig,
-  RoomCardHandlers,
-  RoomCardState,
-  RoomCardTranslations,
-  UseRoomCardPropsParams,
-} from '../types'
+import type { RoomCardConfig, RoomCardHandlers, RoomCardState, RoomCardTranslations, RoomOption } from '../types'
+
+interface UseRoomCardPropsParams {
+  roomOptions: RoomOption[]
+  translations: RoomCardTranslations
+  selectedRoom: RoomOption | null
+  activeImageIndices: Record<number, number>
+  readonly: boolean
+  handleRoomSelection: (room: RoomOption | null) => void
+  handleImageChange: (roomIndex: number, imageIndex: number) => void
+  enableHoverZoom?: boolean
+}
 
 export const useRoomCardProps = ({
   roomOptions,
-  resolvedTexts,
+  translations,
   selectedRoom,
   activeImageIndices,
-  dynamicAmenitiesMap,
   readonly,
-  mode,
   handleRoomSelection,
   handleImageChange,
-  onLearnMore,
   enableHoverZoom = true,
-  handleRoomSelectionWithCenter,
 }: UseRoomCardPropsParams) => {
-  // Memoize translations object to avoid recreation
-  const stableTranslations = useMemo<RoomCardTranslations>(
-    () => ({
-      nightText: resolvedTexts.nightText,
-      learnMoreText: resolvedTexts.learnMoreText,
-      priceInfoText: resolvedTexts.priceInfoText,
-      selectedText: resolvedTexts.selectedText,
-      selectText: resolvedTexts.upgradeNowText || resolvedTexts.selectText,
-      removeText: resolvedTexts.removeText || 'Remove',
-      instantConfirmationText: 'Instant Confirmation',
-      previousImageLabel: resolvedTexts.navigationLabels?.previousImage || 'Previous image',
-      nextImageLabel: resolvedTexts.navigationLabels?.nextImage || 'Next image',
-      viewImageLabel: resolvedTexts.navigationLabels?.viewImage || 'View image',
-    }),
-    [resolvedTexts]
-  )
-
   // Memoize handler functions to prevent recreation
   const stableOnSelectRoom = useMemo(() => {
-    if (readonly || mode === 'consultation') {
+    if (readonly) {
       return () => {}
     }
-    // Use auto-center handler for multi-room scenarios if provided
-    if (handleRoomSelectionWithCenter && roomOptions.length > 2) {
-      return handleRoomSelectionWithCenter
-    }
     return handleRoomSelection
-  }, [readonly, mode, handleRoomSelection, handleRoomSelectionWithCenter, roomOptions.length])
+  }, [readonly, handleRoomSelection])
 
   // Create stable image change handlers for each room
   const imageChangeHandlers = useMemo(() => {
@@ -59,28 +39,17 @@ export const useRoomCardProps = ({
     return handlers
   }, [handleImageChange, roomOptions.length])
 
-  // Memoize config values
-  const stableConfig = useMemo(
-    () => ({
-      currencySymbol: resolvedTexts.currencySymbol,
-      isActive: true,
-      readonly: readonly || mode === 'consultation',
-      enableHoverZoom,
-    }),
-    [resolvedTexts.currencySymbol, readonly, mode, enableHoverZoom]
-  )
-
   return useMemo(() => {
     return roomOptions.map((room, roomIndex) => {
       const handlers: RoomCardHandlers = {
         onSelectRoom: stableOnSelectRoom,
         onImageChange: imageChangeHandlers[roomIndex],
-        onLearnMore,
       }
 
       const config: RoomCardConfig = {
-        ...stableConfig,
-        dynamicAmenities: dynamicAmenitiesMap.get(room.id),
+        isActive: true,
+        readonly,
+        enableHoverZoom,
         roomIndex,
       }
 
@@ -91,7 +60,7 @@ export const useRoomCardProps = ({
 
       return {
         room,
-        translations: stableTranslations,
+        translations,
         handlers,
         config,
         state: cardState,
@@ -99,13 +68,12 @@ export const useRoomCardProps = ({
     })
   }, [
     roomOptions,
-    stableTranslations,
+    translations,
     stableOnSelectRoom,
     imageChangeHandlers,
-    stableConfig,
+    readonly,
+    enableHoverZoom,
     selectedRoom,
     activeImageIndices,
-    dynamicAmenitiesMap,
-    onLearnMore,
   ])
 }

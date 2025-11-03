@@ -4,12 +4,14 @@ import type React from 'react'
 import type { CarouselApi } from '@/components/ui/carousel'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import RoomCard from '@/components/upsell/RoomSelectionCarousel/RoomCard'
+import { useIsDesktop } from '@/hooks/useIsDesktop'
 import { cn } from '@/lib/utils'
+import type { RoomCardProps } from '../types'
 import { CarouselDots } from './CarouselDots'
 
 interface TwoRoomLayoutProps {
   className?: string
-  roomCardPropsArray: any[]
+  roomCardPropsArray: RoomCardProps[]
   roomCarouselApi?: CarouselApi
   setRoomCarouselApi: (api: CarouselApi) => void
   current: number
@@ -22,17 +24,22 @@ export const TwoRoomLayout: React.FC<TwoRoomLayoutProps> = ({
   current,
   roomCarouselApi,
 }) => {
+  // Use xl breakpoint (1280px) to match Tailwind's xl: utility class
+  const isDesktop = useIsDesktop(1280)
+
   return (
     <div className={cn(className)}>
-      {/* Desktop: Side by side */}
-      <div className="hidden gap-6 xl:grid xl:grid-cols-2">
-        {roomCardPropsArray.map((roomCardProps) => (
-          <RoomCard key={roomCardProps.room.id} {...roomCardProps} />
-        ))}
-      </div>
+      {/* Desktop: Side by side - conditionally rendered */}
+      {isDesktop && (
+        <div className="flex gap-6">
+          {roomCardPropsArray.map((roomCardProps) => (
+            <RoomCard key={roomCardProps.room.id} {...roomCardProps} />
+          ))}
+        </div>
+      )}
 
-      {/* Mobile and Tablet: Carousel */}
-      <div className="xl:hidden">
+      {/* Mobile and Tablet: Carousel - conditionally rendered */}
+      {!isDesktop && (
         <div className="overflow-hidden px-6">
           <Carousel
             setApi={setRoomCarouselApi}
@@ -45,7 +52,7 @@ export const TwoRoomLayout: React.FC<TwoRoomLayoutProps> = ({
               dragFree: false,
               skipSnaps: false,
             }}
-            className="w-full"
+            className="w-full select-none"
           >
             <CarouselContent className="flex">
               {roomCardPropsArray.map((roomCardProps) => (
@@ -79,7 +86,7 @@ export const TwoRoomLayout: React.FC<TwoRoomLayoutProps> = ({
             className="mt-6"
           />
         </div>
-      </div>
+      )}
     </div>
   )
 }

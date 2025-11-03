@@ -119,8 +119,8 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
 }
 
 const BookingViewPageStory = () => (
-  <div className="relative min-h-screen bg-muted pb-32" style={goldThemeOverride}>
-    <div className="bg-background">
+  <div className="relative min-h-screen bg-muted pb-4" style={goldThemeOverride}>
+    <div className="bg-muted max-w-6xl flex-col gap-6 px-4 py-10 mx-auto">
       <BookingBanner
         className="px-0"
         welcomeText={{ salutation: 'Welcome to Hotelverse!', greeting: 'Enjoy your stay!' }}
@@ -151,9 +151,9 @@ const BookingViewPageStory = () => (
       </section>
     </main>
 
-    <div className="sticky bottom-0 z-10 border-border/60 border-t bg-background/95 px-4 py-4 backdrop-blur">
+    <div className="sticky bottom-0 z-10 bg-muted px-4 py-4 backdrop-blur max-w-6xl mx-auto">
       <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-3 rounded-xl border border-primary/20 bg-primary/10 p-4 text-foreground">
+        <div className="flex flex-col gap-3 rounded-xl border p-4 text-foreground bg-white">
           <p className="text-muted-foreground text-sm">Modify your selection to change rooms, upgrades or extras.</p>
           <UiButton className="w-full sm:w-auto">Modify Selection</UiButton>
         </div>

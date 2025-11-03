@@ -1,3 +1,13 @@
+import type { ReactNode } from 'react'
+
+export enum MediaType {
+  Unknown = 0,
+  Image = 1,
+  Video = 2,
+  Image180 = 3,
+  Image360 = 4,
+}
+
 export type SegmentType =
   | 'business'
   | 'leisure'
@@ -37,16 +47,32 @@ export interface Multimedia {
   matterport?: string // Matterport URL
 }
 
+/**
+ * Media type for UI layer - mirrors the backend enum to keep compatibility
+ */
+
+/**
+ * MediaItem represents a single media asset (image, video, or immersive tour)
+ * Used for rendering in carousels and galleries
+ */
+export interface MediaItem {
+  type: MediaType
+  url: string // URL to display
+  thumbnailUrl?: string // Optional thumbnail URL for images
+}
+
 export interface RoomOption {
   id: string
   title?: string
   roomType: string
-  description: string | React.ReactNode // Pre-parsed HTML from data layer
-  amenities: string[]
+  description: string | ReactNode // Pre-parsed HTML from data layer
+  amenities?: string[] // Full amenities list (may be used by app layer for various purposes)
+  displayAmenities?: string[] // Pre-selected amenities for display (e.g., top 3)
   price: string
   oldPrice?: number
   images?: string[] // Deprecated: use multimedia.images instead
   multimedia?: Multimedia
+  mediaItems?: MediaItem[] // Pre-flattened media items for display (preferred over multimedia)
   segmentDiscount?: SegmentDiscount
 }
 
@@ -99,27 +125,6 @@ export interface CarouselState {
   selectedRoom: RoomOption | null
 }
 
-// Keep only interfaces used by RoomUpgradeCarousel
-export interface ResolvedTranslations extends RoomSelectionCarouselTranslations {
-  // Ensures all translation keys are present
-}
-
-export interface UseRoomCardPropsParams {
-  roomOptions: RoomOption[]
-  resolvedTexts: ResolvedTranslations
-  selectedRoom: RoomOption | null
-  activeImageIndices: Record<number, number>
-  dynamicAmenitiesMap: Map<string, string[]>
-  readonly: boolean
-  mode: 'selection' | 'consultation'
-  handleRoomSelection: (room: RoomOption | null) => void
-  handleImageChange: (roomIndex: number, imageIndex: number) => void
-  onLearnMore?: (room: RoomOption) => void
-  enableHoverZoom?: boolean
-  // Optional upgrade-specific handler for auto-centering
-  handleRoomSelectionWithCenter?: (room: RoomOption | null) => void
-}
-
 // RoomCard specific interfaces
 export interface RoomCardTranslations {
   nightText: string
@@ -131,7 +136,7 @@ export interface RoomCardTranslations {
   instantConfirmationText?: string
   previousImageLabel?: string
   nextImageLabel?: string
-  viewImageLabel?: string // Template: 'View image {index}'
+  viewImageLabel?: string | ((index: number) => string) // Template: 'View image {index}' or function
   totalPriceText?: string
 }
 
@@ -144,7 +149,6 @@ export interface RoomCardHandlers {
 export interface RoomCardConfig {
   currencySymbol?: string
   isActive?: boolean
-  dynamicAmenities?: string[]
   roomIndex?: number
   enableHoverZoom?: boolean
   readonly?: boolean
@@ -175,6 +179,7 @@ export interface RoomUpgradeCarouselTranslations {
   previousImageLabel: string
   nextImageLabel: string
   viewImageLabel: (index: number) => string
+  instantConfirmationText?: string
 }
 
 export interface RoomUpgradeCarouselProps {

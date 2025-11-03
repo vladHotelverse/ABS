@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from 'lucide-react'
 import React, { useCallback, useEffect, useId, useRef } from 'react'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import type { MultiBookingPricingSummaryPanelProps } from '../MultiBookingPricingSummaryPanel'
@@ -174,7 +174,7 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
           </DialogDescription>
 
           {/* Close button positioned in top right corner with safe area support */}
-          <UiButton
+          <Button
             ref={closeButtonRef}
             variant="secondary"
             size="icon"
@@ -183,7 +183,7 @@ const MobilePricingOverlay: React.FC<MobilePricingOverlayProps> = ({
             aria-label={closeButtonLabel}
           >
             <ArrowLeft className="h-5 w-5 text-foreground" aria-hidden="true" />
-          </UiButton>
+          </Button>
 
           {/* Scrollable content area with safe area support */}
           <div

@@ -8,7 +8,7 @@ export const roomOptions: RoomOption[] = [
     roomType: 'DELUXE GOLD',
     description:
       "True rock stars look down from above. A space covering 33 square metres with spectacular sea views, a private furnished terrace and elegant décor for a superior experience from the fifth floor upwards. Exceed even your own expectations, and relax with chromotherapy lighting that you can personalise. Lie back like a rock star in a luxurious king-sized bed, or in two full-sized single beds, and enjoy this room's ultra-modern facilities: thoughtfully selected state-of-the-art furniture, a 43 SMART TV screen, a dock station and a comfortable reading corner with a sofa bed.",
-    price: 22,
+    price: '22',
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt633/c37cc822-a6bf-4345-93f8-deb22d186d10/image.webp',
     images: [
@@ -49,7 +49,7 @@ export const roomOptions: RoomOption[] = [
     roomType: 'DELUXE SWIM-UP',
     description:
       'What about adding to your Double room a furnished outdoors terrace with a direct access to the meandering pool and private sun lounger waiting for you to enjoy the splash.',
-    price: 31,
+    price: '31',
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt634/cdf69769-f553-4c82-aa06-e3e8867954fb/image.webp',
     images: [
@@ -91,7 +91,7 @@ export const roomOptions: RoomOption[] = [
     title: 'Supreme luxury with divine views',
     description:
       "Our contemporary Hard Rock Ibiza Suites perfectly capture the authenticity and irreverence of rock 'n' roll with the sensuality and sophistication of Ibiza Island. Three connecting spaces - Living/ lounge, bedroom and bathroom - allowing you to decide when it's time for plugging in or chilling out. Totally unpredictable, totally Ibiza Hard Rock.",
-    price: 89,
+    price: '89',
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt640/3e7e2260-63e3-4934-9358-ebf08bb6d96a/image.webp',
     images: [
@@ -139,7 +139,7 @@ export const roomOptions: RoomOption[] = [
     title: '80s nostalgia unleashed',
     description:
       "60 square-meter space with an 80s setting, among which vinyl, mirror ball, music cassettes with 80s music and some 80's gifts like a welcome kit that includes a t-shirt.",
-    price: 120,
+    price: '120',
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt635/24fa2b9d-307c-4d23-9021-eb174520dbc0/image.webp',
     images: [
@@ -187,7 +187,7 @@ export const roomOptions: RoomOption[] = [
     title: 'Glam rock with infinite views',
     description:
       'Llega a la cima del rock en este espacio de 75 metros cuadrados auténticamente inspirado en estrellas del rock y que ofrece ese toque de vida glamourosa. Con una exuberancia sin límites, incluye unas vistas infinitas que se prolongan desde la suite hasta la terraza, y una bañera de grifería vista en mitad del dormitorio principal para que no te pierdas el mínimo detalle del paisaje mientras disfrutas de un placer infinito. Estancia de 75 metros cuadrados con capacidad hasta cuatro personas.',
-    price: 199,
+    price: '199',
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt643/5a6459fb-7a86-4d9d-9d9d-acd9a80033d5/original.webp',
     images: [
@@ -235,7 +235,7 @@ export const roomOptions: RoomOption[] = [
     title: 'Live the rock legend',
     description:
       'Llega a la cima del rock en este espacio de 75 metros cuadrados auténticamente inspirado en estrellas del rock y que ofrece ese toque de vida glamourosa. Con una exuberancia sin límites, incluye unas vistas infinitas que se prolongan desde la suite hasta la terraza, y una bañera de grifería vista en mitad del dormitorio principal para que no te pierdas el mínimo detalle del paisaje mientras disfrutas de un placer infinito. Estancia de 75 metros cuadrados con capacidad hasta cuatro personas.',
-    price: 300,
+    price: '300',
     image:
       'https://hvdatauatstgweu.blob.core.windows.net/roomtypehotelimages/h83/rt644/b15ce84f-709d-4d46-a0af-2654a645c643/original.webp',
     images: [

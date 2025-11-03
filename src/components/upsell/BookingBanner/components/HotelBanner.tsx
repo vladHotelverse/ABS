@@ -5,7 +5,6 @@ interface HotelBannerProps {
   hotelImage?: string
   welcomeText?: {
     salutation: string
-    greeting: string
   }
 }
 
@@ -55,7 +54,7 @@ const HotelBanner: React.FC<HotelBannerProps> = ({ hotelImage, welcomeText }) =>
           <div className="absolute inset-0 flex items-center justify-center p-6">
             <div className="text-center">
               <h4 className="mt-2 font-bold text-3xl text-white drop-shadow-lg md:text-4xl lg:text-5xl">
-                {welcomeText.greeting}
+                {welcomeText.salutation}
               </h4>
             </div>
           </div>

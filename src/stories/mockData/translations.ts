@@ -11,6 +11,7 @@ export const upgradeCarouselTranslations: RoomUpgradeCarouselTranslations = {
   previousImageLabel: 'Previous image',
   nextImageLabel: 'Next image',
   viewImageLabel: (index: number) => `View image ${index}`,
+  instantConfirmationText: 'Instant confirmation',
 }
 
 export const layoutUpgradeTranslations: RoomUpgradeCarouselTranslations = {

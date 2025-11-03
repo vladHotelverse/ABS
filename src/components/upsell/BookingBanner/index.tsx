@@ -45,7 +45,7 @@ const BookingBanner: React.FC<BookingBannerProps> = ({
   }
 
   return (
-    <div className={`${className ? className : ''} container relative mx-auto w-full px-3 py-6 sm:px-4 sm:py-8`}>
+    <div className={`${className ? className : ''} container relative mx-auto w-full`}>
       {/* Hotel Image Banner */}
       <HotelBanner hotelImage={hotelImage} welcomeText={welcomeText} />
 

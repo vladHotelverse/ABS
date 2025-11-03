@@ -34,7 +34,6 @@ describe('RoomCarouselContent', () => {
     config: {
       currencySymbol: '€',
       isActive: true,
-      dynamicAmenities: room.amenities.slice(0, 3),
       roomIndex: index,
       enableHoverZoom: true,
     },

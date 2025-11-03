@@ -18,18 +18,6 @@ export interface CartSection {
   items: FormattedCartItem[]
 }
 
-// Pure display interfaces for UI components
-export interface BookingDisplay {
-  id?: string
-  bookingKey?: string
-  checkInDate?: string
-  checkOutDate?: string
-  guestName?: string
-  roomTypeName?: string
-  nights?: number
-  totalGuests?: number
-}
-
 export interface UILabels {
   // Core UI labels
   subtotalLabel: string

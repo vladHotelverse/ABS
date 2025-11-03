@@ -21,13 +21,13 @@ const RoomCarouselContent: React.FC<RoomCarouselContentProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('relative mx-auto w-full', className)}>
+    <div className={cn('relative mx-auto w-full select-none', className)}>
       <div className="overflow-hidden">
         <Carousel
           setApi={setRoomCarouselApi}
           opts={{
             align: 'center',
-            loop: roomCardPropsArray.length > 2,
+            loop: false,
             containScroll: false,
             slidesToScroll: 1,
             dragFree: false,
@@ -41,17 +41,24 @@ const RoomCarouselContent: React.FC<RoomCarouselContentProps> = ({
               width: '100%',
             }}
           >
-            {roomCardPropsArray.map((roomCardProps, index) => (
-              <CarouselItem
-                key={roomCardProps.room.id}
-                className={cn('flex w-full flex-shrink-0 basis-full justify-center pt-1 xl:w-[50%] xl:basis-[50%]', {
-                  // Handle slide opacity and pointer events based on current slide
-                  'pointer-events-none opacity-50': current !== index + 1 && roomCardPropsArray.length > 2,
-                })}
-              >
-                <RoomCard {...roomCardProps} />
-              </CarouselItem>
-            ))}
+            {roomCardPropsArray.map((roomCardProps, index) => {
+              // Calculate if this card should be faded (not the center card)
+              // current is 1-indexed, index is 0-indexed
+              const isCenterCard = current === index + 1
+              const shouldFade = !isCenterCard && roomCardPropsArray.length > 2
+
+              return (
+                <CarouselItem
+                  key={roomCardProps.room.id}
+                  className={cn('flex w-full flex-shrink-0 basis-full justify-center pt-1 xl:w-[50%] xl:basis-[50%]', {
+                    // Handle slide opacity and pointer events based on current slide
+                    'pointer-events-none opacity-50': shouldFade,
+                  })}
+                >
+                  <RoomCard {...roomCardProps} />
+                </CarouselItem>
+              )
+            })}
           </CarouselContent>
         </Carousel>
       </div>

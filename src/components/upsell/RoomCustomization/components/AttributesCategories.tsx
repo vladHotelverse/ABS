@@ -91,7 +91,7 @@ const AttributesCategories: React.FC<AttributesCategoriesProps> = ({
         if (!hasAccordion) {
           return (
             <li key={category.id}>
-              <h4 className="mb-4 font-medium text-foreground text-lg sm:font-medium sm:text-lg">{category.name}</h4>
+              <h4 className="mb-4 font-medium text-foreground text-lg sm:font-semibold sm:text-lg">{category.name}</h4>
               <ul className="grid grid-cols-1 gap-4 transition-all duration-300 sm:grid-cols-2 2xl:grid-cols-3">
                 {sortedAttributes.map((attribute) => renderAttributeCard(attribute, category.id))}
               </ul>

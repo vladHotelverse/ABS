@@ -3,7 +3,7 @@
 import clsx from 'clsx'
 import { CreditCard } from 'lucide-react'
 import type React from 'react'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import LoadingSkeleton from '@/components/upsell/PricingSummaryPanel/components/LoadingSkeleton'
 
 interface PriceBreakdownProps {
@@ -64,18 +64,18 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
               <span className="text-muted-foreground text-xs italic">{labels.subjectToAvailability}</span>
             )}
           </section>
-          {/* <UiButton
+          {/* <Button
           type="button"
           variant="link"
           size="sm"
           className="cursor-pointer border-none bg-transparent pl-0 font-medium text-muted-foreground text-sm underline transition-colors hover:text-foreground"
         >
           {labels.viewTermsLabel}
-        </UiButton> */}
+        </Button> */}
         </div>
 
         {/* Confirm Button */}
-        <UiButton
+        <Button
           onClick={onConfirm}
           disabled={isLoading || disabled}
           variant="default"
@@ -89,7 +89,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
           ) : (
             labels.confirmButtonLabel
           )}
-        </UiButton>
+        </Button>
       </div>
     </>
   )

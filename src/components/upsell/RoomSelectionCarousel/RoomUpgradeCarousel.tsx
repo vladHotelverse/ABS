@@ -1,7 +1,6 @@
 'use client'
 
 import type React from 'react'
-import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import RoomCarouselContent from './components/RoomCarouselContent'
 import RoomCarouselNavigation from './components/RoomCarouselNavigation'
@@ -9,9 +8,7 @@ import { SingleRoomLayout } from './components/SingleRoomLayout'
 import { TwoRoomLayout } from './components/TwoRoomLayout'
 import { useCarouselState } from './hooks/useCarouselState'
 import { useRoomCardProps } from './hooks/useRoomCardProps'
-import { useUpgradeAutoCenter } from './hooks/useUpgradeAutoCenter'
-import type { RoomUpgradeCarouselProps } from './types'
-import { adaptUpgradeTranslations, createSimpleAmenitiesMap } from './utils/translationAdapters'
+import type { RoomCardTranslations, RoomUpgradeCarouselProps } from './types'
 
 const RoomUpgradeCarousel: React.FC<RoomUpgradeCarouselProps> = ({
   roomOptions,
@@ -37,33 +34,29 @@ const RoomUpgradeCarousel: React.FC<RoomUpgradeCarouselProps> = ({
     onRoomSelected,
   })
 
-  // Use existing auto-center hook for multi-room scenarios
-  const { handleRoomSelectionWithCenter } = useUpgradeAutoCenter({
-    selectedRoomId: selectedRoom?.id || null,
-    roomCarouselApi,
-    roomOptions,
-    onRoomSelection: handleRoomSelection,
-  })
-
-  // Convert upgrade translations to format expected by shared hooks
-  const resolvedTexts = useMemo(() => adaptUpgradeTranslations(translations), [translations])
-
-  // Create simple amenities map for upgrade scenarios
-  const dynamicAmenitiesMap = useMemo(() => createSimpleAmenitiesMap(roomOptions), [roomOptions])
+  // Convert translations to RoomCardTranslations format
+  const roomCardTranslations: RoomCardTranslations = {
+    nightText: translations.nightText,
+    learnMoreText: translations.learnMoreText,
+    priceInfoText: translations.priceInfoText,
+    selectedText: translations.selectedText,
+    selectText: translations.selectText,
+    removeText: translations.removeText,
+    previousImageLabel: translations.previousImageLabel,
+    nextImageLabel: translations.nextImageLabel,
+    viewImageLabel: translations.viewImageLabel,
+  }
 
   // Use shared room card props hook
   const roomCardPropsArray = useRoomCardProps({
     roomOptions,
-    resolvedTexts,
+    translations: roomCardTranslations,
     selectedRoom,
     activeImageIndices,
-    dynamicAmenitiesMap,
     readonly: false,
-    mode: 'selection',
     handleRoomSelection,
     handleImageChange,
     enableHoverZoom,
-    handleRoomSelectionWithCenter,
   })
 
   // Determine layout based on room count

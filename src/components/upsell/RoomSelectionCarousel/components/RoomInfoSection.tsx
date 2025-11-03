@@ -32,13 +32,7 @@ const RoomInfoSection: React.FC<RoomInfoSectionProps> = ({
   const { currencySymbol = '€' } = config
   const { selectedRoom } = state
 
-  const {
-    nightText,
-    priceInfoText,
-    selectText,
-    removeText,
-    instantConfirmationText = 'Instant Confirmation',
-  } = translations
+  const { nightText, priceInfoText, selectText, removeText, instantConfirmationText = '' } = translations
 
   const handleSelectRoom = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation()
@@ -70,7 +64,6 @@ const RoomInfoSection: React.FC<RoomInfoSectionProps> = ({
         selectText={selectText}
         removeText={removeText}
         instantConfirmationText={instantConfirmationText}
-        segmentDiscount={room.segmentDiscount}
         readonly={config.readonly || false}
         onSelect={handleSelectRoom}
       />

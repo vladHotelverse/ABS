@@ -26,11 +26,6 @@ export interface ResponsiveHeaderProps {
   className?: string
 }
 
-export interface ResponsiveInfoBarProps {
-  children: ReactNode
-  className?: string
-}
-
 export interface ResponsiveMobileWidgetProps {
   children: ReactNode
   className?: string

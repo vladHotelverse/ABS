@@ -4,7 +4,6 @@ export type BookingBannerProps = {
   companyLogo?: string
   welcomeText?: {
     salutation: string
-    greeting: string
   }
   hotelName?: string
   // Optional booking info displayed on the right

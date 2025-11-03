@@ -24,7 +24,6 @@ const RoomCardDetailModal: React.FC<RoomCardDetailModalProps> = ({
   onClose,
   onImageClick,
 }) => {
-  const { dynamicAmenities, enableHoverZoom = true } = config
   const { selectedRoom } = state
 
   return (
@@ -40,14 +39,7 @@ const RoomCardDetailModal: React.FC<RoomCardDetailModalProps> = ({
           )}
         >
           {/* Room Image Section */}
-          <RoomImageSection
-            room={room}
-            translations={translations}
-            state={state}
-            dynamicAmenities={dynamicAmenities}
-            onImageClick={onImageClick}
-            enableHoverZoom={enableHoverZoom}
-          />
+          <RoomImageSection room={room} translations={translations} state={state} onImageClick={onImageClick} />
 
           {/* Room Info Section */}
           <div className="pb-2">

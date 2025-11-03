@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { UiButton as Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import type { CarouselApi } from '@/components/ui/carousel'
 import { cn } from '@/lib/utils'
 import type { RoomOption } from '../types'
@@ -25,14 +25,17 @@ const RoomCarouselNavigation = ({
   showDots = true,
   className,
 }: RoomCarouselNavigationProps) => {
+  const isFirst = current === 1
+  const isLast = current === count
+
   const handlePrevious = () => {
-    if (roomCarouselApi) {
+    if (roomCarouselApi && !isFirst) {
       roomCarouselApi.scrollPrev()
     }
   }
 
   const handleNext = () => {
-    if (roomCarouselApi) {
+    if (roomCarouselApi && !isLast) {
       roomCarouselApi.scrollNext()
     }
   }
@@ -50,8 +53,8 @@ const RoomCarouselNavigation = ({
               'disabled:pointer-events-none disabled:opacity-50'
             )}
             onClick={handlePrevious}
-            disabled={!roomCarouselApi}
-            aria-label="Previous room"
+            disabled={!roomCarouselApi || isFirst}
+            aria-label={`Previous room (${current - 1} of ${count})`}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -63,8 +66,8 @@ const RoomCarouselNavigation = ({
               'disabled:pointer-events-none disabled:opacity-50'
             )}
             onClick={handleNext}
-            disabled={!roomCarouselApi}
-            aria-label="Next room"
+            disabled={!roomCarouselApi || isLast}
+            aria-label={`Next room (${current + 1} of ${count})`}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -75,18 +78,22 @@ const RoomCarouselNavigation = ({
       {showDots && (
         <div className={cn('flex justify-center', className)}>
           <div className="mr-2 flex items-center justify-center">
-            {Array.from({ length: count }, (_, y) => (
-              <button
-                key={`dot-${roomOptions[y]?.id ?? y}`}
-                className={cn(
-                  'relative flex h-10 w-8 items-center justify-center rounded-full transition-colors',
-                  "after:flex after:h-[14px] after:w-[14px] after:items-center after:rounded-full after:border-2 after:content-['']",
-                  current === y + 1 ? 'after:border-foreground' : 'after:border-muted-foreground'
-                )}
-                onClick={() => roomCarouselApi?.scrollTo(y)}
-                aria-label={`Go to slide ${y + 1}`}
-              />
-            ))}
+            {Array.from({ length: count }, (_, y) => {
+              const roomTitle = roomOptions[y]?.title || roomOptions[y]?.roomType
+              return (
+                <button
+                  key={`dot-${roomOptions[y]?.id ?? y}`}
+                  className={cn(
+                    'relative flex h-10 w-8 items-center justify-center rounded-full transition-colors',
+                    "after:flex after:h-[14px] after:w-[14px] after:items-center after:rounded-full after:border-2 after:content-['']",
+                    current === y + 1 ? 'after:border-foreground' : 'after:border-muted-foreground'
+                  )}
+                  onClick={() => roomCarouselApi?.scrollTo(y)}
+                  aria-label={`View ${roomTitle} (room ${y + 1} of ${count})`}
+                  aria-current={current === y + 1 ? 'page' : undefined}
+                />
+              )
+            })}
           </div>
         </div>
       )}

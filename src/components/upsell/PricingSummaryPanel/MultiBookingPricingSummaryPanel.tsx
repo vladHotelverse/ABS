@@ -43,7 +43,7 @@ export interface MultiBookingPricingSummaryPanelProps {
   loading?: boolean
   activeRooms?: string[]
   onActiveRoomsChange?: (roomIds: string[]) => void
-  onRemoveItem?: (bookingKey: string, itemId: string, itemName: string) => void
+  onRemoveItem?: (bookingKey: string, itemId: string) => void
   onConfirm?: () => void
   hideFooter?: boolean
   isConfirmDisabled?: boolean
@@ -176,14 +176,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
           </div>
         )}
 
-        <div
-          className={clsx(
-            'min-h-0 flex-1 bg-muted',
-            isSticky && 'overflow-y-auto',
-            typeof (isSticky ? 'max-h-[calc(100svh-500px)]' : false) === 'string' &&
-              (isSticky ? 'max-h-[calc(100svh-500px)]' : false)
-          )}
-        >
+        <div className={clsx('min-h-0 flex-1 bg-muted', isSticky && 'overflow-y-auto')}>
           {isMultiBooking ? (
             rooms.map((room) => (
               <RoomAccordionItem
@@ -196,7 +189,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
                 isActive={isRoomActive(room.id)}
                 labels={labels}
                 onToggle={() => handleAccordionToggle(room.id)}
-                onRemoveItem={(itemId, itemName) => (onRemoveItem ? onRemoveItem(room.id, itemId, itemName) : null)}
+                onRemoveItem={(itemId) => (onRemoveItem ? onRemoveItem(room.id, itemId) : null)}
                 readonly={readonly}
                 guestCount={room.guestCount}
               />
@@ -210,7 +203,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
               sections={singleRoom.sections}
               guestCount={singleRoom.guestCount}
               labels={labels}
-              onRemoveItem={(itemId, itemName) => onRemoveItem?.(singleRoom.id, itemId, itemName)}
+              onRemoveItem={(itemId) => onRemoveItem?.(singleRoom.id, itemId)}
               readonly={readonly}
             />
           ) : null}

@@ -3,7 +3,7 @@
 import { Icon } from '@iconify/react'
 import clsx from 'clsx'
 import { useState } from 'react'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { TooltipProvider, UiTooltip, UiTooltipContent, UiTooltipTrigger } from '@/components/ui/tooltip'
 import { TruncatedTooltip } from '@/components/upsell/truncated-tooltip'
 import { cn } from '@/lib/utils'
@@ -19,38 +19,18 @@ interface AttributeCardProps {
   isSelected: boolean
   disabled: boolean
   onToggle?: () => void
-  // discountedPrice: number
   originalPrice: number
   displayCurrency: string
-  // loyaltyPercentage?: number
-  // loyaltyText?: string
   readonly?: boolean
 }
-
-// Helper component for loyalty badge
-// const LoyaltyBadge: React.FC<{
-//   loyaltyPercentage?: number
-//   loyaltyText?: string
-// }> = ({ loyaltyPercentage = 10, loyaltyText = 'Loyalty' }) => {
-//   return (
-//     <div className="inline-flex items-center rounded bg-blue-50 px-2 py-1 font-medium text-blue-700 text-xs dark:bg-blue-950 dark:text-blue-300">
-//       <span>
-//         {loyaltyText} {loyaltyPercentage}%
-//       </span>
-//     </div>
-//   )
-// }
 
 const AttributeCard: React.FC<AttributeCardProps> = ({
   attribute,
   isSelected,
   disabled,
   onToggle,
-  // discountedPrice,
   originalPrice,
   displayCurrency,
-  // loyaltyPercentage = 10,
-  // loyaltyText = 'Loyalty',
   readonly = false,
 }) => {
   const [imageError, setImageError] = useState(false)
@@ -95,14 +75,14 @@ const AttributeCard: React.FC<AttributeCardProps> = ({
               {attribute.name}
             </h5>
             {attribute.description && (
-              <TruncatedTooltip triggerClassName="mt-1 line-clamp-1 text-muted-foreground text-xs min-h-0">
-                {attribute.description}
+              <TruncatedTooltip triggerClassName="mt-1 line-clamp-2 text-muted-foreground text-xs min-h-0">
+                {attribute.description.length > 55 ? `${attribute.description.slice(0, 55)}…` : attribute.description}
               </TruncatedTooltip>
             )}
           </div>
         </div>
         {!readonly && (
-          <UiButton
+          <Button
             disabled={disabled}
             onClick={onToggle}
             className={clsx('h-7 flex-shrink-0 px-3 text-xs transition-all', {
@@ -112,7 +92,7 @@ const AttributeCard: React.FC<AttributeCardProps> = ({
             size="sm"
           >
             {isSelected ? 'Remove' : disabled ? 'N/A' : 'Add'}
-          </UiButton>
+          </Button>
         )}
       </section>
 
@@ -121,17 +101,7 @@ const AttributeCard: React.FC<AttributeCardProps> = ({
         <div className="flex flex-1 flex-wrap items-baseline gap-2">
           <span className="font-bold text-card-foreground text-lg sm:text-xl">{originalPrice.toFixed(2)}</span>
           <span className="text-muted-foreground text-xs sm:text-sm">{displayCurrency}/night</span>
-          {/* {originalPrice > 0 && (
-            <span className="text-muted-foreground text-xs line-through sm:text-sm">
-              {originalPrice.toFixed(2)} {displayCurrency}
-            </span>
-          )} */}
         </div>
-        {/* {originalPrice > 0 && (
-          <div className="flex-shrink-0">
-            <LoyaltyBadge loyaltyPercentage={loyaltyPercentage} loyaltyText={loyaltyText} />
-          </div>
-        )} */}
       </div>
     </li>
   )

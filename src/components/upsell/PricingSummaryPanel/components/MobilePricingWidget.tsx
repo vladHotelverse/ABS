@@ -3,7 +3,7 @@
 import clsx from 'clsx'
 import { Settings, ShoppingCart, TrendingUp } from 'lucide-react'
 import React, { useId, useMemo } from 'react'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export interface MobilePricingWidgetProps {
   formattedTotal: string
@@ -156,7 +156,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
             </div>
           )}
 
-          <UiButton
+          <Button
             onClick={onShowPricing}
             variant="default"
             disabled={isDisabled}
@@ -181,7 +181,7 @@ const MobilePricingWidget: React.FC<MobilePricingWidgetProps> = ({
                 {summaryButtonLabel}
               </>
             )}
-          </UiButton>
+          </Button>
         </div>
       </div>
     </aside>

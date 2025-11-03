@@ -6,8 +6,6 @@ interface UseCarouselStateParams {
   roomOptions: RoomOption[]
   initialSelectedRoom: RoomOption | null
   onRoomSelected?: (room: RoomOption | null) => void
-  contextRoomId?: string
-  roomSpecificSelections?: Record<string, string>
 }
 
 interface UseCarouselStateReturn {
@@ -25,35 +23,35 @@ export const useCarouselState = ({
   roomOptions,
   initialSelectedRoom,
   onRoomSelected,
-  contextRoomId,
-  roomSpecificSelections,
 }: UseCarouselStateParams): UseCarouselStateReturn => {
-  // Function to determine selected room based on context
-  const getSelectedRoomForContext = useCallback((): RoomOption | null => {
-    if (contextRoomId && roomSpecificSelections?.[contextRoomId]) {
-      const selectedRoomId = roomSpecificSelections[contextRoomId]
-      return roomOptions.find((room) => room.id === selectedRoomId) || null
-    }
-    return initialSelectedRoom
-  }, [contextRoomId, roomSpecificSelections, roomOptions, initialSelectedRoom])
+  // Simple selected room state
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(initialSelectedRoom)
 
-  // Initialize selected room based on context or initial selection
-  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(() => getSelectedRoomForContext())
+  // Carousel API for controlling room navigation
+  const [roomCarouselApi, setRoomCarouselApiState] = useState<CarouselApi>()
 
-  // Update selected room when context changes
+  // Update when initialSelectedRoom changes
   useEffect(() => {
-    const newSelectedRoom = getSelectedRoomForContext()
-    if (newSelectedRoom?.id !== selectedRoom?.id) {
-      setSelectedRoom(newSelectedRoom)
-    }
-  }, [getSelectedRoomForContext, selectedRoom?.id])
-
-  // Update when initialSelectedRoom changes (for simple cases)
-  useEffect(() => {
-    if (!contextRoomId && initialSelectedRoom?.id !== selectedRoom?.id) {
+    if (initialSelectedRoom?.id !== selectedRoom?.id) {
       setSelectedRoom(initialSelectedRoom)
     }
-  }, [initialSelectedRoom, contextRoomId, selectedRoom?.id])
+  }, [initialSelectedRoom, selectedRoom?.id])
+
+  // Auto-center carousel when selected room changes (e.g., tab switch in multi-booking)
+  useEffect(() => {
+    if (!roomCarouselApi || !selectedRoom || roomOptions.length <= 2) {
+      return
+    }
+
+    const roomIndex = roomOptions.findIndex((room) => room.id === selectedRoom.id)
+    const currentIndex = roomCarouselApi.selectedScrollSnap()
+
+    if (roomIndex !== -1 && roomIndex !== currentIndex) {
+      // Auto-center without animation when selection changes externally
+      roomCarouselApi.scrollTo(roomIndex, true)
+    }
+  }, [selectedRoom?.id, roomCarouselApi, roomOptions])
+
   const [activeImageIndices, setActiveImageIndices] = useState<Record<number, number>>(() => {
     const indices: Record<number, number> = {}
     roomOptions.forEach((_, index) => {
@@ -61,9 +59,6 @@ export const useCarouselState = ({
     })
     return indices
   })
-
-  // Carousel API for controlling room navigation
-  const [roomCarouselApi, setRoomCarouselApiState] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
 

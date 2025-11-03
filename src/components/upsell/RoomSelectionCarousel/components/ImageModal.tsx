@@ -1,15 +1,16 @@
 'use client'
 
 import useEmblaCarousel from 'embla-carousel-react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, Rotate3DIcon } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import Matterport from '@/components/multimedia/Matterport'
 import Video from '@/components/multimedia/Video'
-import { UiButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import type { MediaItem } from '../utils/multimedia'
+import type { MediaItem } from '../types'
+import { MediaType } from '../types'
 
 interface ImageModalProps {
   images?: string[] // Deprecated: use mediaItems instead
@@ -18,6 +19,19 @@ interface ImageModalProps {
   initialImageIndex: number
   onClose: () => void
   roomTitle: string
+}
+
+const isStandardImageType = (type: MediaItem['type']) =>
+  typeof type === 'number' && (type === MediaType.Image || type === MediaType.Image180)
+
+const isVideoType = (type: MediaItem['type']) => type === MediaType.Video
+const isTourType = (type: MediaItem['type']) => type === MediaType.Image360
+
+const getMediaTypeLabel = (type: MediaItem['type']) => {
+  if (isStandardImageType(type)) return 'image'
+  if (isVideoType(type)) return 'video'
+  if (isTourType(type)) return '360 tour'
+  return 'media'
 }
 
 const ImageModal: React.FC<ImageModalProps> = ({
@@ -29,7 +43,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
   roomTitle,
 }) => {
   // Support backward compatibility: convert images array to mediaItems if needed
-  const media: MediaItem[] = mediaItems || (images ? images.map((url) => ({ type: 'image' as const, url })) : [])
+  const media: MediaItem[] =
+    mediaItems || (images ? images.map((url) => ({ type: MediaType.Image, url })) : [])
 
   const [currentImageIndex, setCurrentImageIndex] = useState(initialImageIndex)
   const hasMedia = media && media.length > 0
@@ -114,11 +129,11 @@ const ImageModal: React.FC<ImageModalProps> = ({
 
         {/* Header */}
         <div className="absolute top-6 right-6 z-10 flex flex-shrink-0 items-center justify-end">
-          <UiButton onClick={onClose} variant="outline" className="hover:cursor-pointer" aria-label="Close image modal">
+          <Button onClick={onClose} variant="outline" className="hover:cursor-pointer" aria-label="Close image modal">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </UiButton>
+          </Button>
         </div>
 
         {/* Main carousel container */}
@@ -128,7 +143,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
             {/* Navigation Arrow Buttons */}
             {hasMedia && media.length > 1 && (
               <>
-                <UiButton
+                <Button
                   size="icon"
                   className={cn(
                     '-translate-y-1/2 absolute top-1/2 z-30 rounded-full border border-white bg-black text-white shadow-lg backdrop-blur-sm hover:bg-background',
@@ -139,8 +154,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   aria-label="Previous media"
                 >
                   <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
-                </UiButton>
-                <UiButton
+                </Button>
+                <Button
                   size="icon"
                   className={cn(
                     '-translate-y-1/2 absolute top-1/2 z-30 rounded-full border border-white bg-black text-white shadow-lg backdrop-blur-sm hover:bg-background',
@@ -151,7 +166,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
                   aria-label="Next media"
                 >
                   <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
-                </UiButton>
+                </Button>
               </>
             )}
 
@@ -174,10 +189,10 @@ const ImageModal: React.FC<ImageModalProps> = ({
                 {hasMedia ? (
                   media.map((item, index) => (
                     <div
-                      key={`${item.type}-${item.url}-${index}`}
+                      key={`${String(item.type)}-${item.url}-${index}`}
                       className="flex h-full w-full flex-none items-center justify-center p-0 md:p-4"
                     >
-                      {item.type === 'image' && (
+                      {isStandardImageType(item.type) && (
                         <img
                           src={item.url}
                           alt={`${roomTitle} - ${index + 1} of ${media.length}`}
@@ -185,12 +200,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
                           draggable={false}
                         />
                       )}
-                      {item.type === 'video' && (
+                      {isVideoType(item.type) && (
                         <div className="h-full w-full">
                           <Video url={item.url} aspectRatio={null} className="h-full w-full" />
                         </div>
                       )}
-                      {item.type === 'matterport' && (
+                      {isTourType(item.type) && (
                         <div className="h-full w-full">
                           <Matterport url={item.url} aspectRatio={null} className="h-full w-full" />
                         </div>
@@ -218,7 +233,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
               >
                 <div className="flex w-full items-center justify-start gap-2 md:justify-center">
                   {media.map((item, index) => (
-                    <div key={`${item.type}-${item.url}-${index}`} className="flex-none">
+                    <div key={`${String(item.type)}-${item.url}-${index}`} className="flex-none">
                       <button
                         onClick={() => onThumbClick(index)}
                         className={cn(
@@ -227,10 +242,10 @@ const ImageModal: React.FC<ImageModalProps> = ({
                             ? 'border-primary ring-2 ring-primary/20'
                             : 'border-border hover:border-ring'
                         )}
-                        aria-label={`Go to ${item.type} ${index + 1}`}
+                        aria-label={`Go to ${getMediaTypeLabel(item.type)} ${index + 1}`}
                       >
                         {/* Thumbnail preview */}
-                        {item.type === 'image' && (
+                        {isStandardImageType(item.type) && (
                           <img
                             src={item.thumbnailUrl || item.url}
                             alt={`${roomTitle} - ${index + 1} of ${media.length}`}
@@ -238,55 +253,29 @@ const ImageModal: React.FC<ImageModalProps> = ({
                             draggable={false}
                           />
                         )}
-                        {item.type === 'video' && (
-                          <div className="flex h-full w-full items-center justify-center bg-muted">
-                            <svg
-                              className="h-6 w-6 text-muted-foreground"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z"
-                              />
-                            </svg>
+                        {isVideoType(item.type) && (
+                          <div className="flex h-full w-full items-center justify-center">
+                            {/* Play button icon */}
+                            <Play className="h-6 w-6 fill-white text-white drop-shadow-md" />
                           </div>
                         )}
-                        {item.type === 'matterport' && (
-                          <div className="flex h-full w-full items-center justify-center bg-muted">
-                            <svg
-                              className="h-6 w-6 text-muted-foreground"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg>
+                        {isTourType(item.type) && (
+                          <div className="flex h-full w-full flex-col items-center justify-center">
+                            {/* 360 view icon */}
+                            <Rotate3DIcon className="h-6 w-6 text-black drop-shadow-md" />
+                            <span>360</span>
                           </div>
                         )}
 
                         {/* Media type icon overlay */}
-                        {item.type === 'video' && (
+                        {isVideoType(item.type) && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                             <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24" strokeWidth={0}>
                               <path d="M8 5v14l11-7z" />
                             </svg>
                           </div>
                         )}
-                        {item.type === 'matterport' && (
+                        {isTourType(item.type) && (
                           <div className="absolute top-0.5 right-0.5 rounded bg-black/60 px-1 py-0.5">
                             <span className="font-medium text-[10px] text-white">360°</span>
                           </div>
