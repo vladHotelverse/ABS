@@ -1,0 +1,223 @@
+@import "./scrollbars.css";
+
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  /* Dual-shadow system for realistic depth (light from above concept) */
+  /* These automatically adapt to light/dark theme via CSS variables */
+  --shadow-depth-1: var(--shadow-depth-1-light), var(--shadow-depth-1-highlight);
+  --shadow-depth-2: var(--shadow-depth-2-light), var(--shadow-depth-2-highlight);
+  --shadow-depth-3: var(--shadow-depth-3-light), var(--shadow-depth-3-highlight);
+}
+
+@layer base {
+  :root {
+    --radius: 0.625rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+
+    /* Light theme shadows (subtle, light from above) */
+    --shadow-depth-1-light: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-depth-1-highlight: 0 -1px 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-depth-2-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-depth-2-highlight: 0 -2px 4px 0 rgba(255, 255, 255, 0.05);
+    --shadow-depth-3-light: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-depth-3-highlight: 0 -4px 6px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.269 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.371 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+
+    /* Dark theme shadows (more pronounced, deeper blacks, subtle highlights) */
+    --shadow-depth-1-light: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-depth-1-highlight: 0 -1px 1px 0 rgba(255, 255, 255, 0.03);
+    --shadow-depth-2-light: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-depth-2-highlight: 0 -2px 4px 0 rgba(255, 255, 255, 0.02);
+    --shadow-depth-3-light: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-depth-3-highlight: 0 -4px 6px 0 rgba(255, 255, 255, 0.02);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: var(--color-ring);
+    outline-offset: 2px;
+    outline-width: 0;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes animationFadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modalContentFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes cardFadeIn {
+    0% {
+      opacity: 0;
+      margin-top: -8px;
+    }
+    100% {
+      opacity: 1;
+      margin-top: 0;
+    }
+  }
+
+  @keyframes loadingBounce {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes roomTypeCardBarFadeIn {
+    0% {
+      opacity: 1;
+      height: 0px;
+    }
+    100% {
+      opacity: 1;
+      height: 42px;
+    }
+  }
+
+  @keyframes spinner-rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes smoothHeightChange {
+    from {
+      height: var(--height-from, 0px);
+    }
+    to {
+      height: var(--height-to, 0px);
+    }
+  }
+}
+
+@layer components {
+  /* Only used fluid utilities */
+  .fluid-px-md {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+  }
+  .fluid-py-sm {
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+  }
+
+  /* Container query */
+  .cq-container {
+    container-type: inline-size;
+  }
+
+  /* No scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Disable transitions temporarily (used for preventing flash on mount/instant updates) */
+  .no-transition,
+  .no-transition * {
+    transition-property: none;
+    transition-duration: 0s;
+  }
+}

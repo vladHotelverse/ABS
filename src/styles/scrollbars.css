@@ -1,0 +1,43 @@
+/* Hide Scrollbars */
+*:not([data-scrollbar="true"]) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Default scrollbar styles */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.66);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.66);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* Scrollbar styles for elements with data-scrollbar attribute */
+[data-scrollbar="true"]::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+[data-scrollbar="true"]::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+[data-scrollbar="true"]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 0px;
+}
+
+[data-scrollbar="true"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
