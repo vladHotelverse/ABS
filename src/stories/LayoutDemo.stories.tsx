@@ -13,6 +13,7 @@ import { BookingAccordionCard } from '@/components/upsell/ViewCards'
 import SpecialOffers from '@/components/upsell/SpecialOffers'
 import type { OfferSelection, OfferType } from '@/components/upsell/SpecialOffers/types'
 import { TabsStrip } from './components'
+import useAccordionState from './PricingSummaryPanel/hooks/useAccordionState'
 import { formatOfferCards } from './SpecialOffers/utils/offerFormatter'
 import { getDefaultLabels } from './SpecialOffers/utils/labels'
 import { useOfferPricing } from './SpecialOffers/hooks/useOfferPricing'
@@ -58,11 +59,6 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
   useEffect(() => {
     setSelectedRoom(carouselRooms[initialIndex] ?? carouselRooms[0] ?? null)
   }, [carouselRooms, initialIndex])
-
-  const [activeRooms, setActiveRooms] = useState<string[]>(() => (pricingRooms[0] ? [pricingRooms[0].id] : []))
-  useEffect(() => {
-    setActiveRooms(pricingRooms[0] ? [pricingRooms[0].id] : [])
-  }, [pricingRooms])
 
   // State for room customization selections (per room)
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, Record<number, boolean>>>(() => {
@@ -157,6 +153,11 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
     })
   }, [pricingRooms, selectedAttributes, bookedOffers, offerSelections, calculateTotal, formatPrice])
 
+  const { activeRooms, setActiveRooms, initialActiveRooms } = useAccordionState({
+    rooms: computedPricingRooms,
+    exclusiveAccordion: true,
+  })
+
   const toggleAttribute = useCallback((roomId: string, attributeId: number) => {
     setSelectedAttributes((prev) => {
       const roomSelections = { ...(prev[roomId] || {}) }
@@ -175,9 +176,9 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
 
   // Get the currently active room for display
   const activeRoom = useMemo(() => {
-    const activeRoomId = activeRooms[0] || pricingRooms[0]?.id
+    const activeRoomId = activeRooms[0] || initialActiveRooms[0] || pricingRooms[0]?.id
     return pricingRooms.find((r) => r.id === activeRoomId)
-  }, [activeRooms, pricingRooms])
+  }, [activeRooms, initialActiveRooms, pricingRooms])
 
   const activeRoomDisplayName = activeRoom?.displayName?.toUpperCase() || 'TRIPLE DELUXE GOLF VIEW'
 
@@ -204,7 +205,7 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
                     label: b.displayName,
                     badge: <span className="rounded-lg bg-white/20 px-2 py-0.5 text-xs">{b.formattedGuests}</span>,
                   }))}
-                  activeId={activeRooms[0]}
+                  activeId={activeRooms[0] || initialActiveRooms[0]}
                   sticky={false}
                   className="border-0 bg-transparent"
                   onChange={(id) => setActiveRooms(id ? [id] : [])}
@@ -234,7 +235,7 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
               <AttributesCategories
                 categories={defaultRoomCustomizationCategories}
                 renderAttributeCard={(attribute) => {
-                  const currentRoomId = activeRooms[0] || pricingRooms[0]?.id
+                  const currentRoomId = activeRooms[0] || initialActiveRooms[0] || pricingRooms[0]?.id
                   if (!currentRoomId || !attribute.amount) return null
                   const isSelected = Boolean(selectedAttributes[currentRoomId]?.[attribute.id])
                   const pricePerNight = attribute.amount / 8
@@ -293,6 +294,7 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
             formattedOverallTotal={formattedOverallTotal}
             labels={layoutPricingLabels}
             activeRooms={activeRooms}
+            initialActiveRooms={initialActiveRooms}
             onActiveRoomsChange={setActiveRooms}
             exclusiveAccordion
             isSticky={true}

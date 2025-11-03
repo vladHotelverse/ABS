@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import type React from 'react'
+import React, { useCallback } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import BookingBanner from '@/components/upsell/BookingBanner'
 import {
@@ -11,6 +11,7 @@ import {
   ResponsiveSidebar,
 } from '@/components/upsell/Layout'
 import MultiBookingPricingSummaryPanel from '@/components/upsell/PricingSummaryPanel/MultiBookingPricingSummaryPanel'
+import useAccordionState from './hooks/useAccordionState'
 import {
   defaultRoomCustomizationCategories,
   fourRoomsBookings,
@@ -20,8 +21,8 @@ import {
   pricingSummaryLabels,
   singleBookingSummary,
   singleRoomSummary,
-} from './mockData'
-import { RoomCustomizationPreview } from './utils/RoomCustomizationPreview'
+} from '../mockData'
+import { RoomCustomizationPreview } from '../utils/RoomCustomizationPreview'
 
 const PricingLayoutPreview: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ResponsiveLayout showMobileWidget className="bg-slate-100">
@@ -40,7 +41,7 @@ const PricingLayoutPreview: React.FC<{ children: React.ReactNode }> = ({ childre
 
     <div className="bg-white shadow-sm">
       <BookingBanner
-        welcomeText={{ salutation: 'Welcome back,', greeting: 'Alex!' }}
+        welcomeText={{ salutation: 'Welcome back, Alex!' }}
         hotelName="Hotel Paradise Resort"
         hotelImage="https://cdn.hotelverse.tech/renderimages/h323/views/01_main-0060/37fd4da9-4801-458d-9886-33a5d8521482/original.webp"
         companyLogo="https://cdn.hotelverse.tech/logos/h323/fc48c20e-9a2e-414d-ba2e-2863aa069ae5/original.webp"
@@ -115,6 +116,38 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const AccordionStateStory: React.FC<React.ComponentProps<typeof MultiBookingPricingSummaryPanel>> = ({
+  rooms,
+  exclusiveAccordion = false,
+  onActiveRoomsChange,
+  ...rest
+}) => {
+  const safeRooms = rooms ?? []
+  const { activeRooms, setActiveRooms, initialActiveRooms } = useAccordionState({
+    rooms: safeRooms,
+    exclusiveAccordion,
+  })
+
+  const handleActiveRoomsChange = useCallback(
+    (nextRooms: string[]) => {
+      setActiveRooms(nextRooms)
+      onActiveRoomsChange?.(nextRooms)
+    },
+    [onActiveRoomsChange, setActiveRooms]
+  )
+
+  return (
+    <MultiBookingPricingSummaryPanel
+      {...rest}
+      rooms={safeRooms}
+      exclusiveAccordion={exclusiveAccordion}
+      activeRooms={activeRooms}
+      initialActiveRooms={initialActiveRooms}
+      onActiveRoomsChange={handleActiveRoomsChange}
+    />
+  )
+}
+
 export const Default: Story = {
   args: {
     rooms: multiRoomSummary,
@@ -122,11 +155,12 @@ export const Default: Story = {
     formattedOverallTotal: '€1,045.00',
     labels: pricingSummaryLabels,
     exclusiveAccordion: true,
-    onRemoveItem: (roomId, itemId, itemName) => {
-      console.log('Remove item', { roomId, itemId, itemName })
+    onRemoveItem: (bookingKey, itemId) => {
+      console.log('Remove item', { bookingKey, itemId })
     },
     onConfirm: () => console.log('Confirm selection'),
   },
+  render: (args) => <AccordionStateStory {...args} />,
   parameters: {
     docs: {
       description: {
@@ -149,6 +183,7 @@ export const SingleRoom: Story = {
     exclusiveAccordion: true,
     onConfirm: () => console.log('Confirm single room'),
   },
+  render: (args) => <AccordionStateStory {...args} />,
   parameters: {
     docs: {
       description: {
@@ -169,6 +204,7 @@ export const Loading: Story = {
     loading: true,
     exclusiveAccordion: true,
   },
+  render: (args) => <AccordionStateStory {...args} />,
   parameters: {
     docs: {
       description: {
@@ -189,6 +225,7 @@ export const ReadOnly: Story = {
     readonly: true,
     exclusiveAccordion: true,
   },
+  render: (args) => <AccordionStateStory {...args} />,
   parameters: {
     docs: {
       description: {
@@ -207,11 +244,12 @@ export const DynamicHeightTest: Story = {
     formattedOverallTotal: '€5,965.00',
     labels: pricingSummaryLabels,
     exclusiveAccordion: false,
-    onRemoveItem: (roomId, itemId, itemName) => {
-      console.log('Remove item', { roomId, itemId, itemName })
+    onRemoveItem: (bookingKey, itemId) => {
+      console.log('Remove item', { bookingKey, itemId })
     },
     onConfirm: () => console.log('Confirm selection'),
   },
+  render: (args) => <AccordionStateStory {...args} />,
   parameters: {
     viewport: {
       defaultViewport: 'smallDesktop',

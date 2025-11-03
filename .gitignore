@@ -42,3 +42,5 @@ playwright/.cache/
 # Test artifacts
 *.spec.js.map
 *.test.js.map
+
+storybook-static

@@ -1,8 +1,6 @@
 'use client'
 
-import { Icon } from '@iconify/react'
-import { useEffect, useState } from 'react'
-import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useMemo, useState } from 'react'
 
 interface Attribute {
   id: number
@@ -24,47 +22,32 @@ interface AttributesCategoriesProps {
   categories: Category[]
   renderAttributeCard: (attribute: Attribute, categoryId: number) => React.ReactNode
   initialItemsCount?: number
+  displayConfig?: {
+    initialVisibleCount?: number
+    showMoreThreshold?: number
+    showMoreLabel?: (remaining: number) => string
+    showLessLabel?: string
+  }
 }
 
 const AttributesCategories: React.FC<AttributesCategoriesProps> = ({
   categories,
   renderAttributeCard,
-  initialItemsCount: _defaultInitialItemsCount = 3,
+  initialItemsCount: legacyInitialCount,
+  displayConfig,
 }) => {
-  const [openCategories, setOpenCategories] = useState<Record<number, boolean>>({})
-  const [showInfo, setShowInfo] = useState<Record<number, boolean>>({})
   const [showAllAttributes, setShowAllAttributes] = useState<Record<number, boolean>>({})
 
-  // Use breakpoint hook for responsive initial items count
-  const breakpoint = useBreakpoint()
-  const initialItemsCount = breakpoint === '2xl' ? 3 : breakpoint === 'mobile' ? 1 : 2
-
-  // Initialize all categories as open
-  useEffect(() => {
-    const initialOpenState = categories.reduce(
-      (acc, category) => {
-        acc[category.id] = true
-        return acc
-      },
-      {} as Record<number, boolean>
-    )
-    setOpenCategories(initialOpenState)
-  }, [categories.length])
-
-  const toggleCategory = (categoryId: number) => {
-    setOpenCategories((prev) => ({
-      ...prev,
-      [categoryId]: !prev[categoryId],
-    }))
-  }
-
-  const toggleInfo = (categoryId: number, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowInfo((prev) => ({
-      ...prev,
-      [categoryId]: !prev[categoryId],
-    }))
-  }
+  const config = useMemo(() => {
+    const initialVisibleCount = displayConfig?.initialVisibleCount ?? legacyInitialCount ?? 3
+    const showMoreThreshold = displayConfig?.showMoreThreshold ?? initialVisibleCount
+    return {
+      initialVisibleCount,
+      showMoreThreshold,
+      showMoreLabel: displayConfig?.showMoreLabel,
+      showLessLabel: displayConfig?.showLessLabel,
+    }
+  }, [categories.length, displayConfig, legacyInitialCount])
 
   const toggleShowAllAttributes = (categoryId: number) => {
     setShowAllAttributes((prev) => ({
@@ -77,12 +60,14 @@ const AttributesCategories: React.FC<AttributesCategoriesProps> = ({
     <ul className="space-y-8">
       {categories.map((category) => {
         const showAll = showAllAttributes[category.id] ?? false
-        const shouldShowMoreButton = category.attributes.length > initialItemsCount
-        const sortedAttributes = [...category.attributes].sort(
-          (a, b) => (a.exclusivityRatio ?? 0) - (b.exclusivityRatio ?? 0)
-        )
-        const displayAttributes = showAll ? sortedAttributes : sortedAttributes.slice(0, initialItemsCount)
-        const remainingCount = category.attributes.length - initialItemsCount
+        const shouldShowMoreButton = category.attributes.length > config.showMoreThreshold
+        const displayAttributes = showAll
+          ? category.attributes
+          : category.attributes.slice(0, config.initialVisibleCount)
+        const remainingCount = Math.max(category.attributes.length - config.initialVisibleCount, 0)
+        const showMoreLabel =
+          config.showMoreLabel?.(remainingCount) ?? `Show More${remainingCount > 0 ? ` (${remainingCount} more)` : ''}`
+        const showLessLabel = config.showLessLabel ?? 'Show Less'
 
         return (
           <li key={category.id}>
@@ -102,7 +87,7 @@ const AttributesCategories: React.FC<AttributesCategoriesProps> = ({
                   className="rounded-lg border border-border px-4 py-2 font-medium text-primary text-sm transition-colors duration-200 hover:border-ring hover:bg-accent hover:text-primary/80"
                   type="button"
                 >
-                  {showAll ? 'Show Less' : `Show More (${remainingCount} more)`}
+                  {showAll ? showLessLabel : showMoreLabel}
                 </button>
               </div>
             )}

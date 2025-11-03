@@ -2,6 +2,11 @@ import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { AttributeCard, AttributesCategories } from '@/components/upsell/RoomCustomization/components'
 import type { RoomCustomizationCategory } from '../mockData'
+import {
+  DEFAULT_ATTRIBUTE_DISPLAY_CONFIG,
+  sortAttributesByExclusivity,
+  useAttributeDisplaySettings,
+} from '../RoomCustomization/utils/attributeFormatter'
 
 export type { RoomCustomizationAttribute, RoomCustomizationCategory } from '../mockData'
 export {
@@ -67,11 +72,15 @@ export const RoomCustomizationPreview: React.FC<RoomCustomizationPreviewProps> =
     })
   }
 
+  const sortedCategories = useMemo(() => sortAttributesByExclusivity(categories), [categories])
+
+  const displaySettings = useAttributeDisplaySettings(DEFAULT_ATTRIBUTE_DISPLAY_CONFIG)
+
   const selectedSummary = useMemo(() => {
     const items: Array<{ id: number; label: string; perStay: number }> = []
     let totalPerStay = 0
 
-    for (const category of categories) {
+    for (const category of sortedCategories) {
       for (const attribute of category.attributes) {
         if (selectedAttributes[attribute.id]) {
           items.push({ id: attribute.id, label: attribute.name, perStay: attribute.amount })
@@ -87,7 +96,7 @@ export const RoomCustomizationPreview: React.FC<RoomCustomizationPreviewProps> =
       totalPerStay,
       totalPerNight,
     }
-  }, [categories, nights, selectedAttributes])
+  }, [sortedCategories, nights, selectedAttributes])
 
   return (
     <div className="space-y-6">
@@ -96,7 +105,7 @@ export const RoomCustomizationPreview: React.FC<RoomCustomizationPreviewProps> =
         <p className="text-muted-foreground text-sm">{description}</p>
       </div>
       <AttributesCategories
-        categories={categories}
+        categories={sortedCategories}
         renderAttributeCard={(attribute) => {
           const isSelected = Boolean(selectedAttributes[attribute.id])
           const disabled = Boolean(attribute.disabled || disabledSet.has(attribute.id))
@@ -114,6 +123,12 @@ export const RoomCustomizationPreview: React.FC<RoomCustomizationPreviewProps> =
               readonly={readonly}
             />
           )
+        }}
+        displayConfig={{
+          initialVisibleCount: displaySettings.initialVisibleCount,
+          showMoreThreshold: displaySettings.showMoreThreshold,
+          showMoreLabel: displaySettings.showMoreLabel,
+          showLessLabel: displaySettings.showLessLabel,
         }}
       />
       <div className="rounded-lg bg-muted p-4 shadow-inner">

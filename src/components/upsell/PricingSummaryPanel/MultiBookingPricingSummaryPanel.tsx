@@ -50,6 +50,7 @@ export interface MultiBookingPricingSummaryPanelProps {
   readonly?: boolean
   isSticky?: boolean
   exclusiveAccordion?: boolean // Only one room accordion open at a time (default: false)
+  initialActiveRooms?: string[]
 }
 
 /**
@@ -72,6 +73,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
   readonly = false,
   isSticky = true,
   exclusiveAccordion = false,
+  initialActiveRooms: initialActiveRoomsProp,
 }) => {
   const isMultiBooking = rooms.length > 1
   const singleRoom = !isMultiBooking ? rooms[0] : undefined
@@ -93,18 +95,28 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
     disabled: !isDesktop || !isSticky,
   })
 
-  // Simple accordion state management (if no external control provided)
-  const [internalActiveRooms, setInternalActiveRooms] = React.useState<string[]>(() => {
-    // Only open rooms that have items selected
-    const roomsWithItems = rooms.filter((room) => room.sections.some((section) => section.items.length > 0))
+  const initialActiveRooms = React.useMemo(
+    () => (Array.isArray(initialActiveRoomsProp) ? [...initialActiveRoomsProp] : []),
+    [initialActiveRoomsProp]
+  )
 
-    if (exclusiveAccordion) {
-      // Start with first room that has items (exclusive mode)
-      return roomsWithItems.length > 0 ? [roomsWithItems[0].id] : []
+  // Simple accordion state management (if no external control provided)
+  const [internalActiveRooms, setInternalActiveRooms] = React.useState<string[]>(initialActiveRooms)
+
+  const areRoomsEqual = React.useCallback(
+    (a: string[], b: string[]) => a.length === b.length && a.every((roomId, index) => roomId === b[index]),
+    []
+  )
+
+  // Sync uncontrolled state with parent-provided defaults
+  React.useEffect(() => {
+    if (activeRooms === undefined) {
+      if (initialActiveRoomsProp === undefined) {
+        return
+      }
+      setInternalActiveRooms((prev) => (areRoomsEqual(prev, initialActiveRooms) ? prev : initialActiveRooms))
     }
-    // Start with all rooms that have items (default mode)
-    return roomsWithItems.map((r) => r.id)
-  })
+  }, [activeRooms, initialActiveRooms, initialActiveRoomsProp, areRoomsEqual])
 
   // Safety check for required props
   if (!labels) {
