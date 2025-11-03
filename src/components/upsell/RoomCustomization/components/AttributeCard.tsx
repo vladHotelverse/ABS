@@ -39,10 +39,10 @@ const AttributeCard: React.FC<AttributeCardProps> = ({
     <li
       key={attribute.id}
       className={cn(
-        'relative space-y-3 rounded-lg bg-card p-3 shadow-depth-2 transition-all duration-200 sm:p-4',
+        'relative space-y-3 rounded-lg bg-white p-3 shadow-sm ring-1 ring-border/40 transition-all duration-200 sm:p-4',
         disabled && !readonly && 'cursor-not-allowed opacity-50',
-        isSelected && 'ring-1 ring-emerald-500',
-        !disabled && !readonly && 'hover:shadow-depth-3'
+        isSelected && 'ring-2 ring-emerald-500',
+        !disabled && !readonly && 'hover:shadow-md'
       )}
     >
       {/* Selected badge */}

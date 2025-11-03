@@ -37,8 +37,8 @@ export const TabsStrip: FC<TabsStripProps> = ({
 
   const containerClass = useMemo(() => {
     const stickyCls = sticky
-      ? 'sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-border'
-      : 'border-b border-border'
+      ? 'sticky top-0 z-10 bg-white/90 backdrop-blur '
+      : ''
     return [stickyCls, className].filter(Boolean).join(' ')
   }, [className, sticky])
 

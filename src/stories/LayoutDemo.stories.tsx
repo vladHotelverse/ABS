@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { UiButton } from '@/components/ui/button'
 import BookingBanner from '@/components/upsell/BookingBanner'
 import MultiBookingPricingSummaryPanel, {
   type MultiBookingPricingSummaryPanelProps,
 } from '@/components/upsell/PricingSummaryPanel/MultiBookingPricingSummaryPanel'
+import { SectionType } from '@/components/upsell/PricingSummaryPanel/types'
+import { AttributeCard, AttributesCategories } from '@/components/upsell/RoomCustomization/components'
 import { RoomUpgradeCarousel } from '@/components/upsell/RoomSelectionCarousel'
 import type { RoomOption } from '@/components/upsell/RoomSelectionCarousel/types'
 import { BookingAccordionCard } from '@/components/upsell/ViewCards'
@@ -12,12 +14,14 @@ import { TabsStrip } from './components'
 import {
   bookingViewCards,
   bookingViewTranslations,
+  defaultRoomCustomizationCategories,
   goldThemeOverride,
   layoutPricingBookings,
   layoutPricingLabels,
   layoutPricingRooms,
   layoutUpgradeTranslations,
   roomOptions,
+  type RoomCustomizationAttribute,
 } from './mockData'
 import { adaptRoomsForCarousel, createTranslator, formatBookingDate } from './utils'
 
@@ -53,7 +57,76 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
     setActiveRooms(pricingRooms[0] ? [pricingRooms[0].id] : [])
   }, [pricingRooms])
 
+  // State for room customization selections (per room)
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, Record<number, boolean>>>(() => {
+    const initial: Record<string, Record<number, boolean>> = {}
+    pricingRooms.forEach((room) => {
+      initial[room.id] = {}
+    })
+    return initial
+  })
+
+  // Compute pricing rooms with customization items included
+  const computedPricingRooms = useMemo(() => {
+    return pricingRooms.map((room) => {
+      const roomSelections = selectedAttributes[room.id] || {}
+      const customizationItems = Object.entries(roomSelections)
+        .filter(([, isSelected]) => isSelected)
+        .map(([attributeId]) => {
+          const attr = defaultRoomCustomizationCategories
+            .flatMap((cat) => cat.attributes)
+            .find((a) => a.id === Number(attributeId))
+          if (!attr) return null
+          const pricePerNight = attr.amount / 8 // 8 nights
+          return {
+            id: `attr-${attr.id}`,
+            name: attr.name,
+            formattedPrice: `€${attr.amount.toFixed(2)}`,
+          }
+        })
+        .filter(Boolean) as Array<{ id: string; name: string; formattedPrice: string }>
+
+      // Find existing customization section or create new one
+      const existingSections = room.sections.filter((s) => s.type !== SectionType.Customization)
+      const customizationSection =
+        customizationItems.length > 0
+          ? {
+              title: 'Customize your room',
+              type: SectionType.Customization,
+              items: customizationItems,
+            }
+          : undefined
+
+      return {
+        ...room,
+        sections: customizationSection ? [...existingSections, customizationSection] : existingSections,
+      }
+    })
+  }, [pricingRooms, selectedAttributes])
+
+  const toggleAttribute = useCallback((roomId: string, attributeId: number) => {
+    setSelectedAttributes((prev) => {
+      const roomSelections = { ...(prev[roomId] || {}) }
+      roomSelections[attributeId] = !roomSelections[attributeId]
+      if (!roomSelections[attributeId]) {
+        delete roomSelections[attributeId]
+      }
+      return {
+        ...prev,
+        [roomId]: roomSelections,
+      }
+    })
+  }, [])
+
   const themeOverrides = useMemo(() => goldThemeOverride, [])
+
+  // Get the currently active room for display
+  const activeRoom = useMemo(() => {
+    const activeRoomId = activeRooms[0] || pricingRooms[0]?.id
+    return pricingRooms.find((r) => r.id === activeRoomId)
+  }, [activeRooms, pricingRooms])
+
+  const activeRoomDisplayName = activeRoom?.displayName?.toUpperCase() || 'TRIPLE DELUXE GOLF VIEW'
 
   return (
     <div className="min-h-screen bg-muted pb-16" style={themeOverrides}>
@@ -71,12 +144,12 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div>
             {showTabs && (
-              <div className="mb-4 flex w-full">
+              <div className="mb-4 flex w-full border-b border-border">
                 <TabsStrip
                   tabs={pricingBookings.map((b) => ({
                     id: b.id,
                     label: b.displayName,
-                    badge: <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{b.formattedGuests}</span>,
+                    badge: <span className="rounded-lg bg-white/20 px-2 py-0.5 text-xs">{b.formattedGuests}</span>,
                   }))}
                   activeId={activeRooms[0]}
                   sticky={false}
@@ -86,10 +159,10 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
               </div>
             )}
             <header className="space-y-2">
-              <h2 className="font-bold text-2xl text-foreground">Upgrade Your Room - TRIPLE DELUXE GOLF VIEW</h2>
+              <h2 className="font-bold text-2xl text-foreground">Upgrade Your Room - {activeRoomDisplayName}</h2>
               <p className="text-muted-foreground text-sm">Choose an upgrade for your currently selected room.</p>
             </header>
-            <div className="mt-6 overflow-hidden rounded-[24px] bg-white p-4 shadow-depth-1 ring-1 ring-border/40">
+            <div className="mt-6 overflow-hidden rounded-3xl bg-white p-4 shadow-depth-1 ring-1 ring-border/40">
               <RoomUpgradeCarousel
                 roomOptions={carouselRooms}
                 initialSelectedRoom={selectedRoom}
@@ -99,17 +172,45 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
                 className="w-full"
               />
             </div>
+
+            <header className="mt-10 space-y-2">
+              <h2 className="font-bold text-2xl text-foreground">Customize your stay - {activeRoomDisplayName}</h2>
+              <p className="text-muted-foreground text-sm">Pick room add-ons to tailor the experience before guests arrive.</p>
+            </header>
+            <div className="mt-6 overflow-hidden rounded-3xl bg-white p-4 shadow-depth-1 ring-1 ring-border/40">
+              <AttributesCategories
+                categories={defaultRoomCustomizationCategories}
+                renderAttributeCard={(attribute) => {
+                  const currentRoomId = activeRooms[0] || pricingRooms[0]?.id
+                  if (!currentRoomId || !attribute.amount) return null
+                  const isSelected = Boolean(selectedAttributes[currentRoomId]?.[attribute.id])
+                  const pricePerNight = attribute.amount / 8
+                  return (
+                    <AttributeCard
+                      key={attribute.id}
+                      attribute={attribute as RoomCustomizationAttribute}
+                      isSelected={isSelected}
+                      disabled={false}
+                      onToggle={() => toggleAttribute(currentRoomId, attribute.id)}
+                      originalPrice={pricePerNight}
+                      displayCurrency="EUR"
+                      readonly={false}
+                    />
+                  )
+                }}
+              />
+            </div>
           </div>
 
           <MultiBookingPricingSummaryPanel
-            rooms={pricingRooms}
+            rooms={computedPricingRooms}
             formattedBookings={pricingBookings}
             formattedOverallTotal={formattedOverallTotal}
             labels={layoutPricingLabels}
             activeRooms={activeRooms}
             onActiveRoomsChange={setActiveRooms}
             exclusiveAccordion
-            isSticky={false}
+            isSticky={true}
             hideFooter={false}
           />
         </div>

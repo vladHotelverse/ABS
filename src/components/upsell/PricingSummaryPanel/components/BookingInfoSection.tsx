@@ -19,7 +19,7 @@ export interface BookingInfoSectionProps {
 const BookingInfoSection: React.FC<BookingInfoSectionProps> = memo(
   ({ roomCount, sectionTitle, labels, className = '' }) => {
     return (
-      <div className={`w-full overflow-hidden rounded-t-lg bg-muted ${className}`}>
+      <div className={`w-full overflow-hidden rounded-t-lg bg-white border-b ${className}`}>
         <div className="flex items-center justify-between p-4">
           {/* Section Title */}
           <div>

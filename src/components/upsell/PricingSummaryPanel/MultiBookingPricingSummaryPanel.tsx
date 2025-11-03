@@ -210,7 +210,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
         </div>
 
         {!hideFooter && (
-          <div className="flex-shrink-0 bg-muted p-4">
+          <div className="flex-shrink-0 bg-white p-4">
             <PriceBreakdown
               formattedTotal={formattedOverallTotal}
               isLoading={loading}

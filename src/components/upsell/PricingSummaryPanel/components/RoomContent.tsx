@@ -24,7 +24,7 @@ const RoomContent: React.FC<RoomContentProps> = memo(({ sections, labels, onRemo
   const hasItems = sections.some((section) => section.items.length > 0)
 
   return (
-    <div className="rounded-b-xl border-border border-t bg-card">
+    <div className="border-border border-t bg-card">
       <div className="space-y-4 p-4">
         {!hasItems ? (
           <div className="py-8 text-center text-muted-foreground">
