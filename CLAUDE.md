@@ -138,3 +138,18 @@ Responsive design hooks in `src/hooks/`:
 - `.storybook/main.ts`: Storybook config with Tailwind integration
 - `playwright.config.ts`: E2E test configuration
 - `tsconfig.json`: TypeScript path aliases
+
+✅ **UI Layer SHOULD:**
+- Receive pre-formatted display data
+- Handle user interactions via callbacks
+- Manage visual state (open/closed, hover, focus)
+- Apply styling and layout
+- Trigger provided callbacks
+
+❌ **UI Layer SHOULD NOT:**
+- Transform data structures
+- Calculate or format values
+- Sort, filter, or limit data
+- Contain business rules (thresholds, limits, conditions)
+- Make decisions based on data characteristics
+- Manage complex orchestration

@@ -2,6 +2,7 @@
 export enum SectionType {
   Upgrade = 'upgrade',
   Customization = 'customization',
+  Offer = 'offer',
 }
 
 // Shared type for formatted cart items (removes duplication)

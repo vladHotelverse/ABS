@@ -10,7 +10,14 @@ import { AttributeCard, AttributesCategories } from '@/components/upsell/RoomCus
 import { RoomUpgradeCarousel } from '@/components/upsell/RoomSelectionCarousel'
 import type { RoomOption } from '@/components/upsell/RoomSelectionCarousel/types'
 import { BookingAccordionCard } from '@/components/upsell/ViewCards'
+import SpecialOffers from '@/components/upsell/SpecialOffers'
+import type { OfferSelection, OfferType } from '@/components/upsell/SpecialOffers/types'
 import { TabsStrip } from './components'
+import { formatOfferCards } from './SpecialOffers/utils/offerFormatter'
+import { getDefaultLabels } from './SpecialOffers/utils/labels'
+import { useOfferPricing } from './SpecialOffers/hooks/useOfferPricing'
+import { useOfferSelections } from './SpecialOffers/hooks/useOfferSelections'
+import { mockOffers, mockReservationInfo } from './SpecialOffers/data/mockOffers'
 import {
   bookingViewCards,
   bookingViewTranslations,
@@ -66,7 +73,21 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
     return initial
   })
 
-  // Compute pricing rooms with customization items included
+  // SpecialOffers state and hooks
+  const { formatPrice, calculateTotal, getUnitLabel } = useOfferPricing('€', mockReservationInfo)
+  const {
+    selections: offerSelections,
+    bookedOffers,
+    updateQuantity,
+    updateSelectedDate,
+    updateSelectedDates,
+    setBookedOffers,
+  } = useOfferSelections({
+    offers: mockOffers,
+    reservationInfo: mockReservationInfo,
+  })
+
+  // Compute pricing rooms with customization items and special offers included
   const computedPricingRooms = useMemo(() => {
     return pricingRooms.map((room) => {
       const roomSelections = selectedAttributes[room.id] || {}
@@ -86,8 +107,27 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
         })
         .filter(Boolean) as Array<{ id: string; name: string; formattedPrice: string }>
 
-      // Find existing customization section or create new one
-      const existingSections = room.sections.filter((s) => s.type !== SectionType.Customization)
+      // Compute special offers items for this room
+      const specialOffersItems = Array.from(bookedOffers)
+        .map((offerId) => {
+          const offer = mockOffers.find((o) => o.id === offerId)
+          if (!offer) return null
+          const selection = offerSelections[offerId] || { quantity: 0 }
+          const total = calculateTotal(offer, selection)
+          return {
+            id: `offer-${offer.id}`,
+            name: offer.title,
+            formattedPrice: formatPrice(total),
+          }
+        })
+        .filter(Boolean) as Array<{ id: string; name: string; formattedPrice: string }>
+
+      // Find existing sections but filter out old offer/customization sections
+      const existingSections = room.sections.filter(
+        (s) => s.type !== SectionType.Customization && s.type !== SectionType.Offer
+      )
+
+      // Create new sections
       const customizationSection =
         customizationItems.length > 0
           ? {
@@ -97,12 +137,25 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
             }
           : undefined
 
+      const offersSection =
+        specialOffersItems.length > 0
+          ? {
+              title: 'Special Offers',
+              type: SectionType.Offer,
+              items: specialOffersItems,
+            }
+          : undefined
+
+      const sections = existingSections
+      if (customizationSection) sections.push(customizationSection)
+      if (offersSection) sections.push(offersSection)
+
       return {
         ...room,
-        sections: customizationSection ? [...existingSections, customizationSection] : existingSections,
+        sections,
       }
     })
-  }, [pricingRooms, selectedAttributes])
+  }, [pricingRooms, selectedAttributes, bookedOffers, offerSelections, calculateTotal, formatPrice])
 
   const toggleAttribute = useCallback((roomId: string, attributeId: number) => {
     setSelectedAttributes((prev) => {
@@ -198,6 +251,38 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
                     />
                   )
                 }}
+              />
+            </div>
+
+            <header className="mt-10 space-y-2">
+              <h2 className="font-bold text-2xl text-foreground">Special Offers - {activeRoomDisplayName}</h2>
+              <p className="text-muted-foreground text-sm">Enhance your stay with our exclusive special offers.</p>
+            </header>
+            <div className="mt-6 overflow-hidden rounded-3xl bg-white p-4 shadow-depth-1 ring-1 ring-border/40">
+              <SpecialOffers
+                cardData={formatOfferCards(
+                  mockOffers,
+                  offerSelections,
+                  Array.from(bookedOffers),
+                  '€',
+                  getDefaultLabels(),
+                  formatPrice,
+                  calculateTotal,
+                  (type) => getUnitLabel(type, getDefaultLabels())
+                )}
+                onUpdateQuantity={updateQuantity}
+                onUpdateSelectedDate={updateSelectedDate}
+                onUpdateSelectedDates={updateSelectedDates}
+                onBookOffer={(offerId) => {
+                  const newBooked = new Set(bookedOffers)
+                  if (newBooked.has(offerId)) {
+                    newBooked.delete(offerId)
+                  } else {
+                    newBooked.add(offerId)
+                  }
+                  setBookedOffers(newBooked)
+                }}
+                labels={getDefaultLabels()}
               />
             </div>
           </div>
