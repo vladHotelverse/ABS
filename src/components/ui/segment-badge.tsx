@@ -1,7 +1,15 @@
 import { type VariantProps, cva } from 'class-variance-authority'
 import type * as React from 'react'
 import { cn } from '../../lib/utils'
-import type { SegmentDiscount, SegmentType } from '../ABS_RoomSelectionCarousel/types'
+
+type SegmentType = 'business' | 'leisure' | 'luxury' | 'budget' | 'family' | 'loyalty' | 'group' | 'extended-stay'
+
+type SegmentDiscount = {
+  segmentType: SegmentType
+  label: string
+  discountType: 'percentage' | 'flat'
+  discountAmount: number
+}
 
 const segmentBadgeVariants = cva(
   'inline-flex items-center rounded px-2 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
@@ -25,7 +33,7 @@ const segmentBadgeVariants = cva(
 // Default colors for each segment type
 const segmentTypeColors: Record<SegmentType, 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gold'> = {
   business: 'blue',
-  leisure: 'green', 
+  leisure: 'green',
   luxury: 'gold',
   budget: 'orange',
   family: 'purple',
@@ -34,22 +42,22 @@ const segmentTypeColors: Record<SegmentType, 'blue' | 'green' | 'purple' | 'oran
   'extended-stay': 'green',
 }
 
-export interface SegmentBadgeProps 
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>, 
-  VariantProps<typeof segmentBadgeVariants> {
+export interface SegmentBadgeProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>,
+    VariantProps<typeof segmentBadgeVariants> {
   segmentDiscount: SegmentDiscount
   showIcon?: boolean
 }
 
-function SegmentBadge({ 
-  className, 
-  color, 
-  segmentDiscount, 
+function SegmentBadge({
+  className,
+  color,
+  segmentDiscount,
   showIcon = false,
-  ...props 
+  ...props
 }: SegmentBadgeProps) {
   const badgeColor = color || (segmentTypeColors[segmentDiscount.segmentType] as 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gold')
-  
+
   const formatDiscount = (discount: SegmentDiscount) => {
     if (discount.discountType === 'percentage') {
       return `${discount.discountAmount}%`
@@ -59,8 +67,8 @@ function SegmentBadge({
 
   const getSegmentIcon = (segmentType: SegmentType) => {
     if (!showIcon) return null
-    
-    const iconClasses = "h-3 w-3 mr-1"
+
+    const iconClasses = 'mr-1 h-3 w-3'
     switch (segmentType) {
       case 'business':
         return <svg className={iconClasses} fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/></svg>
@@ -76,15 +84,18 @@ function SegmentBadge({
   }
 
   return (
-    <div 
-      className={cn(segmentBadgeVariants({ color: badgeColor }), className)} 
+    <div
+      className={cn(segmentBadgeVariants({ color: badgeColor }), className)}
       title={`${segmentDiscount.label} - ${formatDiscount(segmentDiscount)}`}
       {...props}
     >
       {getSegmentIcon(segmentDiscount.segmentType)}
-      <span>{segmentDiscount.label} {formatDiscount(segmentDiscount)}</span>
+      <span>
+        {segmentDiscount.label} {formatDiscount(segmentDiscount)}
+      </span>
     </div>
   )
 }
 
 export { SegmentBadge, segmentBadgeVariants }
+export type { SegmentDiscount, SegmentType }
