@@ -40,7 +40,7 @@ export const multiRoomSummary: MultiBookingPricingSummaryPanelProps['rooms'] = [
     displayName: 'Skyline Suite',
     guestName: 'Sarah Johnson',
     formattedNights: '3 nights',
-    formattedTotal: '€685.00',
+    formattedTotal: '€1,095.00',
     sections: [
       {
         title: 'Choose your superior room',
@@ -58,6 +58,14 @@ export const multiRoomSummary: MultiBookingPricingSummaryPanelProps['rooms'] = [
           { id: 'welcome-kit', name: 'Wellness welcome kit', formattedPrice: '€30.00' },
         ],
       },
+      {
+        title: 'Stay Enhancement',
+        type: SectionType.Offer,
+        items: [
+          { id: 'spa-package', name: 'Spa Package', formattedPrice: '€180.00' },
+          { id: 'breakfast-buffet', name: 'Breakfast Buffet', formattedPrice: '€90.00' },
+        ],
+      },
     ],
     guestCount: 2,
   },
@@ -66,7 +74,7 @@ export const multiRoomSummary: MultiBookingPricingSummaryPanelProps['rooms'] = [
     displayName: 'Deluxe King Room',
     guestName: 'Miguel Torres',
     formattedNights: '2 nights',
-    formattedTotal: '€360.00',
+    formattedTotal: '€633.00',
     sections: [
       {
         title: 'Customize your room',
@@ -74,6 +82,15 @@ export const multiRoomSummary: MultiBookingPricingSummaryPanelProps['rooms'] = [
         items: [
           { id: 'balcony-set', name: 'Balcony breakfast set', formattedPrice: '€48.00' },
           { id: 'crib', name: 'Crib & kids amenities', formattedPrice: '€35.00' },
+        ],
+      },
+      {
+        title: 'Stay Enhancement',
+        type: SectionType.Offer,
+        items: [
+          { id: 'late-checkout-2', name: 'Late Checkout', formattedPrice: '€30.00' },
+          { id: 'airport-transfer', name: 'Airport Transfer', formattedPrice: '€70.00' },
+          { id: 'city-tour', name: 'City Tour Experience', formattedPrice: '€90.00' },
         ],
       },
     ],
@@ -96,6 +113,117 @@ export const multiBookingSummary: MultiBookingPricingSummaryPanelProps['formatte
     bookingKey: 'bcn-deluxe',
     formattedDateRange: '12 Aug - 14 Aug',
     formattedNights: '2 nights',
+    formattedGuests: '3 guests',
+  },
+]
+
+// Mock data with only Stay Enhancement offers
+export const stayEnhancementOnlyRooms: MultiBookingPricingSummaryPanelProps['rooms'] = [
+  {
+    id: 'enhance-suite',
+    displayName: 'Premium Suite',
+    guestName: 'Julia Martinez',
+    formattedNights: '4 nights',
+    formattedTotal: '€1,680.00',
+    sections: [
+      {
+        title: 'Stay Enhancement',
+        type: SectionType.Offer,
+        items: [
+          { id: 'all-inclusive', name: 'All Inclusive Package', formattedPrice: '€1,200.00' },
+          { id: 'wine-tasting', name: 'Wine Tasting Experience', formattedPrice: '€180.00' },
+          { id: 'morning-yoga', name: 'Morning Yoga Classes', formattedPrice: '€80.00' },
+        ],
+      },
+    ],
+    guestCount: 2,
+  },
+  {
+    id: 'enhance-deluxe',
+    displayName: 'Deluxe Room',
+    guestName: 'Thomas Anderson',
+    formattedNights: '3 nights',
+    formattedTotal: '€525.00',
+    sections: [
+      {
+        title: 'Stay Enhancement',
+        type: SectionType.Offer,
+        items: [
+          { id: 'valet-parking', name: 'Valet Parking Service', formattedPrice: '€75.00' },
+          { id: 'online-checkin', name: 'Online Check-in Express', formattedPrice: '€10.00' },
+          { id: 'late-checkout-3', name: 'Late Checkout 4 PM', formattedPrice: '€45.00' },
+        ],
+      },
+    ],
+    guestCount: 1,
+  },
+]
+
+export const stayEnhancementOnlyBookings: MultiBookingPricingSummaryPanelProps['formattedBookings'] = [
+  {
+    id: 'enhance-suite',
+    displayName: 'Premium Suite',
+    bookingKey: 'enhance-suite',
+    formattedDateRange: '20 Oct - 24 Oct',
+    formattedNights: '4 nights',
+    formattedGuests: '2 guests',
+  },
+  {
+    id: 'enhance-deluxe',
+    displayName: 'Deluxe Room',
+    bookingKey: 'enhance-deluxe',
+    formattedDateRange: '20 Oct - 23 Oct',
+    formattedNights: '3 nights',
+    formattedGuests: '1 guest',
+  },
+]
+
+// Mock data with all three types: Upgrade, Customization, and Stay Enhancement
+export const completeOptionsRooms: MultiBookingPricingSummaryPanelProps['rooms'] = [
+  {
+    id: 'complete-suite',
+    displayName: 'Grand Penthouse',
+    guestName: 'Rebecca Williams',
+    formattedNights: '5 nights',
+    formattedTotal: '€2,945.00',
+    sections: [
+      {
+        title: 'Choose your superior room',
+        type: SectionType.Upgrade,
+        items: [
+          { id: 'suite-upgrade', name: 'Upgrade to Grand Penthouse', formattedPrice: '€1,200.00' },
+          { id: 'early-checkin', name: 'Early check-in 11 AM', formattedPrice: '€60.00' },
+        ],
+      },
+      {
+        title: 'Customize your room',
+        type: SectionType.Customization,
+        items: [
+          { id: 'custom-amenities', name: 'Custom welcome kit', formattedPrice: '€85.00' },
+          { id: 'room-decoration', name: 'Special room decoration', formattedPrice: '€150.00' },
+        ],
+      },
+      {
+        title: 'Stay Enhancement',
+        type: SectionType.Offer,
+        items: [
+          { id: 'spa-experience', name: 'Full Spa Experience', formattedPrice: '€400.00' },
+          { id: 'gourmet-dining', name: 'Gourmet Dining Package', formattedPrice: '€350.00' },
+          { id: 'concierge', name: 'Premium Concierge Service', formattedPrice: '€205.00' },
+        ],
+      },
+    ],
+    guestCount: 3,
+  },
+]
+
+export const completeOptionsBookings: MultiBookingPricingSummaryPanelProps['formattedBookings'] = [
+  {
+    id: 'complete-suite',
+    displayName: 'Grand Penthouse',
+    bookingKey: 'complete-suite',
+    formattedDateRange: '01 Dec - 06 Dec',
+    formattedNights: '5 nights',
     formattedGuests: '3 guests',
   },
 ]

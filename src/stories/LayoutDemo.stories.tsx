@@ -286,7 +286,7 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
 
   return (
     <div className="min-h-screen bg-muted pb-16" style={themeOverrides}>
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pt-10">
+      <div className="mx-auto flex container flex-col gap-8 px-4 pt-10">
         <BookingBanner
           className="px-0"
           welcomeText={{ salutation: 'Welcome to Hotelverse!', greeting: 'Enjoy your stay!' }}

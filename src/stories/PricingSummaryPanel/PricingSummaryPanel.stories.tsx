@@ -4,7 +4,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import BookingBanner from '@/components/upsell/BookingBanner'
 import {
   ResponsiveContent,
-  ResponsiveHeader,
   ResponsiveLayout,
   ResponsiveMain,
   ResponsiveMobileWidget,
@@ -13,7 +12,8 @@ import {
 import MultiBookingPricingSummaryPanel from '@/components/upsell/PricingSummaryPanel/MultiBookingPricingSummaryPanel'
 import useAccordionState from './hooks/useAccordionState'
 import {
-  defaultRoomCustomizationCategories,
+  completeOptionsBookings,
+  completeOptionsRooms,
   fourRoomsBookings,
   fourRoomsSummary,
   multiBookingSummary,
@@ -21,25 +21,12 @@ import {
   pricingSummaryLabels,
   singleBookingSummary,
   singleRoomSummary,
+  stayEnhancementOnlyBookings,
+  stayEnhancementOnlyRooms,
 } from '../mockData'
-import { RoomCustomizationPreview } from '../utils/RoomCustomizationPreview'
 
 const PricingLayoutPreview: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ResponsiveLayout showMobileWidget className="bg-slate-100">
-    <ResponsiveHeader>
-      <div className="bg-white shadow-sm">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-4">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-3 w-64" />
-          </div>
-          <Skeleton className="h-10 w-36 rounded-md" />
-        </div>
-      </div>
-    </ResponsiveHeader>
-
-    <div className="bg-white shadow-sm">
+  <ResponsiveLayout showMobileWidget className="bg-muted my-8">
       <BookingBanner
         welcomeText={{ salutation: 'Welcome back, Alex!' }}
         hotelName="Hotel Paradise Resort"
@@ -48,36 +35,25 @@ const PricingLayoutPreview: React.FC<{ children: React.ReactNode }> = ({ childre
         bookingDateRange="12 Aug 2024 - 19 Aug 2024"
         bookingReference="BCN-458921"
       />
-    </div>
 
-    <ResponsiveMain>
+    <ResponsiveMain className='mt-8 sm:px-0'>
       <ResponsiveContent>
-        <div className="space-y-6">
-          <RoomCustomizationPreview
-            title="Customize your stay"
-            description="Pick room add-ons to tailor the experience before guests arrive."
-            currency="EUR"
-            nights={4}
-            categories={defaultRoomCustomizationCategories}
-          />
-
-          <section className="rounded-lg bg-white p-6 shadow-sm">
-            <div className="space-y-3">
-              <Skeleton className="h-6 w-56" />
-              <Skeleton className="h-4 w-72" />
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Skeleton className="h-32 rounded-lg" />
-              <Skeleton className="h-32 rounded-lg" />
-            </div>
-          </section>
-        </div>
+        <section className="rounded-lg bg-white p-6 shadow-sm">
+          <div className="space-y-3">
+            <Skeleton className="h-6 w-56" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Skeleton className="h-32 rounded-lg" />
+            <Skeleton className="h-32 rounded-lg" />
+          </div>
+        </section>
       </ResponsiveContent>
       <ResponsiveSidebar>{children}</ResponsiveSidebar>
     </ResponsiveMain>
 
     <ResponsiveMobileWidget>
-      <div className="border-border border-t bg-white p-4 shadow-[0_-4px_12px_rgba(15,23,42,0.08)]">
+      <div className="border-border border-t bg-white p-4 shadow">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="space-y-1">
@@ -152,7 +128,7 @@ export const Default: Story = {
   args: {
     rooms: multiRoomSummary,
     formattedBookings: multiBookingSummary,
-    formattedOverallTotal: '€1,045.00',
+    formattedOverallTotal: '€1,728.00',
     labels: pricingSummaryLabels,
     exclusiveAccordion: true,
     onRemoveItem: (bookingKey, itemId) => {
@@ -165,9 +141,7 @@ export const Default: Story = {
     docs: {
       description: {
         story: `
-Matches the sidebar integration used in \`apps/upsell-app\`. The \`MultiBookingPricingSummaryPanel\` receives the same
-pre-formatted rooms, booking metadata, and labels that \`usePricingSummaryPanel\` delivers so designers can preview the
-cart summary without opening the full application.
+Includes all three option types: room upgrades, room customizations, and stay enhancements. Matches the sidebar integration used in \`apps/upsell-app\`. The \`MultiBookingPricingSummaryPanel\` receives the same pre-formatted rooms, booking metadata, and labels that \`usePricingSummaryPanel\` delivers so designers can preview the cart summary without opening the full application.
         `,
       },
     },
@@ -253,6 +227,54 @@ export const DynamicHeightTest: Story = {
   parameters: {
     viewport: {
       defaultViewport: 'smallDesktop',
+    },
+  },
+}
+
+export const StayEnhancementOnly: Story = {
+  args: {
+    rooms: stayEnhancementOnlyRooms,
+    formattedBookings: stayEnhancementOnlyBookings,
+    formattedOverallTotal: '€2,205.00',
+    labels: pricingSummaryLabels,
+    exclusiveAccordion: true,
+    onRemoveItem: (bookingKey, itemId) => {
+      console.log('Remove item', { bookingKey, itemId })
+    },
+    onConfirm: () => console.log('Confirm selection'),
+  },
+  render: (args) => <AccordionStateStory {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Multi-room booking with only Stay Enhancement offers selected. Shows how the pricing summary handles rooms with exclusive stay enhancement items like spa packages, airport transfers, and special services.
+        `,
+      },
+    },
+  },
+}
+
+export const CompleteOptions: Story = {
+  args: {
+    rooms: completeOptionsRooms,
+    formattedBookings: completeOptionsBookings,
+    formattedOverallTotal: '€2,945.00',
+    labels: pricingSummaryLabels,
+    exclusiveAccordion: true,
+    onRemoveItem: (bookingKey, itemId) => {
+      console.log('Remove item', { bookingKey, itemId })
+    },
+    onConfirm: () => console.log('Confirm selection'),
+  },
+  render: (args) => <AccordionStateStory {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Showcase all three option categories in a single room: room upgrades, room customizations, and stay enhancements. This demonstrates the full flexibility of the pricing summary panel.
+        `,
+      },
     },
   },
 }
