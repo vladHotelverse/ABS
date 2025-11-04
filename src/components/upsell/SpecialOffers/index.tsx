@@ -49,21 +49,30 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
   return (
     <div id={id} className={clsx('transition-all duration-300 ease-in-out', className)}>
       <div className={gridClass}>
-        {cardData.map((card) => (
-          <OfferCard
-            key={card.offer.id}
-            cardData={card}
-            onUpdateQuantity={onUpdateQuantity ? (change) => onUpdateQuantity(card.offer.id, change) : undefined}
-            onUpdateSelectedDate={
-              onUpdateSelectedDate ? (date) => onUpdateSelectedDate(card.offer.id, date) : undefined
-            }
-            onUpdateSelectedDates={
-              onUpdateSelectedDates ? (dates) => onUpdateSelectedDates(card.offer.id, dates) : undefined
-            }
-            onBook={onBookOffer ? () => onBookOffer(card.offer.id) : undefined}
-            labels={labels}
-          />
-        ))}
+        {cardData.map((card) => {
+          // perNight offers always require date selection to calculate number of nights
+          const requiresDateSelection = card.offer.requiresDateSelection === true || card.offer.type === 'perNight'
+          const allowsMultipleDates = requiresDateSelection && card.offer.allowsMultipleDates === true
+          const enableSingleDate = requiresDateSelection && !allowsMultipleDates
+
+          return (
+            <OfferCard
+              key={card.offer.id}
+              cardData={card}
+              onUpdateQuantity={onUpdateQuantity ? (change) => onUpdateQuantity(card.offer.id, change) : undefined}
+              onUpdateSelectedDate={
+                enableSingleDate && onUpdateSelectedDate ? (date) => onUpdateSelectedDate(card.offer.id, date) : undefined
+              }
+              onUpdateSelectedDates={
+                allowsMultipleDates && onUpdateSelectedDates
+                  ? (dates) => onUpdateSelectedDates(card.offer.id, dates)
+                  : undefined
+              }
+              onBook={onBookOffer ? () => onBookOffer(card.offer.id) : undefined}
+              labels={labels}
+            />
+          )
+        })}
       </div>
     </div>
   )

@@ -32,7 +32,7 @@ function detectSpecialOfferType(offerTitle: string): {
 
 /**
  * Determine if quantity controls should be shown
- * Business rule: Don't show for date-required offers, perNight, or special offers
+ * Business rule: Don't show for date-required offers, perPerson (auto-uses reservation persons), or special offers
  */
 function shouldShowQuantityControls(
   offer: OfferType,
@@ -43,6 +43,7 @@ function shouldShowQuantityControls(
   return (
     !offer.requiresDateSelection &&
     offer.type !== 'perNight' &&
+    offer.type !== 'perPerson' &&
     !isAllInclusive &&
     !isOnlineCheckin &&
     !isLateCheckout
@@ -115,8 +116,12 @@ function isButtonDisabled(
     return true
   }
 
-  // perNight offers require date range
-  if (offer.type === 'perNight' && (!selection.startDate || !selection.endDate)) {
+  // perNight offers require at least one date to be selected
+  if (
+    offer.type === 'perNight' &&
+    !selection.selectedDate &&
+    (!selection.selectedDates || selection.selectedDates.length === 0)
+  ) {
     return true
   }
 

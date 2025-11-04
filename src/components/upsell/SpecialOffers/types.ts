@@ -11,6 +11,13 @@ export interface OfferType {
   allowsMultipleDates?: boolean // For multiple date selection
   featured?: boolean
   segmentDiscount?: SegmentDiscount
+
+  // Control available dates for date selector
+  availableDates?: Date[]
+
+  // Control quantity limits for quantity selector (perStay offers)
+  minQuantity?: number // Minimum quantity (default: 0)
+  maxQuantity?: number // Maximum quantity (default: unlimited)
 }
 
 export interface OfferSelection {
@@ -116,12 +123,14 @@ export interface OfferLabels {
   selectDateTooltip: string
   dateRequiredLabel: string
   // Enhanced date selector labels
-  selectDatesLabel?: string
-  selectDatesTooltip?: string
-  availableDatesLabel?: string
-  noAvailableDatesLabel?: string
-  clearDatesLabel?: string
-  confirmDatesLabel?: string
-  dateSelectedLabel?: string
-  multipleDatesRequiredLabel?: string
+  selectDatesLabel: string
+  selectDatesTooltip: string
+  availableDatesLabel: string
+  noAvailableDatesLabel: string
+  clearDatesLabel: string
+  selectAllDatesLabel: string
+  confirmDatesLabel: string
+  dateSelectedLabel: string
+  multipleDatesRequiredLabel: string
+  whatsIncludedLabel: string
 }

@@ -13,63 +13,58 @@ import {
   TooltipProvider,
   UiTooltipTrigger as TooltipTrigger,
 } from '@/components/ui/tooltip'
+import type { OfferLabels } from '../types'
+import type { AvailableDate } from '../utils/dateFormatting'
 import SimpleListPicker from './SimpleListPicker'
 import { dateToKey, keyToDate } from '../utils/dateHelpers'
 
 interface EnhancedDateSelectorProps {
   id: string
   label: string
+  // Pre-formatted display text for selected dates (no formatting in component)
+  formattedSelectedDates: string
+  // Pre-calculated available dates (no calculation in component)
+  availableDates: AvailableDate[]
+  // Selected dates for internal state management
   selectedDates: Date[]
   onChange: (dates: Date[]) => void
   disabled?: boolean
   tooltipText?: string
-  reservationStartDate?: Date
-  reservationEndDate?: Date
   className?: string
   multiple?: boolean
-  maxDates?: number
+  onDoneAndBook?: () => void
+  labels: OfferLabels
 }
 
 const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
   id,
   label,
+  formattedSelectedDates,
+  availableDates,
   selectedDates,
   onChange,
   disabled = false,
   tooltipText,
-  reservationStartDate,
-  reservationEndDate,
   className = '',
   multiple = true,
-  maxDates = 5,
+  onDoneAndBook,
+  labels,
 }) => {
+  /**
+   * ✅ UI Layer ONLY - Pure presentation component
+   * - Receives pre-formatted dates (no formatting in component)
+   * - Receives pre-calculated available dates (no calculation in component)
+   * - Manages visual state (popover open/close)
+   * - Handles user interactions via callbacks
+   * - No data transformation or business logic
+   */
+
   const [open, setOpen] = useState(false)
 
-  // Convert dates to string keys for list picker
+  // Convert dates to string keys for list picker (UI state management only)
   const selectedDateKeys = useMemo(() => {
     return new Set(selectedDates.map(dateToKey))
   }, [selectedDates])
-
-  const formatSelectedDates = (): string => {
-    if (selectedDates.length === 0) {
-      return 'Select dates'
-    }
-
-    if (selectedDates.length === 1) {
-      return selectedDates[0].toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-      })
-    }
-
-    if (selectedDates.length <= 2) {
-      return selectedDates
-        .map((date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
-        .join(', ')
-    }
-
-    return `${selectedDates.length} dates selected`
-  }
 
   const handleListDateToggle = (dateKey: string) => {
     const isAlreadySelected = selectedDateKeys.has(dateKey)
@@ -79,8 +74,8 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
         // Remove date
         const newDates = selectedDates.filter((d) => dateToKey(d) !== dateKey)
         onChange(newDates)
-      } else if (selectedDates.length < maxDates) {
-        // Add date
+      } else {
+        // Add date (max dates validation is handled by parent when calculating availableDates)
         const newDate = keyToDate(dateKey)
         const newDates = [...selectedDates, newDate].sort((a, b) => a.getTime() - b.getTime())
         onChange(newDates)
@@ -98,6 +93,16 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
 
   const handleDone = () => {
     setOpen(false)
+    // Trigger booking if callback provided and dates are selected
+    if (onDoneAndBook && selectedDates.length > 0) {
+      onDoneAndBook()
+    }
+  }
+
+  const handleSelectAll = (dateKeys: string[]) => {
+    // Convert date keys back to Date objects
+    const allDates = dateKeys.map(keyToDate).sort((a, b) => a.getTime() - b.getTime())
+    onChange(allDates)
   }
 
   const handleClose = () => {
@@ -122,13 +127,13 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
             }`}
           >
             <CalendarIcon className={`h-4 w-4 ${label && selectedDates.length > 0 ? 'mr-2' : ''}`} />
-            {label && formatSelectedDates()}
+            {label && formattedSelectedDates}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           {/* Header */}
           <div className="flex items-center justify-between p-3 border-b">
-            <span className="text-sm font-medium">Select dates</span>
+            <span className="text-sm font-medium">{labels.selectDatesLabel}</span>
             <Button
               onClick={handleClose}
               variant="ghost"
@@ -142,13 +147,14 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
 
           {/* List view only */}
           <SimpleListPicker
+            availableDates={availableDates}
             selectedDates={selectedDateKeys}
             onDateToggle={handleListDateToggle}
             onClear={handleClear}
+            onSelectAll={handleSelectAll}
             onDone={handleDone}
-            reservationStartDate={reservationStartDate}
-            reservationEndDate={reservationEndDate}
-            maxDates={maxDates}
+            multiple={multiple}
+            labels={labels}
           />
         </PopoverContent>
       </Popover>

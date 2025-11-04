@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import SpecialOffers from '@/components/upsell/SpecialOffers'
-import type { OfferData, OfferSelection, OfferType } from '@/components/upsell/SpecialOffers/types'
+import type { OfferData, OfferLabels, OfferSelection, OfferType } from '@/components/upsell/SpecialOffers/types'
 import { useOfferPricing } from './hooks/useOfferPricing'
 import { useOfferSelections } from './hooks/useOfferSelections'
 import { useOfferBooking } from './hooks/useOfferBooking'
@@ -13,9 +13,11 @@ import {
   mockFeaturedOffers,
   mockSingleOffer,
   mockDateSelectionOffers,
+  mockPerStayOffer,
+  mockPerPersonOffer,
+  mockPerNightOffer,
+  mockPerRoomOffer,
   mockReservationInfo,
-  mockLongStayReservationInfo,
-  mockShortStayReservationInfo,
 } from './data/mockOffers'
 
 const meta: Meta<typeof SpecialOffers> = {
@@ -40,9 +42,21 @@ This component is **fully controlled** - all state and business logic is handled
 ## Integration
 
 The component requires pricing utilities and callbacks from parent. See stories below for examples:
-- Default: Basic integration with hooks
-- Controlled: Manually controlled state
+- PerStayPricing: Stay-based pricing with quantity controls
+- PerPersonPricing: Person-count dependent totals and messaging
+- PerNightPricing: Night/service pricing scenarios
+- SingleDateSelection: Offers that require a single date
+- MultipleDatesSelection: Offers that allow multiple dates
 - Multibooking: Integration with bookingStore (see SpecialOffersMultibooking.stories.tsx)
+
+## Variations
+
+Special offers can combine these dimensions (pre-calculated by the parent):
+- Pricing basis: per stay, per person, or per night/service.
+- Quantity handling: fixed quantities (e.g. all-inclusive) vs adjustable controls.
+- Date requirements: no date, single-date selector, or multi-date selector with optional reservation windows.
+- Reservation context: person counts, night counts, or stay windows needed for totals.
+- Booking state and validation: already booked, disabled, or requiring warning messages.
 
 ## Hooks
 
@@ -70,11 +84,13 @@ function SpecialOffersWithHooks({
   currencySymbol = '€',
   reservationInfo,
   onOfferBooked,
+  labelsOverride,
 }: {
   offers: OfferType[]
   currencySymbol?: string
   reservationInfo?: typeof mockReservationInfo
   onOfferBooked?: (offerData: OfferData) => void
+  labelsOverride?: Partial<OfferLabels>
 }) {
   // Initialize pricing utilities
   const { formatPrice, calculateTotal, getUnitLabel } = useOfferPricing(currencySymbol, reservationInfo)
@@ -96,7 +112,8 @@ function SpecialOffersWithHooks({
   })
 
   // Get default labels
-  const labels = getDefaultLabels()
+  const defaultLabels = getDefaultLabels()
+  const labels = labelsOverride ? { ...defaultLabels, ...labelsOverride } : defaultLabels
 
   // Booking handler that creates OfferData
   const handleBook = (offerId: number) => {
@@ -142,19 +159,21 @@ function SpecialOffersWithHooks({
     labels,
     formatPrice,
     calculateTotal,
-    getUnitLabel,
+    (type) => getUnitLabel(type, labels),
     showValidation
   )
 
   return (
-    <SpecialOffers
-      cardData={cardData}
-      onUpdateQuantity={updateQuantity}
-      onUpdateSelectedDate={updateSelectedDate}
-      onUpdateSelectedDates={updateSelectedDates}
-      onBookOffer={handleBook}
-      labels={labels}
-    />
+    <div className="w-full flex justify-center">
+      <SpecialOffers
+        cardData={cardData}
+        onUpdateQuantity={updateQuantity}
+        onUpdateSelectedDate={updateSelectedDate}
+        onUpdateSelectedDates={updateSelectedDates}
+        onBookOffer={handleBook}
+        labels={labels}
+      />
+    </div>
   )
 }
 
@@ -198,12 +217,15 @@ export const SingleOffer: Story = {
 }
 
 /**
- * Date selection offers - demonstrates offers requiring date selection
+ * Per-stay pricing focus - shows stay-based unit label and quantity handling
+ * Base: unit price multiplied by quantity
+ * Frequency: once per stay
+ * Scope: not applicable
  */
-export const WithDateSelection: Story = {
+export const PerStayPricing: Story = {
   render: () => (
     <SpecialOffersWithHooks
-      offers={mockDateSelectionOffers}
+      offers={mockPerStayOffer}
       reservationInfo={mockReservationInfo}
       onOfferBooked={(data) => console.log('Offer booked:', data)}
     />
@@ -211,26 +233,65 @@ export const WithDateSelection: Story = {
 }
 
 /**
- * Long stay - demonstrates pricing with longer reservation
+ * Per-person pricing focus - highlights person-based totals and messaging
+ * Base: per person 
+ * Frequency: once per stay
+ * Scope: not applicable or entire stay
  */
-export const LongStay: Story = {
+export const PerPersonPricing: Story = {
   render: () => (
     <SpecialOffersWithHooks
-      offers={mockOffers}
-      reservationInfo={mockLongStayReservationInfo}
+      offers={mockPerPersonOffer}
+      reservationInfo={mockReservationInfo}
       onOfferBooked={(data) => console.log('Offer booked:', data)}
     />
   ),
 }
 
 /**
- * Short stay - demonstrates pricing with minimal stay
+ * Per-night/service pricing focus - showcases nightly pricing behavior
+ * Includes nightly services like dinner packages and valet parking
  */
-export const ShortStay: Story = {
+export const PerNightPricing: Story = {
   render: () => (
     <SpecialOffersWithHooks
-      offers={mockOffers}
-      reservationInfo={mockShortStayReservationInfo}
+      offers={mockPerNightOffer}
+      reservationInfo={mockReservationInfo}
+      onOfferBooked={(data) => console.log('Offer booked:', data)}
+    />
+  ),
+}
+
+/**
+ * Per-room pricing focus - demonstrates multiplying per-room services as quantity
+ * Base: per room per stay
+ * Frequency: once per stay per room
+ * Scope: room-specific
+ */
+export const PerRoomPricing: Story = {
+  render: () => (
+    <SpecialOffersWithHooks
+      offers={mockPerRoomOffer}
+      reservationInfo={mockReservationInfo}
+      onOfferBooked={(data) => console.log('Offer booked:', data)}
+      labelsOverride={{
+        perStay: 'per room',
+        decreaseQuantityLabel: 'Decrease rooms',
+        increaseQuantityLabel: 'Increase rooms',
+        removeOfferLabel: 'Remove room',
+      }}
+    />
+  ),
+}
+
+/**
+ * Date selection offers - demonstrates offers requiring date selection
+ */
+export const WithDateSelection: Story = {
+  render: () => (
+    <SpecialOffersWithHooks
+      offers={mockDateSelectionOffers}
+      reservationInfo={mockReservationInfo}
       onOfferBooked={(data) => console.log('Offer booked:', data)}
     />
   ),
@@ -249,16 +310,6 @@ export const DifferentCurrency: Story = {
     />
   ),
 }
-
-/**
- * No reservation context - offers without reservation info
- */
-export const NoReservationContext: Story = {
-  render: () => (
-    <SpecialOffersWithHooks offers={mockOffers} onOfferBooked={(data) => console.log('Offer booked:', data)} />
-  ),
-}
-
 /**
  * Interactive example with booking log
  */

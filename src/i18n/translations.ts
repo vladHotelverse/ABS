@@ -138,6 +138,16 @@ export const useABSTranslations = (): ABSLandingTranslations => {
       selectDateLabel: t('abs_components.special_offers.select_date_label'),
       selectDateTooltip: t('abs_components.special_offers.select_date_tooltip'),
       dateRequiredLabel: t('abs_components.special_offers.date_required_label'),
+      selectDatesLabel: t('abs_components.special_offers.select_dates_label'),
+      selectDatesTooltip: t('abs_components.special_offers.select_dates_tooltip'),
+      availableDatesLabel: t('abs_components.special_offers.available_dates_label'),
+      noAvailableDatesLabel: t('abs_components.special_offers.no_available_dates_label'),
+      clearDatesLabel: t('abs_components.special_offers.clear_dates_label'),
+      selectAllDatesLabel: t('abs_components.special_offers.select_all_dates_label'),
+      confirmDatesLabel: t('abs_components.special_offers.confirm_dates_label'),
+      dateSelectedLabel: t('abs_components.special_offers.date_selected_label'),
+      multipleDatesRequiredLabel: t('abs_components.special_offers.multiple_dates_required_label'),
+      whatsIncludedLabel: t('abs_components.special_offers.whats_included_label'),
     },
 
     // Booking state section

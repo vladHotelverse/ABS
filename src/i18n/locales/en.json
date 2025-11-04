@@ -234,7 +234,17 @@
       "increase_quantity_label": "Increase quantity",
       "select_date_label": "Select date",
       "select_date_tooltip": "Choose a date for this offer",
-      "date_required_label": "Date selection required"
+      "date_required_label": "Date selection required",
+      "select_dates_label": "Select dates",
+      "select_dates_tooltip": "Choose dates for this offer",
+      "available_dates_label": "Available dates",
+      "no_available_dates_label": "No available dates",
+      "clear_dates_label": "Clear",
+      "select_all_dates_label": "Select All",
+      "confirm_dates_label": "Done",
+      "date_selected_label": "Date selected",
+      "multiple_dates_required_label": "Multiple dates required",
+      "whats_included_label": "What's included?"
     },
     "booking_info": {
       "check_in_label": "Check-in",

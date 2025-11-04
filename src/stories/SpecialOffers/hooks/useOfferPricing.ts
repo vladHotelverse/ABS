@@ -39,8 +39,9 @@ export const useOfferPricing = (currencySymbol: string, reservationInfo?: Reserv
     if (offer.requiresDateSelection && offer.allowsMultipleDates && selection.selectedDates && selection.selectedDates.length > 0) {
       switch (offer.type) {
         case 'perPerson':
-          const personCount = reservationInfo?.personCount || selection.persons || 1
-          return offer.price * selection.selectedDates.length * personCount
+          // Auto-use reservation person count (not user-selectable)
+          const personCountMultiDate = reservationInfo?.personCount || 1
+          return offer.price * selection.selectedDates.length * personCountMultiDate
         case 'perNight':
           return offer.price * selection.selectedDates.length * (selection.nights || 1)
         default: // perStay
@@ -51,7 +52,8 @@ export const useOfferPricing = (currencySymbol: string, reservationInfo?: Reserv
     // Original logic for non-date or single-date offers
     switch (offer.type) {
       case 'perPerson':
-        const finalPersonCount = reservationInfo?.personCount || selection.persons || 1
+        // Auto-use reservation person count (not user-selectable)
+        const finalPersonCount = reservationInfo?.personCount || 1
         return offer.price * selection.quantity * finalPersonCount
       case 'perNight':
         return offer.price * selection.quantity * (selection.nights || 1)

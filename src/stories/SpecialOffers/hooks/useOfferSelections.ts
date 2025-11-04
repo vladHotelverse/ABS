@@ -161,7 +161,6 @@ export const useOfferSelections = ({ offers, initialSelections, reservationInfo 
     [offers, clearOfferState]
   )
 
-
   return {
     selections,
     bookedOffers,

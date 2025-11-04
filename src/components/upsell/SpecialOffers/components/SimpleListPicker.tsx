@@ -1,119 +1,124 @@
 import type React from 'react'
-import { useMemo } from 'react'
 import { UiButton as Button } from '@/components/ui/button'
-import { dateToKey } from '../utils/dateHelpers'
+import type { OfferLabels } from '../types'
+import type { AvailableDate } from '../utils/dateFormatting'
 
 interface SimpleListPickerProps {
+  // Pre-calculated available dates (no calculation in component)
+  availableDates: AvailableDate[]
+
+  // User interactions
   selectedDates: Set<string>
   onDateToggle: (dateKey: string) => void
   onClear: () => void
+  onSelectAll?: (dates: string[]) => void
   onDone: () => void
-  reservationStartDate?: Date
-  reservationEndDate?: Date
-  maxDates?: number
+
+  // Configuration
+  multiple?: boolean
+
+  // Labels for all UI text
+  labels: OfferLabels
 }
 
 const SimpleListPicker: React.FC<SimpleListPickerProps> = ({
+  availableDates,
   selectedDates,
   onDateToggle,
   onClear,
+  onSelectAll,
   onDone,
-  reservationStartDate,
-  reservationEndDate,
-  maxDates = 10,
+  multiple = true,
+  labels,
 }) => {
-  // Generate available dates
-  const availableDates = useMemo(() => {
-    const dates = []
-    const today = new Date()
-    today.setHours(0, 0, 0, 0) // Normalize to start of day
-
-    // Use reservation dates as the date range if provided, otherwise use today + maxDates
-    let startDate: Date
-    let endDate: Date
-
-    if (reservationStartDate && reservationEndDate) {
-      // Use the reservation period
-      startDate = new Date(reservationStartDate)
-      startDate.setHours(0, 0, 0, 0) // Normalize to start of day
-      endDate = new Date(reservationEndDate)
-      endDate.setHours(0, 0, 0, 0) // Normalize to start of day
-    } else {
-      // Fallback to today + maxDates days
-      startDate = new Date(today)
-      endDate = new Date(today)
-      endDate.setDate(today.getDate() + Math.max(maxDates, 10))
-    }
-
-    // Generate dates within the range
-    const current = new Date(startDate)
-    while (current <= endDate) {
-      // If we have reservation dates, include all dates in the reservation period
-      // Otherwise, only include dates that are today or in the future
-      const shouldIncludeDate = (reservationStartDate && reservationEndDate) || current >= today
-      
-      if (shouldIncludeDate) {
-        const dateKey = dateToKey(current)
-        const dayName = current.toLocaleDateString('en-US', { weekday: 'short' })
-        const day = current.getDate()
-        const monthName = current.toLocaleDateString('en-US', { month: 'short' })
-
-        dates.push({
-          key: dateKey,
-          day: day.toString(),
-          label: `${dayName} ${day}, ${monthName}`,
-          date: new Date(current),
-        })
-      }
-
-      current.setDate(current.getDate() + 1)
-    }
-
-    return dates
-  }, [reservationStartDate, reservationEndDate, maxDates])
+  /**
+   * ✅ UI Layer ONLY - Pure presentation component
+   * - Receives pre-calculated availableDates (all business logic moved to parent)
+   * - Renders date list with user-provided labels
+   * - Handles user interactions via callbacks
+   * - No data transformation, calculation, or filtering
+   */
 
   return (
     <div className="w-72">
       {/* Date list */}
       <div className="p-4 space-y-2 max-h-64 overflow-y-auto">
+        {multiple && availableDates.length > 3 && onSelectAll && (
+            <Button
+              onClick={() => onSelectAll(availableDates.map((d) => d.key))}
+              variant="ghost"
+              className="text-xs text-muted-foreground hover:text-foreground px-3 py-1 h-7"
+              aria-label={labels.selectAllDatesLabel}
+            >
+              {labels.selectAllDatesLabel}
+            </Button>
+          )}
         {availableDates.length > 0 ? (
           availableDates.map((date) => (
-            <label
+            <div
               key={date.key}
-              htmlFor={`date-checkbox-${date.key}`}
               className="flex items-center justify-between p-2 hover:bg-muted rounded-md cursor-pointer"
+              onClick={() => onDateToggle(date.key)}
             >
-              <span className="font-medium">{date.label}</span>
-              <input
-                id={`date-checkbox-${date.key}`}
-                type="checkbox"
-                checked={selectedDates.has(date.key)}
-                onChange={() => onDateToggle(date.key)}
-                className="w-4 h-4"
-                aria-label={`Select ${date.label}`}
-              />
-            </label>
+              <label
+                htmlFor={`date-selector-${date.key}`}
+                className="flex-1 font-medium cursor-pointer"
+              >
+                {date.label}
+              </label>
+              {multiple ? (
+                // Checkboxes for multiple selection
+                <input
+                  id={`date-selector-${date.key}`}
+                  type="checkbox"
+                  checked={selectedDates.has(date.key)}
+                  onChange={(e) => {
+                    e.stopPropagation()
+                    onDateToggle(date.key)
+                  }}
+                  className="w-4 h-4 cursor-pointer"
+                  aria-label={`Select ${date.label}`}
+                />
+              ) : (
+                // Radio buttons for single selection
+                <input
+                  id={`date-selector-${date.key}`}
+                  type="radio"
+                  name="date-selection"
+                  checked={selectedDates.has(date.key)}
+                  onChange={(e) => {
+                    e.stopPropagation()
+                    onDateToggle(date.key)
+                  }}
+                  className="w-4 h-4 cursor-pointer"
+                  aria-label={`Select ${date.label}`}
+                />
+              )}
+            </div>
           ))
         ) : (
-          <div className="p-2 text-center text-muted-foreground">No available dates</div>
+          <div className="p-2 text-center text-muted-foreground">{labels.noAvailableDatesLabel}</div>
         )}
       </div>
 
-      {/* Actions */}
+      {/* Bottom actions - CLEAR, SELECT ALL (if applicable), and DONE */}
       <div className="flex items-center justify-between p-3 border-t bg-muted/30">
-        <Button
-          onClick={onClear}
-          variant="ghost"
-          className="text-xs text-muted-foreground hover:text-foreground px-3 py-1 h-7"
-          aria-label="Clear all selected dates"
-        >
-          CLEAR
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={onClear}
+            variant="ghost"
+            className="text-xs text-muted-foreground hover:text-foreground px-3 py-1 h-7"
+            aria-label={labels.clearDatesLabel}
+          >
+            {labels.clearDatesLabel}
+          </Button>
+        </div>
         <Button
           onClick={onDone}
           className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs font-medium h-7"
+          aria-label={labels.confirmDatesLabel}
         >
-          DONE
+          {labels.confirmDatesLabel}
         </Button>
       </div>
     </div>

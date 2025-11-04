@@ -21,6 +21,8 @@ export const mockOffers: OfferType[] = [
     price: 50,
     type: 'perStay',
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop',
+    minQuantity: 1,
+    maxQuantity: 2,
   },
   {
     id: 3,
@@ -38,6 +40,13 @@ export const mockOffers: OfferType[] = [
     type: 'perPerson',
     image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=300&fit=crop',
     requiresDateSelection: true,
+    allowsMultipleDates: true,
+    availableDates: [
+      new Date('2025-12-16'),
+      new Date('2025-12-17'),
+      new Date('2025-12-18'),
+      new Date('2025-12-19'),
+    ],
     featured: true,
   },
   {
@@ -47,6 +56,8 @@ export const mockOffers: OfferType[] = [
     price: 35,
     type: 'perStay',
     image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=400&h=300&fit=crop',
+    minQuantity: 0,
+    maxQuantity: 5,
   },
   {
     id: 6,
@@ -82,6 +93,30 @@ export const mockOffers: OfferType[] = [
     price: 80,
     type: 'perNight',
     image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop',
+    availableDates: [
+      new Date('2025-12-15'),
+      new Date('2025-12-16'),
+      new Date('2025-12-17'),
+      new Date('2025-12-18'),
+      new Date('2025-12-19'),
+      new Date('2025-12-20'),
+    ],
+  },
+  {
+    id: 10,
+    title: 'Chef\'s Dinner Experience',
+    description: 'Enjoy a curated three-course dinner each night of your stay',
+    price: 55,
+    type: 'perNight',
+    image: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=400&h=300&fit=crop',
+  },
+  {
+    id: 11,
+    title: 'Valet Parking',
+    description: 'Overnight valet parking with unlimited in-and-out privileges',
+    price: 25,
+    type: 'perNight',
+    image: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=400&h=300&fit=crop',
   },
 ]
 
@@ -106,6 +141,39 @@ export const mockOnlineCheckinOffer: OfferType = mockOffers[2]
  * Offers requiring date selection
  */
 export const mockDateSelectionOffers: OfferType[] = mockOffers.filter((offer) => offer.requiresDateSelection)
+
+/**
+ * Focused offer groups for targeted scenarios
+ */
+export const mockPerStayOffer: OfferType[] = [mockOffers[1]]
+export const mockPerPersonOffer: OfferType[] = [mockOffers[0]]
+export const mockPerNightOffer: OfferType[] = mockOffers.filter((offer) => offer.type === 'perNight')
+export const mockPerRoomOffer: OfferType[] = [
+  {
+    id: 201,
+    title: 'Connected Room Package',
+    description:
+      'Guarantee adjacent rooms with shared lounge access. Adjust the quantity to match the number of rooms in the reservation.',
+    price: 45,
+    type: 'perStay',
+    image: 'https://images.unsplash.com/photo-1505693314120-0d443867891c?w=400&h=300&fit=crop',
+  },
+  {
+    id: 202,
+    title: 'Daily Turndown Service',
+    description:
+      'Evening turndown with pillow menu and chocolates, charged per room so multi-room stays scale correctly.',
+    price: 30,
+    type: 'perStay',
+    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
+  },
+]
+export const mockSingleDateOffer: OfferType[] = mockOffers
+  .filter((offer) => offer.requiresDateSelection && !offer.allowsMultipleDates)
+  .slice(0, 1)
+export const mockMultipleDatesOffer: OfferType[] = mockOffers
+  .filter((offer) => offer.requiresDateSelection && offer.allowsMultipleDates)
+  .slice(0, 1)
 
 /**
  * Mock reservation info
