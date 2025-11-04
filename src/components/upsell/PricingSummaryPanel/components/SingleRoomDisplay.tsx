@@ -31,7 +31,7 @@ const SingleRoomDisplay: React.FC<SingleRoomDisplayProps> = ({
   readonly,
 }) => {
   return (
-    <div className="px-4">
+    <div className="">
       <div className="rounded-t-lg bg-card p-4">
         <div className="flex items-center justify-between gap-2">
           <section className="flex gap-2">

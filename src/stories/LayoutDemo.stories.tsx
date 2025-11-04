@@ -23,7 +23,8 @@ import {
   bookingViewCards,
   bookingViewTranslations,
   defaultRoomCustomizationCategories,
-  goldThemeOverride,
+  brandDefaults,
+  createBrandTheme,
   layoutPricingBookings,
   layoutPricingLabels,
   layoutPricingRooms,
@@ -39,7 +40,11 @@ type UpsellLayoutStoryProps = {
   pricingRooms?: MultiBookingPricingSummaryPanelProps['rooms']
   pricingBookings?: MultiBookingPricingSummaryPanelProps['formattedBookings']
   formattedOverallTotal?: string
+  brandPrimary?: string
+  brandPrimaryForeground?: string
 }
+
+type BrandThemeArgs = Pick<UpsellLayoutStoryProps, 'brandPrimary' | 'brandPrimaryForeground'>
 
 const layoutCarouselRooms = adaptRoomsForCarousel(roomOptions.slice(0, 3))
 
@@ -50,7 +55,9 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
   carouselRooms = layoutCarouselRooms,
   pricingRooms = layoutPricingRooms,
   pricingBookings = layoutPricingBookings,
-  formattedOverallTotal = '€1,045.00',
+  formattedOverallTotal: initialOverallTotal = '€1,045.00',
+  brandPrimary = brandDefaults.primary,
+  brandPrimaryForeground = brandDefaults.primaryForeground,
 }) => {
   const initialIndex = carouselRooms.length > 1 ? 1 : 0
   const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(
@@ -69,6 +76,15 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
     return initial
   })
 
+  // State for room upgrades (per room)
+  const [selectedRoomUpgrades, setSelectedRoomUpgrades] = useState<Record<string, string | null>>(() => {
+    const initial: Record<string, string | null> = {}
+    pricingRooms.forEach((room) => {
+      initial[room.id] = null
+    })
+    return initial
+  })
+
   // SpecialOffers state and hooks
   const { formatPrice, calculateTotal, getUnitLabel } = useOfferPricing('€', mockReservationInfo)
   const {
@@ -83,7 +99,7 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
     reservationInfo: mockReservationInfo,
   })
 
-  // Compute pricing rooms with customization items and special offers included
+  // Compute pricing rooms with customization items, room upgrades, and special offers included
   const computedPricingRooms = useMemo(() => {
     return pricingRooms.map((room) => {
       const roomSelections = selectedAttributes[room.id] || {}
@@ -94,7 +110,6 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
             .flatMap((cat) => cat.attributes)
             .find((a) => a.id === Number(attributeId))
           if (!attr) return null
-          const pricePerNight = attr.amount / 8 // 8 nights
           return {
             id: `attr-${attr.id}`,
             name: attr.name,
@@ -102,6 +117,21 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
           }
         })
         .filter(Boolean) as Array<{ id: string; name: string; formattedPrice: string }>
+
+      // Get room upgrade if selected
+      const selectedUpgradeId = selectedRoomUpgrades[room.id]
+      let upgradeItem: { id: string; name: string; formattedPrice: string } | undefined
+      if (selectedUpgradeId) {
+        const selectedUpgradeOption = carouselRooms.find((r) => r.id === selectedUpgradeId)
+        if (selectedUpgradeOption) {
+          const upgradePrice = parseFloat(selectedUpgradeOption.price) * 8 // 8 nights
+          upgradeItem = {
+            id: `room-upgrade-${selectedUpgradeId}`,
+            name: selectedUpgradeOption.roomType || selectedUpgradeOption.title || selectedUpgradeId,
+            formattedPrice: `€${upgradePrice.toFixed(2)}`,
+          }
+        }
+      }
 
       // Compute special offers items for this room
       const specialOffersItems = Array.from(bookedOffers)
@@ -118,12 +148,21 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
         })
         .filter(Boolean) as Array<{ id: string; name: string; formattedPrice: string }>
 
-      // Find existing sections but filter out old offer/customization sections
+      // Find existing sections but filter out old upgrade/offer/customization sections
       const existingSections = room.sections.filter(
-        (s) => s.type !== SectionType.Customization && s.type !== SectionType.Offer
+        (s) => s.type !== SectionType.Customization && s.type !== SectionType.Offer && s.type !== SectionType.Upgrade
       )
 
       // Create new sections
+      const upgradeSection =
+        upgradeItem
+          ? {
+              title: 'Choose your superior room',
+              type: SectionType.Upgrade,
+              items: [upgradeItem],
+            }
+          : undefined
+
       const customizationSection =
         customizationItems.length > 0
           ? {
@@ -143,15 +182,40 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
           : undefined
 
       const sections = existingSections
+      if (upgradeSection) sections.push(upgradeSection)
       if (customizationSection) sections.push(customizationSection)
       if (offersSection) sections.push(offersSection)
+
+      // Calculate room total: base price + upgrade + customizations + offers
+      const basePrice = parseFloat(room.formattedTotal.replace('€', '').replace(',', ''))
+      const upgradeTotal = upgradeItem ? parseFloat(upgradeItem.formattedPrice.replace('€', '').replace(',', '')) : 0
+      const customizationTotal = customizationItems.reduce((sum, item) => {
+        const price = parseFloat(item.formattedPrice.replace('€', '').replace(',', ''))
+        return sum + price
+      }, 0)
+      const offersTotal = specialOffersItems.reduce((sum, item) => {
+        const price = parseFloat(item.formattedPrice.replace('€', '').replace(',', ''))
+        return sum + price
+      }, 0)
+      const roomTotal = basePrice + upgradeTotal + customizationTotal + offersTotal
+      const formattedRoomTotal = `€${roomTotal.toFixed(2)}`
 
       return {
         ...room,
         sections,
+        formattedTotal: formattedRoomTotal,
       }
     })
-  }, [pricingRooms, selectedAttributes, bookedOffers, offerSelections, calculateTotal, formatPrice])
+  }, [pricingRooms, selectedAttributes, selectedRoomUpgrades, carouselRooms, bookedOffers, offerSelections, calculateTotal, formatPrice])
+
+  // Calculate dynamic overall total from computed rooms
+  const computedOverallTotal = useMemo(() => {
+    const total = computedPricingRooms.reduce((sum, room) => {
+      const price = parseFloat(room.formattedTotal.replace('€', '').replace(',', ''))
+      return sum + price
+    }, 0)
+    return `€${total.toFixed(2)}`
+  }, [computedPricingRooms])
 
   const { activeRooms, setActiveRooms, initialActiveRooms } = useAccordionState({
     rooms: computedPricingRooms,
@@ -172,7 +236,38 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
     })
   }, [])
 
-  const themeOverrides = useMemo(() => goldThemeOverride, [])
+  // Handle removing items from pricing summary
+  const handleRemoveItem = useCallback((bookingKey: string, itemId: string) => {
+    if (itemId.startsWith('attr-')) {
+      // Remove customization attribute
+      const attributeId = Number(itemId.replace('attr-', ''))
+      setSelectedAttributes((prev) => {
+        const roomSelections = { ...(prev[bookingKey] || {}) }
+        delete roomSelections[attributeId]
+        return {
+          ...prev,
+          [bookingKey]: roomSelections,
+        }
+      })
+    } else if (itemId.startsWith('room-upgrade-')) {
+      // Remove room upgrade
+      setSelectedRoomUpgrades((prev) => ({
+        ...prev,
+        [bookingKey]: null,
+      }))
+    } else if (itemId.startsWith('offer-')) {
+      // Remove special offer (convert string ID to number to match bookedOffers set)
+      const offerId = Number(itemId.replace('offer-', ''))
+      const newBooked = new Set(bookedOffers)
+      newBooked.delete(offerId)
+      setBookedOffers(newBooked)
+    }
+  }, [bookedOffers])
+
+  const themeOverrides = useMemo(
+    () => createBrandTheme(brandPrimary, brandPrimaryForeground),
+    [brandPrimary, brandPrimaryForeground]
+  )
 
   // Get the currently active room for display
   const activeRoom = useMemo(() => {
@@ -195,10 +290,10 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
           bookingReference="# multi-3-vlad-addsafsfddsf·cu=EUR·email=vlad@hotelverse.tech·chin=2026:03:02·chout=2026:03:10"
         />
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div>
             {showTabs && (
-              <div className="mb-4 flex w-full border-b border-border">
+              <div className="sticky top-0 z-20 mb-4 w-full border-b border-border bg-muted/90 backdrop-blur-sm">
                 <TabsStrip
                   tabs={pricingBookings.map((b) => ({
                     id: b.id,
@@ -220,7 +315,17 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
               <RoomUpgradeCarousel
                 roomOptions={carouselRooms}
                 initialSelectedRoom={selectedRoom}
-                onRoomSelected={setSelectedRoom}
+                onRoomSelected={(room) => {
+                  setSelectedRoom(room)
+                  const currentRoomId = activeRooms[0] || initialActiveRooms[0] || pricingRooms[0]?.id
+                  if (currentRoomId) {
+                    // Handle both selection and deselection (null)
+                    setSelectedRoomUpgrades((prev) => ({
+                      ...prev,
+                      [currentRoomId]: room?.id || null,
+                    }))
+                  }
+                }}
                 translations={layoutUpgradeTranslations}
                 enableHoverZoom
                 className="w-full"
@@ -291,14 +396,16 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
           <MultiBookingPricingSummaryPanel
             rooms={computedPricingRooms}
             formattedBookings={pricingBookings}
-            formattedOverallTotal={formattedOverallTotal}
+            formattedOverallTotal={computedOverallTotal}
             labels={layoutPricingLabels}
             activeRooms={activeRooms}
             initialActiveRooms={initialActiveRooms}
             onActiveRoomsChange={setActiveRooms}
+            onRemoveItem={handleRemoveItem}
             exclusiveAccordion
             isSticky={true}
             hideFooter={false}
+            className="lg:self-start"
           />
         </div>
       </div>
@@ -306,8 +413,10 @@ const UpsellLayoutStory: React.FC<UpsellLayoutStoryProps> = ({
   )
 }
 
-const BookingViewPageStory = () => (
-  <div className="relative min-h-screen bg-muted pb-4" style={goldThemeOverride}>
+const BookingViewPageStory = (
+  { brandPrimary = brandDefaults.primary, brandPrimaryForeground = brandDefaults.primaryForeground }: BrandThemeArgs = {}
+) => (
+  <div className="relative min-h-screen bg-muted pb-4" style={createBrandTheme(brandPrimary, brandPrimaryForeground)}>
     <div className="bg-muted max-w-6xl flex-col gap-6 px-4 py-10 mx-auto">
       <BookingBanner
         className="px-0"
@@ -362,6 +471,20 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
+  argTypes: {
+    brandPrimary: {
+      control: 'color',
+      description: 'Primary brand color token applied via CSS variables.',
+    },
+    brandPrimaryForeground: {
+      control: 'color',
+      description: 'Foreground color used on primary surfaces.',
+    },
+  },
+  args: {
+    brandPrimary: brandDefaults.primary,
+    brandPrimaryForeground: brandDefaults.primaryForeground,
+  },
 } satisfies Meta<typeof UpsellLayoutStory>
 
 export default meta
@@ -382,5 +505,6 @@ export const SingleBooking: Story = {
 }
 
 export const BookingViewPage: Story = {
-  render: () => <BookingViewPageStory />,
+  args: {},
+  render: (args) => <BookingViewPageStory {...args} />,
 }

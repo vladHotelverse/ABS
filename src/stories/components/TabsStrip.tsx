@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export type TabsStripTab = {
   id: string
@@ -42,8 +44,6 @@ export const TabsStrip: FC<TabsStripProps> = ({
     return [stickyCls, className].filter(Boolean).join(' ')
   }, [className, sticky])
 
-  const baseButtonClass =
-    'flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm transition shadow-sm ring-1 ring-border'
 
   if (!tabs.length) {
     return null
@@ -51,17 +51,18 @@ export const TabsStrip: FC<TabsStripProps> = ({
 
   return (
     <div className={containerClass}>
-      <div className="mx-auto flex max-w-6xl gap-3 overflow-x-auto px-4 py-3">
+      <div className="mx-auto flex max-w-6xl gap-3 overflow-x-auto pl-0.5 py-3">
         {tabs.map((tab) => {
           const isActive = tab.id === effectiveActiveId
           const stateClass = isActive
             ? 'bg-primary text-primary-foreground ring-primary'
             : 'bg-background text-foreground hover:bg-muted'
           return (
-            <button
+            <Button
               key={tab.id}
               type="button"
-              className={`${baseButtonClass} ${stateClass}`}
+              variant={isActive ? 'default' : 'ghost'}
+              className={cn(stateClass)}
               onClick={() => {
                 if (activeId === undefined) {
                   setInternalActiveId(tab.id)
@@ -71,7 +72,7 @@ export const TabsStrip: FC<TabsStripProps> = ({
             >
               <span>{tab.label}</span>
               {tab.badge ? <span>{tab.badge}</span> : null}
-            </button>
+            </Button>
           )
         })}
       </div>

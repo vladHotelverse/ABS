@@ -36,7 +36,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, translations, handlers, confi
       {/* Main Card */}
       <div
         className={cn(
-          'cq-container relative ml-0.5 w-full max-w-md overflow-visible rounded-lg bg-card pb-2 shadow-depth-2 transition-all duration-300 hover:shadow-depth-3',
+          'cq-container relative ml-0.5 w-full max-w-md overflow-visible rounded-lg bg-card pb-2 shadow-depth-2 transition-all duration-300 hover:shadow-depth-3shadow-depth-1 ring-1 ring-border',
           {
             'ring-2 ring-emerald-500': selectedRoom?.id === room.id,
           }

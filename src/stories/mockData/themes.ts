@@ -1,11 +1,17 @@
 import type { CSSProperties } from 'react'
 
-export const goldThemeOverride: CSSProperties = {
-  '--primary': '#B99A67',
-  '--primary-foreground': '#ffffff',
-}
+export const brandDefaults = {
+  primary: '#000',
+  primaryForeground: '#ffffff',
+} as const
 
-export const tabsDemoTheme: CSSProperties = {
-  '--primary': '#B99A67',
-  '--primary-foreground': '#ffffff',
-}
+export const createBrandTheme = (
+  primary: string = brandDefaults.primary,
+  primaryForeground: string = brandDefaults.primaryForeground
+): CSSProperties => ({
+  '--primary': primary,
+  '--primary-foreground': primaryForeground,
+})
+
+export const goldThemeOverride: CSSProperties = createBrandTheme()
+export const tabsDemoTheme: CSSProperties = createBrandTheme()

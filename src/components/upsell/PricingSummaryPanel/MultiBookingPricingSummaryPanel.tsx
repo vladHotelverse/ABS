@@ -155,13 +155,13 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
 
   return (
     <div
-      className={clsx(isSticky ? 'sticky w-full md:top-28' : 'relative w-full', className)}
+      className={clsx(isSticky ? 'sticky w-full md:top-0 rounded-lg shadow-depth-1 ring-1 ring-border/40' : 'relative w-full', className)}
       data-testid="multi-booking-pricing-panel"
     >
       <div
         ref={containerRef}
         className={clsx(
-          'flex max-h-full min-w-[350px] flex-col overflow-hidden rounded-lg shadow-depth-2',
+          'flex max-h-full min-w-[350px] flex-col overflow-hidden ',
           'transition-all duration-300 ease-out',
           isScrolling && 'duration-100'
         )}
@@ -222,7 +222,7 @@ const MultiBookingPricingSummaryPanel: React.FC<MultiBookingPricingSummaryPanelP
         </div>
 
         {!hideFooter && (
-          <div className="flex-shrink-0 bg-white p-4">
+          <div className="flex-shrink-0 bg-white p-4 rounded-b-lg">
             <PriceBreakdown
               formattedTotal={formattedOverallTotal}
               isLoading={loading}

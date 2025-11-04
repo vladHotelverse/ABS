@@ -3,22 +3,8 @@
  * Prevents code duplication across story files
  */
 import type React from 'react'
-import {
-  type BookingDisplay,
-  type CartServiceConfig,
-  HOTEL_CART_CONFIG,
-  HOTEL_SECTION_CONFIG,
-  type PricingItem,
-  PurePricingSummaryPanel,
-  type SectionConfig,
-  type UILabels,
-  UPSELL_CART_CONFIG,
-  UPSELL_SECTION_CONFIG,
-  useCartManagement,
-  usePricingLogic,
-} from '../../components/upsell/PricingSummaryPanel'
+import type { UILabels } from '../../components/upsell/PricingSummaryPanel/types'
 import type { Booking } from '../../components/upsell/PricingSummaryPanel/components/BookingInfoSection'
-import { formatCurrency } from '../../lib/currency'
 
 // Story decorator for consistent layout
 export const PricingPanelDecorator = (Story: React.ComponentType) => (
@@ -95,120 +81,11 @@ export const spanishUILabels: UILabels = createUILabels({
   processingLabel: 'Procesando...',
 })
 
-// Story component for pure pricing panel with business logic
-interface PricingStoryProps {
-  items: PricingItem[]
-  bookings: BookingDisplay[]
-  labels?: UILabels
-  currency?: string
-  locale?: string
-  loading?: boolean
-  disabled?: boolean
-  sectionConfig?: SectionConfig
-  cartConfig?: CartServiceConfig
-  onItemRemove?: (itemId: string | number) => void
-  onConfirm?: () => void
-}
-
-export const PricingStoryComponent: React.FC<PricingStoryProps> = ({
-  items,
-  bookings,
-  labels = createUILabels(),
-  currency = 'EUR',
-  locale = 'en-US',
-  loading = false,
-  disabled = false,
-  sectionConfig = HOTEL_SECTION_CONFIG,
-  cartConfig = HOTEL_CART_CONFIG,
-  onItemRemove,
-  onConfirm,
-}) => {
-  // Set up cart management
-  const cartManagement = useCartManagement({
-    initialItems: items,
-    config: cartConfig,
-    onItemsChange: undefined,
-    onOperationResult: (result) => {
-      console.log('Cart operation:', result)
-    },
-  })
-
-  // Set up pricing logic
-  const pricingLogic = usePricingLogic({
-    items: cartManagement.items,
-    sectionConfig,
-    formatCurrency,
-    options: {
-      currency,
-      locale,
-      includeNightMultiplier: true,
-      nights: bookings[0]?.nights || 1,
-      euroSuffix: currency === 'EUR' ? '€' : currency,
-    },
-  })
-
-  // Update sections to include removability information
-  const sectionsWithRemovability = pricingLogic.sections.map((section) => ({
-    ...section,
-    items: section.items.map((item) => ({
-      ...item,
-      removable: cartManagement.canRemoveItem(item.originalItem),
-    })),
-  }))
-
-  const handleItemRemove = async (itemId: string | number) => {
-    const result = await cartManagement.removeItem(itemId)
-    if (onItemRemove) {
-      onItemRemove(itemId)
-    }
-    return result
-  }
-
-  return (
-    <PurePricingSummaryPanel
-      sections={sectionsWithRemovability}
-      pricing={pricingLogic.pricing}
-      bookings={bookings}
-      labels={labels}
-      loading={loading || cartManagement.isRemoving}
-      disabled={disabled}
-      onItemRemove={handleItemRemove}
-      onConfirm={onConfirm}
-    />
-  )
-}
-
-// Preset configurations for different app contexts
-export const AppConfigurations = {
-  hotel: {
-    sectionConfig: HOTEL_SECTION_CONFIG,
-    cartConfig: HOTEL_CART_CONFIG,
-    labels: spanishUILabels,
-  },
-  upsell: {
-    sectionConfig: UPSELL_SECTION_CONFIG,
-    cartConfig: UPSELL_CART_CONFIG,
-    labels: createUILabels({
-      emptyCartMessage: 'No services selected',
-      confirmButtonLabel: 'Confirm Selection',
-      pricingSummaryLabel: 'Service Summary',
-    }),
-  },
-}
-
-// Common story args
-export const createStoryArgs = (overrides: Partial<PricingStoryProps> = {}): PricingStoryProps => ({
-  items: [],
-  bookings: [],
-  labels: spanishUILabels,
-  currency: 'EUR',
-  locale: 'es-ES',
-  loading: false,
-  disabled: false,
-  sectionConfig: HOTEL_SECTION_CONFIG,
-  cartConfig: HOTEL_CART_CONFIG,
-  ...overrides,
-})
+/**
+ * NOTE: The PricingStoryComponent has been removed as it referenced non-existent hooks.
+ * For synchronized cart demos, use RoomCustomizationStoryWrapper from src/stories/components/
+ * For static pricing panel demos, use MultiBookingPricingSummaryPanel directly with mock data.
+ */
 
 // Action handlers for Storybook
 export const storyActions = {
