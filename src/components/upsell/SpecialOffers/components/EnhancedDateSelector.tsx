@@ -27,7 +27,7 @@ interface EnhancedDateSelectorProps {
   availableDates: AvailableDate[]
   // Selected dates for internal state management
   selectedDates: Date[]
-  onChange: (dates: Date[]) => void
+  onChange?: (dates: Date[]) => void
   disabled?: boolean
   tooltipText?: string
   className?: string
@@ -73,22 +73,22 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
       if (isAlreadySelected) {
         // Remove date
         const newDates = selectedDates.filter((d) => dateToKey(d) !== dateKey)
-        onChange(newDates)
+        onChange?.(newDates)
       } else {
         // Add date (max dates validation is handled by parent when calculating availableDates)
         const newDate = keyToDate(dateKey)
         const newDates = [...selectedDates, newDate].sort((a, b) => a.getTime() - b.getTime())
-        onChange(newDates)
+        onChange?.(newDates)
       }
     } else {
       // Single date selection
       const newDate = keyToDate(dateKey)
-      onChange([newDate])
+      onChange?.([newDate])
     }
   }
 
   const handleClear = () => {
-    onChange([])
+    onChange?.([])
   }
 
   const handleDone = () => {
@@ -102,7 +102,7 @@ const EnhancedDateSelector: React.FC<EnhancedDateSelectorProps> = ({
   const handleSelectAll = (dateKeys: string[]) => {
     // Convert date keys back to Date objects
     const allDates = dateKeys.map(keyToDate).sort((a, b) => a.getTime() - b.getTime())
-    onChange(allDates)
+    onChange?.(allDates)
   }
 
   const handleClose = () => {

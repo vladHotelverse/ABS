@@ -6,10 +6,11 @@ export interface OfferImageProps {
   image?: string
   title: string
   className?: string
-  noImageLabel?: string
+  // Label when image is not available (pre-formatted by parent/labels)
+  noImageLabel: string
 }
 
-const OfferImage: React.FC<OfferImageProps> = ({ image, title, className, noImageLabel = 'No image available' }) => (
+const OfferImage: React.FC<OfferImageProps> = ({ image, title, className, noImageLabel }) => (
   <div
     className={clsx(
       'flex items-center justify-center h-48 bg-gradient-to-br from-neutral-100 to-neutral-200 overflow-hidden',

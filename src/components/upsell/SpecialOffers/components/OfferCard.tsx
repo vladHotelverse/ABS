@@ -39,7 +39,7 @@ interface OfferCardProps {
  */
 
 const OfferCard: React.FC<OfferCardProps> = ({ cardData, onUpdateQuantity, onUpdateSelectedDate, onUpdateSelectedDates, onBook, labels }) => {
-  const { offer, selection, formattedBasePrice, formattedTotal, unitLabel, isBooked, showValidation, shouldShowQuantityControls, shouldShowTotal, isButtonDisabled, validationMessages, isAllInclusive, isOnlineCheckin } = cardData
+  const { offer, selection, formattedBasePrice, formattedTotal, unitLabel, quantityUnit, isBooked, showValidation, shouldShowQuantityControls, shouldShowTotal, isButtonDisabled, validationMessages} = cardData
 
   // Create handlers conditionally - these are just callback wrappers (no business logic)
   const dateChangeHandler = onUpdateSelectedDate
@@ -54,7 +54,7 @@ const OfferCard: React.FC<OfferCardProps> = ({ cardData, onUpdateQuantity, onUpd
     >
       {/* Image Section */}
       <div className="h-32 sm:h-40 overflow-hidden relative">
-        <OfferImage image={offer.image} title={offer.title} />
+        <OfferImage image={offer.image} title={offer.title} noImageLabel={labels.noImageLabel} />
         {isBooked && (
           <Badge className="absolute top-2 left-2 bg-green-600 text-white text-xs flex items-center gap-1">
             <Star className="h-3 w-3" />
@@ -123,6 +123,7 @@ const OfferCard: React.FC<OfferCardProps> = ({ cardData, onUpdateQuantity, onUpd
             isBooked={isBooked}
             labels={labels}
             reservationPersonCount={undefined}
+            quantityUnit={quantityUnit}
           />
         )}
       </CardContent>

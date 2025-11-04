@@ -13,6 +13,8 @@ export interface OfferTotalDisplayProps {
   isBooked?: boolean
   labels: OfferLabels
   reservationPersonCount?: number
+  // Pre-calculated quantity unit label from parent (e.g., "people", "nights", "days", "times")
+  quantityUnit?: string
 }
 
 const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
@@ -27,49 +29,10 @@ const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
   isBooked = false,
   labels,
   reservationPersonCount,
+  quantityUnit = '',
 }) => {
   const showBreakdown =
     (offerType === 'perPerson' && (persons || 1) > 1) || (offerType === 'perNight' && (nights || 1) > 1) || quantity > 1
-
-  // Helper function to get the appropriate unit for quantity display
-  const getQuantityUnit = (quantity: number, offerType: string, offerTitle?: string): string => {
-    if (quantity <= 1) return ''
-    
-    // Check if it's All Inclusive - don't show quantity unit for All Inclusive
-    const isAllInclusive = offerTitle?.toLowerCase().includes('all inclusive')
-    if (isAllInclusive) {
-      return '' // Don't show quantity for All Inclusive packages
-    }
-    
-    // Check if it's a transfer/transport related offer
-    const isTransfer = offerTitle?.toLowerCase().includes('transfer') || 
-                      offerTitle?.toLowerCase().includes('transport') ||
-                      offerTitle?.toLowerCase().includes('pickup') ||
-                      offerTitle?.toLowerCase().includes('shuttle')
-    
-    if (isTransfer && offerType === 'perPerson') {
-      return quantity === 1 ? 'person' : 'people'
-    }
-    
-    // For perNight offers, use nights
-    if (offerType === 'perNight') {
-      return quantity === 1 ? 'night' : 'nights'
-    }
-    
-    // For date-based offers (spa, activities), use days
-    const isDateBased = offerTitle?.toLowerCase().includes('spa') ||
-                       offerTitle?.toLowerCase().includes('access') ||
-                       offerTitle?.toLowerCase().includes('pass')
-    
-    if (isDateBased) {
-      return quantity === 1 ? 'day' : 'days'
-    }
-    
-    // Default fallback
-    return quantity === 1 ? 'time' : 'times'
-  }
-
-  const isAllInclusive = offerTitle?.toLowerCase().includes('all inclusive')
   
   return (
     <div
@@ -78,13 +41,10 @@ const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
       {/* Display person count info above the total for perPerson offers */}
       {offerType === 'perPerson' && reservationPersonCount && (
         <div className="text-sm text-neutral-600 mb-2">
-          {isAllInclusive ? 
-            `Entire stay for ${reservationPersonCount} ${reservationPersonCount === 1 ? labels.personSingular : labels.personPlural}` :
-            `For ${reservationPersonCount} ${reservationPersonCount === 1 ? labels.personSingular : labels.personPlural}`
-          }
+          {`For ${reservationPersonCount} ${reservationPersonCount === 1 ? labels.personSingular : labels.personPlural}`}
         </div>
       )}
-      
+
       <div className="flex justify-between items-center">
         <span className="font-medium text-base">{totalLabel}:</span>
         <div className="flex flex-col items-end">
@@ -92,7 +52,7 @@ const OfferTotalDisplay: React.FC<OfferTotalDisplayProps> = ({
           {showBreakdown && (
             <span className="text-xs text-neutral-500 mt-1">
               {basePrice}
-              {quantity > 1 && `, ${quantity} ${getQuantityUnit(quantity, offerType, offerTitle)}`}
+              {quantity > 1 && quantityUnit && `, ${quantity} ${quantityUnit}`}
               {offerType === 'perPerson' && (persons || 1) > 1 &&
                 `, ${persons || 1} ${(persons || 1) === 1 ? labels.personSingular : labels.personPlural}`}
               {offerType === 'perNight' && (nights || 1) > 1 &&

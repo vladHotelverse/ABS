@@ -132,8 +132,8 @@ const OfferPriceDisplay: React.FC<OfferPriceDisplayProps> = ({
     {showQuantityControls && (
       <QuantityControls
         quantity={quantity}
-        onIncrease={onIncreaseQuantity || (() => {})}
-        onDecrease={onDecreaseQuantity || (() => {})}
+        onIncrease={onIncreaseQuantity}
+        onDecrease={onDecreaseQuantity}
         disabled={false}
         isBooked={isBooked}
         labels={labels}

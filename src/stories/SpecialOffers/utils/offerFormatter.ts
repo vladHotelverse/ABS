@@ -31,6 +31,52 @@ function detectSpecialOfferType(offerTitle: string): {
 }
 
 /**
+ * Calculate the appropriate quantity unit label based on offer type and characteristics
+ * ✅ Business Logic Layer - this calculation should NOT be in UI
+ * Returns unit label like "people", "nights", "days", "times"
+ */
+function calculateQuantityUnit(
+  quantity: number,
+  offerType: OfferType['type'],
+  offerTitle: string,
+  isAllInclusive: boolean
+): string {
+  // Don't show quantity unit for single quantity or All Inclusive
+  if (quantity <= 1 || isAllInclusive) {
+    return ''
+  }
+
+  // Check if it's a transfer/transport related offer
+  const isTransfer =
+    offerTitle.toLowerCase().includes('transfer') ||
+    offerTitle.toLowerCase().includes('transport') ||
+    offerTitle.toLowerCase().includes('pickup') ||
+    offerTitle.toLowerCase().includes('shuttle')
+
+  if (isTransfer && offerType === 'perPerson') {
+    return quantity === 1 ? 'person' : 'people'
+  }
+
+  // For perNight offers, use nights
+  if (offerType === 'perNight') {
+    return quantity === 1 ? 'night' : 'nights'
+  }
+
+  // For date-based offers (spa, activities), use days
+  const isDateBased =
+    offerTitle.toLowerCase().includes('spa') ||
+    offerTitle.toLowerCase().includes('access') ||
+    offerTitle.toLowerCase().includes('pass')
+
+  if (isDateBased) {
+    return quantity === 1 ? 'day' : 'days'
+  }
+
+  // Default fallback
+  return quantity === 1 ? 'time' : 'times'
+}
+
+/**
  * Determine if quantity controls should be shown
  * Business rule: Don't show for date-required offers, perPerson (auto-uses reservation persons), or special offers
  */
@@ -167,6 +213,9 @@ export function formatOfferCard(
   const formattedTotal = formatPrice(total)
   const unitLabel = getUnitLabel(offer.type, labels)
 
+  // Calculate quantity unit (pre-formatted for UI display)
+  const quantityUnit = calculateQuantityUnit(selection.quantity, offer.type, offer.title, isAllInclusive)
+
   // Determine visibility and state
   const shouldShowQuantControls = shouldShowQuantityControls(offer, isAllInclusive, isOnlineCheckin, isLateCheckout)
   const shouldShowTotalPrice = shouldShowTotal(offer, selection)
@@ -179,6 +228,7 @@ export function formatOfferCard(
     formattedBasePrice,
     formattedTotal,
     unitLabel,
+    quantityUnit,
     isBooked,
     showValidation,
     shouldShowQuantityControls: shouldShowQuantControls,

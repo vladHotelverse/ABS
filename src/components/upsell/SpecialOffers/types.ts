@@ -64,6 +64,8 @@ export interface OfferCardData {
   formattedBasePrice: string
   formattedTotal: string
   unitLabel: string
+  // Pre-calculated quantity unit label (e.g., "people", "nights", "days", "times")
+  quantityUnit?: string
 
   // Pre-calculated business decisions (UI just displays, doesn't calculate)
   isBooked: boolean
@@ -133,4 +135,6 @@ export interface OfferLabels {
   dateSelectedLabel: string
   multipleDatesRequiredLabel: string
   whatsIncludedLabel: string
+  // Image fallback label
+  noImageLabel: string
 }

@@ -40,4 +40,5 @@ export const getDefaultLabels = (): OfferLabels => ({
   dateSelectedLabel: 'Date selected',
   multipleDatesRequiredLabel: 'Multiple dates required',
   whatsIncludedLabel: "What's included?",
+  noImageLabel: 'No image available',
 })

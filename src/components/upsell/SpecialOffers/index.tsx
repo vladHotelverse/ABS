@@ -42,7 +42,7 @@ const SpecialOffers: React.FC<SpecialOffersProps> = ({
 }) => {
   // Grid layout based on count is a UI decision, not business logic
   const gridClass = clsx(
-    'grid gap-4 sm:gap-6',
+    'grid gap-4 sm:gap-6 min-w-xs',
     cardData.length === 1 ? 'grid-cols-1 max-w-md' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl'
   )
 

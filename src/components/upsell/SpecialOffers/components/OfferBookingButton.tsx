@@ -3,7 +3,7 @@ import type React from 'react'
 import { UiButton } from '@/components/ui/button'
 
 export interface OfferBookingButtonProps {
-  onClick: () => void
+  onClick?: () => void
   disabled: boolean
   isBooked: boolean
   bookText: string
@@ -20,7 +20,7 @@ const OfferBookingButton: React.FC<OfferBookingButtonProps> = ({
   offerTitle,
 }) => {
   const handleClick = () => {
-    onClick()
+    onClick?.()
   }
 
   return (

@@ -5,8 +5,8 @@ import type { OfferLabels } from '../types'
 
 export interface QuantityControlsProps {
   quantity: number
-  onIncrease: () => void
-  onDecrease: () => void
+  onIncrease?: () => void
+  onDecrease?: () => void
   disabled?: boolean
   isBooked?: boolean
   labels: OfferLabels
@@ -31,7 +31,7 @@ const QuantityControls: React.FC<QuantityControlsProps> = ({
       <UiButton
         variant="ghost"
         size="icon"
-        onClick={onDecrease}
+        onClick={() => onDecrease?.()}
         disabled={disabled || !canDecrease}
         aria-label={labels.decreaseQuantityLabel}
         className="h-10 w-10 touch-manipulation"
@@ -42,7 +42,7 @@ const QuantityControls: React.FC<QuantityControlsProps> = ({
       <UiButton
         variant="ghost"
         size="icon"
-        onClick={onIncrease}
+        onClick={() => onIncrease?.()}
         disabled={disabled || !canIncrease}
         aria-label={labels.increaseQuantityLabel}
         className="h-10 w-10 touch-manipulation"
