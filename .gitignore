@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-.claude
-
 # Testing
 # Coverage reports
 coverage/
