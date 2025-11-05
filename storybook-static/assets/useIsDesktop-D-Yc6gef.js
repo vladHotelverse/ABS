@@ -1,0 +1,1 @@
+import{r as s}from"./index-yIsmwZOr.js";const i=(e=768)=>{const[n,r]=s.useState(()=>typeof window>"u"?!0:window.innerWidth>=e);return s.useEffect(()=>{const t=()=>{r(window.innerWidth>=e)};return t(),window.addEventListener("resize",t),()=>{window.removeEventListener("resize",t)}},[e]),n};export{i as u};
