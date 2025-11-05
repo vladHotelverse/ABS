@@ -7,17 +7,25 @@ interface PriceSummaryItem {
   id: string
   name: string
   price: string
+  details?: string
 }
 
 interface BookingsSummarySectionProps {
   upgrades: PriceSummaryItem[]
+  specialOffers?: PriceSummaryItem[]
   extras: PriceSummaryItem[]
   totalAmountFormatted: string
   t: (key: string, values?: Record<string, string | number>) => string
 }
 
-const BookingsSummarySection = ({ upgrades, extras, totalAmountFormatted, t }: BookingsSummarySectionProps) => {
-  const hasBreakdown = upgrades.length > 0 || extras.length > 0
+const BookingsSummarySection = ({
+  upgrades,
+  specialOffers = [],
+  extras,
+  totalAmountFormatted,
+  t,
+}: BookingsSummarySectionProps) => {
+  const hasBreakdown = upgrades.length > 0 || specialOffers.length > 0 || extras.length > 0
 
   return (
     <div className="space-y-6">
@@ -41,6 +49,25 @@ const BookingsSummarySection = ({ upgrades, extras, totalAmountFormatted, t }: B
                         <div key={upgrade.id} className="flex items-center justify-between text-sm">
                           <span className="text-foreground">{upgrade.name}</span>
                           <span className="font-medium text-emerald-600">{upgrade.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {specialOffers.length > 0 && (
+                  <div className="space-y-3 px-4 py-3">
+                    <p className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+                      {t('booking.view.specialOffers')}
+                    </p>
+                    <div className="space-y-2">
+                      {specialOffers.map((offer) => (
+                        <div key={offer.id} className="flex items-start justify-between gap-2 text-sm">
+                          <div className="flex flex-col">
+                            <span className="text-foreground">{offer.name}</span>
+                            {offer.details && <span className="text-xs text-muted-foreground">{offer.details}</span>}
+                          </div>
+                          <span className="font-medium text-blue-600">{offer.price}</span>
                         </div>
                       ))}
                     </div>

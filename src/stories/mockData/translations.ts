@@ -23,11 +23,25 @@ export const layoutUpgradeTranslations: RoomUpgradeCarouselTranslations = {
 export const bookingViewTranslations: Record<string, string> = {
   'booking.view.upgradeCost': 'Upgrade Cost',
   'booking.view.upgraded': 'Upgraded',
+  'booking.view.priceBreakdown': 'Price Breakdown',
+  'booking.view.upgrades': 'Upgrades',
+  'booking.view.specialOffers': 'Special Offers',
+  'booking.view.customizations': 'Customizations',
+  'booking.view.grandTotal': 'Grand Total',
+  'booking.view.noPriceBreakdown': 'No price breakdown available',
+  'booking.view.andMore': 'and {{count}} more...',
   'booking.cancelRequest': 'Cancel request',
 }
 
 export const bookingAccordionTranslations: Record<string, string> = {
   'booking.view.upgradeCost': 'Superior Room Selection',
   'booking.view.upgraded': 'Upgraded',
+  'booking.view.priceBreakdown': 'Price Breakdown',
+  'booking.view.upgrades': 'Upgrades',
+  'booking.view.specialOffers': 'Special Offers',
+  'booking.view.customizations': 'Customizations',
+  'booking.view.grandTotal': 'Grand Total',
+  'booking.view.noPriceBreakdown': 'No price breakdown available',
+  'booking.view.andMore': 'and {{count}} more...',
   'booking.cancelRequest': 'Cancel request',
 }

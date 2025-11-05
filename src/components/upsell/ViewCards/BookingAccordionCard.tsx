@@ -21,6 +21,15 @@ interface Upgrade {
   amountFormatted: string
 }
 
+interface SpecialOfferSummary {
+  id: number
+  title: string
+  formattedPrice: string
+  pricingType: 'perStay' | 'perPerson' | 'perNight'
+  quantity?: number
+  details?: string // e.g., "2 persons × 5 nights"
+}
+
 interface BookingAccordionCardProps {
   roomType: string
   checkInDate: string
@@ -30,12 +39,14 @@ interface BookingAccordionCardProps {
   amenities?: string[]
   hasUpgrade: boolean
   hasExtras: boolean
+  hasSpecialOffers?: boolean
   statusText: string
   isCancelled: boolean
   bookingKey: string
   internalLocator?: string
   attributesBreakdown?: Amenity[]
   upgrade?: Upgrade
+  specialOffers?: SpecialOfferSummary[]
   isPending?: boolean
   onCancelBookingClick?: (locator: string) => void
   formatDate: (date: string) => string
@@ -51,12 +62,14 @@ const BookingAccordionCard = ({
   amenities,
   hasUpgrade,
   hasExtras,
+  hasSpecialOffers = false,
   statusText,
   isCancelled,
   bookingKey,
   internalLocator,
   attributesBreakdown,
   upgrade,
+  specialOffers = [],
   isPending = false,
   onCancelBookingClick,
   formatDate,
@@ -87,7 +100,7 @@ const BookingAccordionCard = ({
           </div>
 
           {/* Pricing Section */}
-          {(hasUpgrade || hasExtras) && (
+          {(hasUpgrade || hasSpecialOffers || hasExtras) && (
             <div className="mt-2 mb-3 space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
               {hasUpgrade && upgrade && (
                 <div className="flex justify-between gap-2 text-sm">
@@ -95,6 +108,16 @@ const BookingAccordionCard = ({
                   <span className="font-medium text-green-600">{upgrade.amountFormatted}</span>
                 </div>
               )}
+              {hasSpecialOffers &&
+                specialOffers?.map((offer) => (
+                  <div key={offer.id} className="flex justify-between gap-2 text-sm">
+                    <div className="flex flex-col">
+                      <span className="text-gray-700">{offer.title}</span>
+                      {offer.details && <span className="text-xs text-gray-500">{offer.details}</span>}
+                    </div>
+                    <span className="font-medium text-blue-600">{offer.formattedPrice}</span>
+                  </div>
+                ))}
               {hasExtras &&
                 attributesBreakdown?.map((attr, index) => (
                   <div key={`${attr.attributeName}-${index}`} className="flex justify-between gap-2 text-sm">

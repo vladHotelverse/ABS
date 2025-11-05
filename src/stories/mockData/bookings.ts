@@ -50,6 +50,7 @@ export const bookingAccordionCardArgs: BookingAccordionCardProps = {
   amenities: ['Golf View', 'Balcony', 'King Size Bed'],
   hasUpgrade: true,
   hasExtras: true,
+  hasSpecialOffers: false,
   statusText: 'Confirmed',
   isCancelled: false,
   formattedTotalPrice: '€480.00',
@@ -58,5 +59,60 @@ export const bookingAccordionCardArgs: BookingAccordionCardProps = {
   attributesBreakdown: [
     { attributeName: 'Upgrade to DELUXE SUITE WITH GOLF VIEW', attributeId: 1, amountFormatted: '€720.00' },
     { attributeName: 'Close to Pool', attributeId: 2, amountFormatted: '€440.00' },
+  ],
+  upgrade: {
+    roomTypeName: 'DELUXE SUITE WITH GOLF VIEW',
+    amountFormatted: '€720.00',
+  },
+  specialOffers: [],
+}
+
+export const bookingAccordionCardArgsWithSpecialOffers: BookingAccordionCardProps = {
+  roomType: 'DELUXE OCEAN VIEW SUITE',
+  checkInDate: '2025-12-15',
+  checkOutDate: '2025-12-20',
+  occupancy: { adults: 2, childs: 1, infants: 0 },
+  roomImage: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=640&h=360&fit=crop&auto=format',
+  amenities: ['Ocean View', 'King Bed', 'Private Balcony'],
+  hasUpgrade: true,
+  hasExtras: true,
+  hasSpecialOffers: true,
+  statusText: 'Confirmed',
+  isCancelled: false,
+  formattedTotalPrice: '€1,850.00',
+  bookingKey: 'XYZ789',
+  internalLocator: 'XYZ789',
+  attributesBreakdown: [
+    { attributeName: 'Late Checkout (until 6 PM)', attributeId: 3, amountFormatted: 'Included' },
+    { attributeName: 'Pillow Menu Selection', attributeId: 4, amountFormatted: 'Included' },
+  ],
+  upgrade: {
+    roomTypeName: 'PREMIUM OCEAN VIEW SUITE',
+    amountFormatted: '€320.00',
+  },
+  specialOffers: [
+    {
+      id: 1,
+      title: 'All Inclusive Package',
+      formattedPrice: '€750.00',
+      pricingType: 'perPerson',
+      quantity: 2,
+      details: '2 persons × 5 nights',
+    },
+    {
+      id: 2,
+      title: 'Spa Package',
+      formattedPrice: '€360.00',
+      pricingType: 'perPerson',
+      details: '3 persons, selected dates: Dec 16, 17, 18',
+    },
+    {
+      id: 5,
+      title: 'Airport Transfer',
+      formattedPrice: '€70.00',
+      pricingType: 'perStay',
+      quantity: 2,
+      details: 'Round trip for 2 passengers',
+    },
   ],
 }
