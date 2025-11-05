@@ -1,3 +1,7 @@
 export { default as BookingAccordionCard } from './BookingAccordionCard'
+export { default as BookingAccordionCardV2 } from './BookingAccordionCardV2'
 export { default as BookingCardHeader } from './BookingCardHeader'
 export { default as BookingsSummarySection } from './BookingsSummarySection'
+export { CollapsibleItemCard } from './CollapsibleItemCard'
+export { VisualReceipt } from './VisualReceipt'
+export * from './utils/icons'
