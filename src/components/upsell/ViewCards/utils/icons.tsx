@@ -1,7 +1,7 @@
 import {
   ArrowUpRight,
   Utensils,
-  Spa,
+  Sparkles,
   Car,
   Clock,
   Wifi,
@@ -38,7 +38,7 @@ export const getBenefitIcon = (type: BenefitType, size: number = 16) => {
     case 'allInclusive':
       return <UtensilsCrossed {...iconProps} />
     case 'spa':
-      return <Spa {...iconProps} />
+      return <Sparkles {...iconProps} />
     case 'transport':
       return <Car {...iconProps} />
     case 'lateCheckout':
